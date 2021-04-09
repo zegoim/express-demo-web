@@ -144,9 +144,11 @@ $('#LoginRoom').on('click', util.throttle( async function () {
     }
   } else {
       if(localStream) {
+      $('#PublishID')[0].disabled = false
         updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing')
       }
       if(remoteStream) {
+      $('#PlayID')[0].disabled = false
         updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
       }
       logoutRoom(id);
@@ -181,6 +183,7 @@ $('#startPublishing').on('click', util.throttle( async function () {
 
   } else {
       if(remoteStream) {
+      $('#PlayID')[0].disabled = false
         updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
       }
       stopPublishingStream($('#pushlishInfo-id').text());

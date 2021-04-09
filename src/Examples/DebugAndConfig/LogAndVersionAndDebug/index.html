@@ -110,33 +110,57 @@
         <h4>Log Setting</h4>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <label class="input-group-text" for="inputGroupSelect01">Console Log Level</label>
+            <label class="input-group-text" for="logLevel">Console Log Level</label>
           </div>
-          <select class="custom-select" id="inputGroupSelect01">
-            <option value="debug">debug</option>
-            <option value="info">info</option>
-            <option value="warn">warn</option>
-            <option value="error">error</option>
-            <option value="report">report</option>
-            <option value="disable">disable</option>
+          <select class="custom-select" id="logLevel">
+            <option value="0">debug</option>
+            <option value="1">info</option>
+            <option value="2">warn</option>
+            <option value="3">error</option>
+            <option value="4">report</option>
+            <option value="5">disable</option>
           </select>
         </div>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <label class="input-group-text" for="inputGroupSelect01">Remote Log Level</label>
+            <label class="input-group-text" for="remoteLogLevel">Remote Log Level</label>
           </div>
-          <select class="custom-select" id="inputGroupSelect01">
-            <option value="debug">debug</option>
-            <option value="info">info</option>
-            <option value="warn">warn</option>
-            <option value="error">error</option>
-            <option value="disable">disable</option>
+          <select class="custom-select" id="remoteLogLevel">
+            <option value="0">debug</option>
+            <option value="1">info</option>
+            <option value="2">warn</option>
+            <option value="3">error</option>
+            <option value="4">disable</option>
           </select>
         </div>
-        <button type="button" class="btn btn-info">SetLogConfig</button>
-        <h4>Debug</h4>
-        <div class=""></div>
+        <button type="button" class="btn btn-info" id="SetLogConfig">
+          <div class="success-svg" id="successSvg" style="display: none;">
+            <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 48 48"
+              aria-hidden="true">
+              <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+              <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"
+                stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                <!-- M14 14 34 34 M34 14 14 34 -->
+            </svg>
+          </div>
+          SetLogConfig
+        </button>
+        <h4 class="m-t-5">Debug</h4>
+        <div class="debug-check">
+          Debug Verbose&emsp; <input type="checkbox" id="debug-check" /><label for="debug-check">Toggle</label>
+        </div>
+        <div class="KeyCenter">
+          AppID<span class="KeyCenterValue m-l-20" id="AppID"></span>
+        </div>
+        <div class="KeyCenter">
+          Server<span class="KeyCenterValue m-l-20" id="Server"></span>
+        </div>
+        <div class="KeyCenter">
+          TokenUrl<span class="KeyCenterValue m-l-20" id="TokenUrl"></span>
+        </div>
         <h4>Version</h4>
+        <div id="SDKVersion"></div>
+        <div id="DemoVersion"></div>
       </div>
     </div>
     <!-- </div> -->
@@ -148,6 +172,7 @@
   <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
   <script src="../../../assets/js/bootstrap.min.js"></script>
   <script src="../../../assets/js/custom.js"></script>
+  <script src="../../../KeyCenter.js"></script>
   <script src="index.js"></script>
 </body>
 

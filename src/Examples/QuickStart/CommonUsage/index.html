@@ -98,7 +98,8 @@
             </li>
             <span class="sidebar-title" data-lang="DebugAndConfig">调试与配置</span>
             <li>
-              <a href="../../DebugAndConfig/LogAndVersionAndDebug/index.html" class="waves-effect" data-lang="Log_Version_Debug">日志、版本号、调试信息</a>
+              <a href="../../DebugAndConfig/LogAndVersionAndDebug/index.html" class="waves-effect"
+                data-lang="Log_Version_Debug">日志、版本号、调试信息</a>
             </li>
           </ul>
         </nav>
@@ -110,23 +111,38 @@
         <div class="row">
           <div class="col-12 col-lg-6 preview-wrapper">
             <div class="preview-roomInfo">
-              RoomID:&nbsp;<span id="roomInfo-id"></span>
-              RoomState<span id="roomInfo-state"></span>
+              RoomID:&nbsp;<div id="roomInfo-id" class="m-r-10"></div>
+              RoomState:&nbsp;<div id="roomInfo-state">
+                <div class="success-svg" id="roomStateSuccessSvg" style="display: none;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+                <div class="error-svg" id="roomStateErrorSvg" style="display: inline-block;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+              </div>
             </div>
-            <div class="preview-pushlishInfo">
-              <div class="pushlishInfo-title">
-                Preview&emsp;PublishStreamID: <span id="pushlishInfo-id"></span>
+            <div class="row">
+              <div class="preview-pushlishInfo col-lg-12 col-6">
+                <div class="pushlishInfo-title">
+                  Preview&emsp;PublishStreamID: <span id="pushlishInfo-id"></span>
+                </div>
+                <div class="preview-content">
+                  <video id="pubshlishVideo" autoplay muted playsinline></video>
+                </div>
               </div>
-              <div class="preview-content">
-                <video id="pubshlishVideo" autoplay muted playsinline></video>
-              </div>
-            </div>
-            <div class="preview-playInfo m-t-10">
-              <div class="pushlishInfo-title">
-                Play Stream&emsp;StreamID: <span id="playInfo-id"></span>
-              </div>
-              <div class="preview-content">
-                <video id="playVideo" autoplay muted playsinline></video>
+              <div class="preview-playInfo m-t-10 col-lg-12 col-6">
+                <div class="pushlishInfo-title">
+                  Play Stream&emsp;StreamID: <span id="playInfo-id"></span>
+                </div>
+                <div class="preview-content">
+                  <video id="playVideo" autoplay muted playsinline></video>
+                </div>
               </div>
             </div>
           </div>
@@ -136,7 +152,17 @@
                 Step1&emsp;<span class="action-info">Create ZegoExpressEngine</span>
               </div>
               <div class="btn-wrapper">
-                <button id="CreateZegoExpressEngine" type="button" class="btn-outline-info btn cuBtn">Setup</button>
+                <button id="CreateZegoExpressEngine" type="button" class="btn-outline-info btn cuBtn">
+                  <div class="success-svg" id="createSuccessSvg" style="display: none;">
+                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height=15 width="15"
+                      viewBox="0 0 48 48" aria-hidden="true">
+                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                    </svg>
+                  </div>
+                  Create Egine
+                </button>
               </div>
             </div>
             <div class="action-step">
@@ -144,8 +170,36 @@
                 Step2&emsp;<span class="action-info">Test Compatiblity</span>
               </div>
               <div class="btn-wrapper">
-                <button id="CheckSystemRequire" type="button" class="btn-outline-info btn cuBtn">Test
-                  Compatiblity</button>
+                <button id="CheckSystemRequire" type="button" class="btn-outline-info btn cuBtn">
+                  <div class="success-svg" id="checkSuccessSvg" style="display: none;">
+                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
+                      viewBox="0 0 48 48" aria-hidden="true">
+                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                    </svg>
+                  </div>
+                  <div class="error-svg" id="checkErrorSvg" style="display: none;">
+                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
+                      viewBox="0 0 48 48" aria-hidden="true">
+                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 14 34 34 M34 14 14 34" />
+                    </svg>
+                  </div>
+                  <div class="warn-svg" id="checkWarnSvg" style="display: none;">
+                    <svg t="1617876217862" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                      xmlns="http://www.w3.org/2000/svg" p-id="8340" width="15" height="15">
+                      <circle class="circle" fill="#5bb543" cx="512" cy="512" r="510" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        d="M512 736.1m-63 0a63 63 0 1 0 126 0 63 63 0 1 0-126 0Z" fill="#FFFFFF" p-id="8344"></path>
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-miterlimit="10"
+                        d="M512 611.8s63-220.5 63-306.3S549.5 204 512 204s-63 15.8-63 101.5 63 306.3 63 306.3z"></path>
+                    </svg>
+                  </div>
+                  Test Compatiblity
+                </button>
               </div>
             </div>
             <div class="action-step">
@@ -157,11 +211,12 @@
                   <div class="action-roomId">
                     RoomID <input type="text" id="RoomID" />
                   </div>
-                  <div class="action-userId">
-                    UserID <input type="text" id="UserID" />
+                  <div class="action-userName">
+                    UserName <input type="text" id="UserName" />
                   </div>
                 </div>
-                <button id="LoginRoom" type="button" class="btn-outline-info btn cuBtn">Login Room</button>
+                <!-- <button id="LoginRoom" type="button" class="btn-outline-info btn cuBtn">Login Room</button> -->
+                <button id="LoginRoom" class="play-pause-button">Login Room</button>
               </div>
             </div>
             <div class="action-step">
@@ -175,7 +230,7 @@
                     <div class="font-12 publish-check m-b-15">
                       <div class="check-wrappre m-r-5">
                         <label class="form-check-label m-r-5" for="Camera">Camera</label>
-                        <input class="check-input" type="checkbox" id="Camera">
+                        <input class="check-input" type="checkbox" id="Camera" disabled>
                       </div>
                       <div class="check-wrappre">
                         <label class="form-check-label m-r-5" for="Microphone">Microphone</label>
@@ -183,8 +238,9 @@
                       </div>
                     </div>
                   </div>
-                  <button id="startPublishing" type="button" class="btn-outline-info btn cuBtn">Strat
-                    Publishing</button>
+                  <!-- <button id="startPublishing" type="button" class="btn-outline-info btn cuBtn">Start
+                    Publishing</button> -->
+                  <button id="startPublishing" class="play-pause-button">Start Publishing</button>
                   <div class="publish-setting m-t-10">
                     <div class="font-12 select-wrapper">
                       Mirror
@@ -211,7 +267,7 @@
                     <div class="font-12 publish-check m-b-15">
                       <div class="check-wrappre m-r-5">
                         <label class="form-check-label m-r-5" for="Video">Video</label>
-                        <input class="check-input" type="checkbox" id="Video">
+                        <input class="check-input" type="checkbox" id="Video" disabled>
                       </div>
                       <div class="check-wrappre">
                         <label class="form-check-label m-r-5" for="Audio">Audio</label>
@@ -219,7 +275,7 @@
                       </div>
                     </div>
                   </div>
-                  <button id="startPlaying" type="button" class="btn btn-outline-info cuBtn">Strat Playing</button>
+                  <button id="startPlaying" class="play-pause-button">Start Playing</button>
                 </div>
               </div>
             </div>
@@ -236,6 +292,7 @@
   <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
   <script src="../../../assets/js/bootstrap.min.js"></script>
   <script src="../../../assets/js/custom.js"></script>
+  <script src="../../../KeyCenter.js"></script>
   <script src="index.js"></script>
 </body>
 

@@ -1,13 +1,18 @@
 // require('../../../../jquery')
-let appID = 1739272706;
-let server = 'wss://webliveroom-test.zego.im/ws';
-let tokenUrl = 'https://wsliveroom-demo.zego.im:8282/token';
+// let appID = 1739272706;   // from  /src/KeyCenter.js
+// let server = 'wss://webliveroom-test.zego.im/ws';  // from  /src/KeyCenter.js
+// let tokenUrl = 'https://wsliveroom-demo.zego.im:8282/token';  // from  /src/KeyCenter.js
 let userID = Util.getBrow() + '_' + new Date().getTime();
 let roomID = '0001'
+let streamID = '0001'
 
-let loaclStream = null;
-let remoteStream = null;
 let zg = null;
+let isChecked = false;
+let isLoginRoom = false;
+let localStream = null;
+let remoteStream = null;
+let published = false;
+let played = false;
 
 // Step1 Create ZegoExpressEngine
 function createZegoExpressEngine() {
@@ -16,7 +21,7 @@ function createZegoExpressEngine() {
 }
 
 // Step2 Login room
-function loginRoom(userId, userName) {
+function loginRoom(roomId, userId, userName) {
   return new Promise((resolve, reject) => {
     $.get(
       tokenUrl,
@@ -26,7 +31,7 @@ function loginRoom(userId, userName) {
       },
       async (token) => {
         try {
-          await zg.loginRoom(roomID, token, {
+          await zg.loginRoom(roomId, token, {
             userID: userId,
             userName
           });
@@ -39,12 +44,19 @@ function loginRoom(userId, userName) {
   })
 }
 
+// Step2 Logout room
+function logoutRoom(roomId) {
+  clearStream('room')
+  zg.logoutRoom(roomId)
+}
+
 // Step3 Start Publishing Stream
 
-async function startPublishingStream (config, options = {}) {
+async function startPublishingStream (streamId, config) {
   try {
-    loaclStream = await zg.createStream(config);
-    zg.startPublishingStream(streamID, loaclStream, options);
+    localStream = await zg.createStream(config);
+    zg.startPublishingStream(streamId, localStream);
+    $('#pubshlishVideo')[0].srcObject = localStream;
     return true
   } catch(err) {
     return false
@@ -52,32 +64,190 @@ async function startPublishingStream (config, options = {}) {
   
 }
 
+//Step3 Stop Publishing Stream
+async function stopPublishingStream(streamId) {
+  zg.stopPublishingStream(streamId)
+  clearStream('publish')
+}
 
 // Step4 Start Play Stream
 async function startPlayingStream(streamId, options = {}) {
   try {
     remoteStream = await zg.startPlayingStream(streamId, options)
+    $('#playVideo')[0].srcObject = remoteStream;
     return true
   } catch (err) {
     return false
   }
 }
 
+// Step4 Stop Play Stream
+async function stopPlayingStream(streamId) {
+  zg.stopPlayingStream(streamId)
+  clearStream()
+}
+
 $('#CreateZegoExpressEngine').on('click', function () {
   createZegoExpressEngine()
-  this.setAttribute('class', 'btn-info btn cuBtn')
+  // this.setAttribute('class', 'btn-info btn cuBtn')
   this.setAttribute('disabled', 'disabled')
-  this.innerText = 'create success'
+  $('#createSuccessSvg').css('display', 'inline-block')
+  initEvent()
 });
 
 $('#CheckSystemRequire').on('click', async function () {
   if(!zg) return alert('you should create zegoExpressEngine')
   const result = await checkSystemRequirements();
   if(result) {
-    this.setAttribute('class', 'btn-info btn cuBtn')
+    this.setAttribute('disabled', 'disabled')
+    $('#checkSuccessSvg').css('display', 'inline-block')
+    enumDevices()
+  } else {
+    this.setAttribute('class', 'btn-outline-danger btn cuBtn')
+    $('#checkErrorSvg').css('display', 'inline-block')
   }
+  isChecked = true;
 })
 
+$('#LoginRoom').on('click', util.throttle( async function () {
+  if(!zg) return alert('should create zegoExpressEngine')
+  if(!isChecked) return alert('should test compatiblity')
+
+  const userName = $('#UserName').val()
+  const id = $('#RoomID').val()
+
+  if(!userName) return alert('UserName is Empty')
+  if(!id) return alert('RoomID is Empty')
+  this.classList.add('border-primary')
+  if(!isLoginRoom) {
+    try {
+      await loginRoom(id, userID, userName);
+      updateButton(this, 'Login Room', 'Logout Room')
+      isLoginRoom = true;
+      $('#UserName')[0].disabled = true
+      $('#RoomID')[0].disabled = true
+      $('#roomStateSuccessSvg').css('display', 'inline-block')
+      $('#roomStateErrorSvg').css('display', 'none')
+    } catch(err) {
+      this.classList.remove('border-primary');
+      this.classList.add('border-error')
+      this.innerText = 'Login Fail Try Again'
+    }
+  } else {
+      logoutRoom(id);
+      updateButton(this, 'Login Room', 'Logout Room')
+      updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing')
+      updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+      isLoginRoom = false;
+      $('#UserName')[0].disabled = false
+      $('#RoomID')[0].disabled = false
+      $('#roomStateSuccessSvg').css('display', 'none')
+      $('#roomStateErrorSvg').css('display', 'inline-block')
+  }
+}, 500))
+
+$('#startPublishing').on('click', util.throttle( async function () {
+  if(!zg) return alert('should create zegoExpressEngine')
+  if(!isChecked) return alert('should test compatiblity')
+  if(!isLoginRoom) return alert('should login room')
+
+  const id = $('#PublishID').val()
+  if(!id) return alert('StreamID is Empty')
+  this.classList.add('border-primary')
+  if(!published) {
+      const flag =  await startPublishingStream(id, getCreateStreamConfig());
+      if(flag) {
+        updateButton(this, 'Start Publishing', 'Stop Publishing');
+        published = true
+        $('#PublishID')[0].disabled = true
+      } else {
+        this.classList.remove('border-primary');
+        this.classList.add('border-error')
+        this.innerText = 'Publishing Fail Try Again'
+      }
+
+  } else {
+      stopPublishingStream($('#pushlishInfo-id').text());
+      updateButton(this, 'Start Publishing', 'Stop Publishing')
+      updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+      published = false
+      $('#PublishID')[0].disabled = false
+  }
+}, 500))
+
+$('#startPlaying').on('click', util.throttle( async function () {
+  if(!zg) return alert('should create zegoExpressEngine')
+  if(!isChecked) return alert('should test compatiblity')
+  if(!isLoginRoom) return alert('should login room')
+
+  const id = $('#PlayID').val()
+  if(!id) return alert('StreamID is Empty')
+  this.classList.add('border-primary')
+  if(!played) {
+      const config = {
+        video: $('#Video')[0].checked,
+        audio: $('#Audio')[0].checked
+      }
+      const flag =  await startPlayingStream(id, config);
+      if(flag) {
+        updateButton(this, 'Start Playing', 'Stop Playing');
+        played = true
+        $('#PlayID')[0].disabled = true
+      } else {
+        this.classList.remove('border-primary');
+        this.classList.add('border-error')
+        this.innerText = 'Playing Fail Try Again'
+      }
+
+  } else {
+      stopPlayingStream($('#playInfo-id').text());
+      updateButton(this, 'Start Playing', 'Stop Playing')
+      played = false
+      $('#PlayID')[0].disabled = false
+  }
+}, 500))
+
+function updateButton(button, preText, afterText) {
+  if (button.classList.contains('playing')) {
+    button.classList.remove('paused', 'playing', 'border-error', 'border-primary');
+    button.classList.add('paused');
+    button.innerText = afterText
+  } else {
+    if (button.classList.contains('paused')) {
+      button.classList.remove('border-error', 'border-primary');
+      button.classList.add('playing');
+      button.innerText = preText
+    }
+  }
+  if (!button.classList.contains('paused')) {
+    button.classList.remove('border-error', 'border-primary');
+    button.classList.add('paused');
+    button.innerText = afterText
+  }
+}
+
+function render() {
+  $('#roomInfo-id').text(roomID)
+  $('#RoomID').val(roomID)
+  $('#UserName').val(userID)
+  $('#PublishID').val(streamID)
+  $('#PlayID').val(streamID)
+  $('#Camera')[0].checked = true
+  $('#Microphone')[0].checked = true
+  $('#Video')[0].checked = true
+}
+
+function a () {
+  return new Promise((res, rej) => {
+    if(zg) {
+      res()
+    } else {
+      rej()
+    }
+  })
+}
+
+render()
 
 async function checkSystemRequirements() {
   console.log('sdk version is', zg.getVersion());
@@ -139,6 +309,61 @@ async function enumDevices() {
   audioInputList.push('<option value="0">禁止</option>');
   videoInputList.push('<option value="0">禁止</option>');
 
-  $('#audioList').html(audioInputList.join(''));
-  $('#videoList').html(videoInputList.join(''));
+  $('#MirrorDevices').html(audioInputList.join(''));
+  $('#CameraDevices').html(videoInputList.join(''));
+}
+
+function getCreateStreamConfig() {
+  const config = {
+    camera: {
+      audioInput: $('#MirrorDevices').val(),
+      videoInput: $('#CameraDevices').val(),
+      video:  $('#Camera')[0].checked,
+      audio: $('#Microphone')[0].checked,
+    },
+  }
+  return config
+}
+
+function initEvent() {
+  zg.on('publisherStateUpdate', result => {
+    if(result.state === "PUBLISHING") {
+      $('#pushlishInfo-id').text(result.streamID)
+    } else if(result.state === "NO_PUBLISH") {
+      $('#pushlishInfo-id').text('')
+    }
+  })
+
+  zg.on('playerStateUpdate', result => {
+    if(result.state === "PLAYING") {
+      $('#playInfo-id').text(result.streamID)
+    } else if(result.state === "NO_PLAY") {
+      console.log(111);
+      $('#playInfo-id').text('')
+    }
+  })
+
+}
+
+function clearStream(flag) {
+  if(localStream && flag) {
+    zg.destroyStream(localStream);
+  }
+  if(remoteStream) {
+    zg.destroyStream(remoteStream);
+  }
+  if(flag) {
+    $('#pubshlishVideo')[0].srcObject = null;
+    localStream = null;
+  }
+  $('#playVideo')[0].srcObject = null;
+  remoteStream = null;
+  if(flag === 'room') {
+    isLoginRoom = false
+  }
+  if(flag === 'room' || flag === 'publish') {
+    published = false
+  }
+
+  played = false
 }

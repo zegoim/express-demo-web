@@ -1,6 +1,113 @@
 select {
   flex: 0 1 45% !important;
-  /* height: 21px !important; */
-  /* padding: 0 !important; */
-  /* font-size: 12px !important; */
 }
+
+.KeyCenter {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.KeyCenterValue {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.debug-check {
+	display: flex;
+	align-items: center;
+}
+
+.debug-check > input[type=checkbox]{
+	height: 0;
+	width: 0;
+	visibility: hidden;
+}
+
+.debug-check > label {
+	cursor: pointer;
+	text-indent: -9999px;
+	width: 40px;
+	height: 20px;
+	background: grey;
+	display: inline-block;
+	border-radius: 100px;
+	position: relative;
+	margin-bottom: 0;
+}
+
+.debug-check > label:after {
+	content: '';
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	background: #fff;
+	border-radius: 100%;
+	transition: 0.3s;
+}
+
+.debug-check > input:checked + label {
+	background: #009efb;
+}
+
+.debug-check > input:checked + label:after {
+	left: calc(100% - 2px);
+	transform: translateX(-100%);
+}
+
+.debug-check > label:active:after {
+	width: 23px;
+}
+
+/* @supports (animation: grow 0.5s cubic-bezier(0.25, 0.25, 0.25, 1) forwards) {
+	.tick {
+		stroke-opacity: 0;
+		stroke-dasharray: 29px;
+		stroke-dashoffset: 29px;
+		animation: draw 0.5s cubic-bezier(0.25, 0.25, 0.25, 1) forwards;
+		animation-delay: 0.6s;
+	}
+
+	.circle {
+		fill-opacity: 0;
+		stroke: #fff;
+		stroke-width: 16px;
+		transform-origin: center;
+		transform: scale(0);
+		animation: grow 1s cubic-bezier(0.25, 0.25, 0.25, 1.25) forwards;
+	}
+}
+
+@keyframes grow {
+	60% {
+		transform: scale(0.8);
+		stroke-width: 4px;
+		fill-opacity: 0;
+	}
+
+	100% {
+		transform: scale(0.9);
+		stroke-width: 8px;
+		fill-opacity: 1;
+		fill: #219a00;
+		stroke: #219a00;
+		/* #00CCAA */
+	}
+}
+
+@keyframes draw {
+
+	0%,
+	100% {
+		stroke-opacity: 1;
+	}
+
+	100% {
+		stroke-dashoffset: 0;
+	}
+}
+
+:root {
+	--theme-color: var(--color-purple);
+} */

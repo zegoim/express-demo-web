@@ -179,4 +179,19 @@ util.getCgi = (appId, serverUrl, cgi) => {
     // Test code end
 }
 
+util.throttle = (fn, delay = 300) => {
+    let preTime = Date.now()
+
+    return function() {
+        const context = this
+        let args = arguments
+        let doTime = Date.now()
+        if (doTime - preTime >= delay) {
+            fn.apply(context, args)
+            preTime = Date.now()
+        }
+    }
+  
+}
+
 window.Util = util;

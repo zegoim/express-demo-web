@@ -7654,3 +7654,235 @@ a.mytooltip {
     padding-left: 0;
   }
 }
+
+
+@supports (animation: grow 0.5s cubic-bezier(0.25, 0.25, 0.25, 1) forwards) {
+	.success-svg  .tick {
+		stroke-opacity: 0;
+		stroke-dasharray: 29px;
+		stroke-dashoffset: 29px;
+		animation: draw 0.5s cubic-bezier(0.25, 0.25, 0.25, 1) forwards;
+		animation-delay: 0.6s;
+	}
+
+	.success-svg  .circle {
+		fill-opacity: 0;
+		stroke: #fff;
+		stroke-width: 16px;
+		transform-origin: center;
+		transform: scale(0);
+		animation: grow 1s cubic-bezier(0.25, 0.25, 0.25, 1.25) forwards;
+	}
+
+  .error-svg .tick {
+		stroke-opacity: 0;
+		stroke-dasharray: 29px;
+		stroke-dashoffset: 29px;
+		animation: draw-error 0.5s cubic-bezier(0.25, 0.25, 0.25, 1) forwards;
+		animation-delay: 0.6s;
+	}
+
+  .error-svg .circle {
+		fill-opacity: 0;
+		stroke: #fff;
+		stroke-width: 16px;
+		transform-origin: center;
+		transform: scale(0);
+		animation: grow-error 1s cubic-bezier(0.25, 0.25, 0.25, 1.25) forwards;
+	}
+
+  .warn-svg .tick {
+    stroke-opacity: 0;
+    stroke-dasharray: 29px;
+    stroke-dashoffset: 29px;
+    animation: draw-warn 0.5s cubic-bezier(0.25, 0.25, 0.25, 1) forwards;
+    animation-delay: 0.8s;
+  }
+
+  .warn-svg .circle {
+    fill-opacity: 0;
+    stroke: #fff;
+    stroke-width: 16px;
+    transform-origin: center;
+    transform: scale(0);
+    animation: grow-warn 1s cubic-bezier(0.25, 0.25, 0.25, 1.25) forwards;
+  }
+}
+
+@keyframes grow {
+	60% {
+		transform: scale(0.8);
+		stroke-width: 4px;
+		fill-opacity: 0;
+	}
+
+	100% {
+		transform: scale(0.9);
+		stroke-width: 8px;
+		fill-opacity: 1;
+		fill: #219a00;
+		stroke: #219a00;
+		/* #00CCAA */
+	}
+}
+
+@keyframes draw {
+
+	0%,
+	100% {
+		stroke-opacity: 1;
+	}
+
+	100% {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes grow-error {
+	60% {
+		transform: scale(0.8);
+		stroke-width: 4px;
+		fill-opacity: 0;
+	}
+
+	100% {
+		transform: scale(0.9);
+		stroke-width: 8px;
+		fill-opacity: 1;
+		fill: #f62d51;
+		stroke: #f62d51;
+		/* #00CCAA */
+	}
+}
+
+@keyframes draw-error {
+
+	0%,
+	100% {
+		stroke-opacity: 1;
+	}
+
+	100% {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes grow-warn {
+  60% {
+    transform: scale(0.8);
+    stroke-width: 4px;
+    fill-opacity: 0;
+  }
+
+  100% {
+    transform: scale(0.9);
+    stroke-width: 8px;
+    fill-opacity: 1;
+    fill: #E9994B;
+    stroke: #E9994B;
+  }
+}
+
+@keyframes draw-warn  {
+
+  0%,
+  100% {
+    stroke-opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+    fill: #fff;
+  }
+}
+
+:root {
+	--theme-color: var(--color-purple);
+}
+
+.border-error {
+  border: 1px solid #f62d51 !important;
+  color: #f62d51 !important;
+}
+
+.border-primary {
+  border: 1px solid #009efb !important;
+  color: #009efb !important;
+}
+
+.play-pause-button {
+  --play: #009efb;
+  --play-shadow: rgba(109, 88, 255, 0.24);
+  --pause: rgb(252, 250, 250);
+  --pause-shadow: rgba(43, 48, 68, 0.24);
+  --color: #fff;
+  margin: 0;
+  line-height: 20px;
+  font-size: 14px;
+  padding:  0 14px;
+  border-radius: 0.25rem;
+  border: 1px solid #009efb;
+  background: none;
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  position: relative;
+  backface-visibility: hidden;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateY(var(--y, 0)) translateZ(0);
+  justify-content: center;
+  color: #009efb;
+  /* box-shadow: 0 var(--shadow-y, 6px) var(--shadow-b, 16px) var(--shadow, var(--pause-shadow)); */
+  background: radial-gradient(circle, var(--play) -0%, var(--play) 50%, var(--pause) 50.5%, var(--pause) 100%);
+  background-size: 405% 400%;
+  background-position: 0% 0%;
+  width: 95%;
+  height: 30px;
+  line-height: 30px;
+  transition: background 1s, box-shadow 0.3s, transform .8s;
+}
+
+.play-pause-button:hover {
+  --y: -1px;
+  --shadow-y: 8px;
+  --shadow-b: 20px;
+}
+
+.play-pause-button:active {
+  --y: 1px;
+  --shadow-y: 4px;
+  --shadow-b: 12px;
+}
+
+.play-pause-button.paused {
+  --shadow: var(--play-shadow);
+  animation: var(--name, background-paused) 0.8s ease forwards;
+}
+
+
+.play-pause-button.paused.playing {
+  --shadow: var(--pause-shadow);
+  --name: background-playing;
+}
+
+@keyframes background-paused {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 50% 50%;
+    color: #fff;
+  }
+}
+
+@keyframes background-playing {
+  from {
+    background-position: 50% 50%;
+  }
+
+  to {
+    background-position: 100% 100%;
+  }
+}

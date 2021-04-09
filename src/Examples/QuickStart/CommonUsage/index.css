@@ -1,3 +1,7 @@
+.pushlishInfo-title {
+  font-weight: 500;
+}
+
 .preview-content {
   width: auto;
   height: 200px;
@@ -5,8 +9,21 @@
 }
 
 .preview-content > video {
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
+}
+.preview-roomInfo {
+  font-weight: 500;
+}
+
+#roomInfo-id {
+  display: inline-block;
+  font-weight: normal;
+}
+
+#roomInfo-state {
+  display: inline-block;
+  font-weight: normal;
 }
 
 
@@ -114,4 +131,10 @@ select {
 option {
   height: 21px !important;
   font-size: 14px;
+}
+
+@media (max-width: 375px) {
+  .preview-playInfo {
+    margin-top: 0 !important;
+  }
 }

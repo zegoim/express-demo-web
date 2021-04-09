@@ -143,14 +143,14 @@ $('#LoginRoom').on('click', util.throttle( async function () {
       this.innerText = 'Login Fail Try Again'
     }
   } else {
-      logoutRoom(id);
-      updateButton(this, 'Login Room', 'Logout Room')
       if(localStream) {
         updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing')
       }
       if(remoteStream) {
         updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
       }
+      logoutRoom(id);
+      updateButton(this, 'Login Room', 'Logout Room')
       isLoginRoom = false;
       $('#UserName')[0].disabled = false
       $('#RoomID')[0].disabled = false
@@ -180,11 +180,11 @@ $('#startPublishing').on('click', util.throttle( async function () {
       }
 
   } else {
-      stopPublishingStream($('#pushlishInfo-id').text());
-      updateButton(this, 'Start Publishing', 'Stop Publishing')
       if(remoteStream) {
         updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
       }
+      stopPublishingStream($('#pushlishInfo-id').text());
+      updateButton(this, 'Start Publishing', 'Stop Publishing')
       published = false
       $('#PublishID')[0].disabled = false
   }

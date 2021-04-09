@@ -46,8 +46,14 @@ function loginRoom(roomId, userId, userName) {
 
 // Step2 Logout room
 function logoutRoom(roomId) {
-  clearStream('room')
+  if(localStream) {
+    stopPublishingStream($('#pushlishInfo-id').text())
+  }
+  if(remoteStream) {
+    stopPlayingStream($('#playInfo-id').text())
+  }
   zg.logoutRoom(roomId)
+  clearStream('room')
 }
 
 // Step3 Start Publishing Stream
@@ -67,6 +73,9 @@ async function startPublishingStream (streamId, config) {
 //Step3 Stop Publishing Stream
 async function stopPublishingStream(streamId) {
   zg.stopPublishingStream(streamId)
+  if(remoteStream) {
+    stopPlayingStream($('#playInfo-id').text())
+  }
   clearStream('publish')
 }
 
@@ -136,8 +145,12 @@ $('#LoginRoom').on('click', util.throttle( async function () {
   } else {
       logoutRoom(id);
       updateButton(this, 'Login Room', 'Logout Room')
-      updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing')
-      updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+      if(localStream) {
+        updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing')
+      }
+      if(remoteStream) {
+        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+      }
       isLoginRoom = false;
       $('#UserName')[0].disabled = false
       $('#RoomID')[0].disabled = false
@@ -169,7 +182,9 @@ $('#startPublishing').on('click', util.throttle( async function () {
   } else {
       stopPublishingStream($('#pushlishInfo-id').text());
       updateButton(this, 'Start Publishing', 'Stop Publishing')
-      updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+      if(remoteStream) {
+        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+      }
       published = false
       $('#PublishID')[0].disabled = false
   }

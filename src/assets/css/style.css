@@ -189,6 +189,10 @@ ol li {
   padding-top: 0px!important
 }
 
+.p-t-5 {
+  padding-top: 5px!important
+}
+
 .p-t-10 {
   padding-top: 10px!important
 }
@@ -7884,5 +7888,103 @@ a.mytooltip {
 
   to {
     background-position: 100% 100%;
+  }
+}
+
+
+.dropdown {
+  border-radius: 5px 0 0 0;
+  position: relative;
+  cursor: pointer;
+}
+
+ul.drop {
+  position: absolute;
+  top: 100%;
+  left: 0%;
+  padding: 0;
+  margin: 0;
+}
+ul.drop li {
+  background: #666;
+  /* color: rgba(255, 255, 255, 0.7); */
+}
+
+ul.drop li:hover {
+  background: #606060;
+}
+
+ul.drop li:first-child {
+  border-top-right-radius: 5px;
+}
+
+ul.drop li:last-child {
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+ul.drop li {
+  display: none;
+}
+
+.dropdown:hover>a {
+  text-decoration: underline;
+}
+.dropdown:hover>ul.drop {
+  perspective: 1000px;
+}
+.dropdown:hover>ul.drop>li {
+  display: block;
+  opacity: 0;
+  /* width: auto; */
+}
+.dropdown:hover>ul.drop>li:nth-child(odd) {
+  background: #ecebe5;
+  -webkit-animation-name: menu1;
+  animation-name: menu1;
+  -webkit-animation-duration: 300ms;
+  animation-duration: 300ms;
+  -webkit-animation-delay: 0ms;
+  animation-delay: 0ms;
+  -webkit-animation-timing-function: ease-in-out;
+  animation-timing-function: ease-in-out;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+.dropdown:hover>ul.drop>li:nth-child(even) {
+  background: rgb(252, 250, 250);
+  -webkit-animation-name: menu1;
+  animation-name: menu1;
+  -webkit-animation-duration: 300ms;
+  animation-duration: 300ms;
+  -webkit-animation-delay: 150ms;
+  animation-delay: 150ms;
+  -webkit-animation-timing-function: ease-in-out;
+  animation-timing-function: ease-in-out;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+@-webkit-keyframes menu1 {
+  0% {
+    opacity: 0;
+    transform: rotateY(-90deg) translateY(30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotateY(0deg) translateY(0px);
+  }
+}
+
+@keyframes menu1 {
+  0% {
+    opacity: 0;
+    transform: rotateY(-90deg) translateY(30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotateY(0deg) translateY(0px);
   }
 }

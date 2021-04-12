@@ -25,6 +25,7 @@ $('#SetLogConfig').on('click', function() {
   setLogConfig(config);
   localStorage.setItem('logLevel', logSelectIndex);
   localStorage.setItem('remoteLogLevel', remoreLogSelectIndex);
+  localStorage.setItem('logConfig', JSON.stringify(config));
   $('#successSvg').css("display", "inline-block")
 })
 

@@ -3,8 +3,8 @@
 // let server = 'wss://webliveroom-test.zego.im/ws';  // from  /src/KeyCenter.js
 // let tokenUrl = 'https://wsliveroom-demo.zego.im:8282/token';  // from  /src/KeyCenter.js
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0001'
-let streamID = '0001'
+let roomID = '0004'
+let streamID = '0004'
 
 let zg = null;
 let isChecked = false;
@@ -186,12 +186,10 @@ $('#startPublishing').on('click', util.throttle( async function () {
         updateButton(this, 'Start Publishing', 'Stop Publishing');
         published = true
         $('#PublishID')[0].disabled = true
-        changeVideo()
       } else {
         this.classList.remove('border-primary');
         this.classList.add('border-error')
         this.innerText = 'Publishing Fail Try Again'
-        changeVideo(true)
       }
 
   } else {
@@ -203,7 +201,6 @@ $('#startPublishing').on('click', util.throttle( async function () {
       updateButton(this, 'Start Publishing', 'Stop Publishing')
       published = false
       $('#PublishID')[0].disabled = false
-      changeVideo(true)
   }
 }, 500))
 
@@ -331,7 +328,7 @@ async function enumDevices() {
   audioInputList.push('<option value="0">禁止</option>');
   videoInputList.push('<option value="0">禁止</option>');
 
-  // $('#MirrorDevices').html(audioInputList.join(''));
+  $('#MirrorDevices').html(audioInputList.join(''));
   $('#CameraDevices').html(videoInputList.join(''));
 }
 
@@ -387,21 +384,4 @@ function clearStream(flag) {
   }
 
   played = false
-}
-
-function changeVideo(flag) {
-  if(flag) {
-    $('#pubshlishVideo').css('transform', 'none')
-    $('#playVideo').css('transform', 'none')
-    return
-  }
-  const value =  $('#Mirror').val()
-  if(value === 'onlyPreview') {
-    $('#pubshlishVideo').css('transform', 'scale(-1, 1)')
-  } else if(value === 'onlyPlay'){
-    $('#playVideo').css('transform', 'scale(-1, 1)')
-  } else if(value === 'both') {
-    $('#pubshlishVideo').css('transform', 'scale(-1, 1)')
-    $('#playVideo').css('transform', 'scale(-1, 1)')
-  }
 }

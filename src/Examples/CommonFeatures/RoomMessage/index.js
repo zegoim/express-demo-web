@@ -2,6 +2,11 @@
 // let appID;   // from  /src/KeyCenter.js
 // let server;  // from  /src/KeyCenter.js
 // let tokenUrl;  // from  /src/KeyCenter.js
+
+// ============================================================== 
+// This part of the code defines the default values and global values 
+// ============================================================== 
+
 let userID = Util.getBrow() + '_' + new Date().getTime();
 let roomID = '0007'
 let streamID = '0007'
@@ -13,6 +18,12 @@ let localStream = null;
 let remoteStream = null;
 let published = false;
 let played = false;
+
+// part end
+
+// ============================================================== 
+// This part of the code uses the SDK
+// ==============================================================  
 
 function createZegoExpressEngine() {
   zg = new ZegoExpressEngine(appID, server);
@@ -158,6 +169,12 @@ async function setRoomExtraInfo(roomId, key, value) {
   }
 }
 
+// uses SDK end
+
+
+// ============================================================== 
+// This part of the code binds the button click event
+// ==============================================================  
 
 $('#startPublishing').on('click', util.throttle( async function () {
   const id = $('#PublishID').val();
@@ -282,6 +299,12 @@ $('#RoomExtraInfoBtn').on('click', util.throttle(async function() {
   }
 }, 500))
 
+// bind event end
+
+
+// ============================================================== 
+// This part of the code bias tool
+// ============================================================== 
 
 function initEvent() {
   zg.on('publisherStateUpdate', result => {
@@ -419,6 +442,12 @@ function reSetVideoInfo(flag) {
   }
 }
 
+// tool end
+
+// ============================================================== 
+// This part of the code Initialization web page
+// ============================================================== 
+
 async function render() {
   $('#roomInfo-id').text(roomID)
   $('#RoomID').val(roomID)
@@ -444,3 +473,5 @@ async function render() {
 }
 
 render()
+
+// Initialization end

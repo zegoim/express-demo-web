@@ -2,7 +2,12 @@
 // let appID;   // from  /src/KeyCenter.js
 // let server;  // from  /src/KeyCenter.js
 // let tokenUrl;  // from  /src/KeyCenter.js
-let userID = Util.getBrow() + '_' + new Date().getTime();
+
+// ============================================================== 
+// This part of the code defines the default values and global values 
+// ============================================================== 
+
+let userID = util.getBrow() + '_' + new Date().getTime();
 let roomID = '0004'
 let streamID = '0004'
 
@@ -16,6 +21,12 @@ let played = false;
 let playMultipleStreamList = [];
 let palyedObj = {};
 let playMultipleUserList = [];
+
+// part end
+
+// ============================================================== 
+// This part of the code uses the SDK
+// ==============================================================  
 
 function createZegoExpressEngine() {
   zg = new ZegoExpressEngine(appID, server);
@@ -98,7 +109,7 @@ function loginRoom(roomId, userId, userName) {
           await zg.loginRoom(roomId, token, {
             userID: userId,
             userName
-          });
+          }, { userUpdate: true });
           resolve()
         } catch (err) {
           reject()
@@ -164,6 +175,12 @@ async function stopPlayingStream(streamId) {
   clearStream()
 }
 
+// uses SDK end
+
+
+// ============================================================== 
+// This part of the code binds the button click event
+// ==============================================================   
 
 $('#startPublishing').on('click', util.throttle( async function () {
   this.classList.add('border-primary')
@@ -218,6 +235,12 @@ $('#startPlaying').on('click', util.throttle( async function () {
   }
 }, 500))
 
+// bind event end
+
+
+// ============================================================== 
+// This part of the code bias tool
+// ============================================================== 
 
 function getCreateStreamConfig() {
   const resolution = $('#captureResolution').val().split('*')
@@ -353,7 +376,6 @@ function playMultipleEvent() {
   })
 
   zg.on('roomStreamUpdate', async (roomID, updateType, streamList, extendedData) => {
-    console.log(roomID, updateType, streamList);
     if(updateType === 'ADD') {
       for(let i = 0; i < streamList.length; i++) {
         playMultipleStreamList.push(streamList[i])
@@ -362,7 +384,6 @@ function playMultipleEvent() {
         addMultiplePlayingEvent(streamList[i].streamID)
       }
     } else if (updateType == 'DELETE') {
-      console.log(streamList);
       for(let k = 0; k < playMultipleStreamList.length; k++) {
         for(let j = 0; j < streamList.length; j++) {
           if (playMultipleStreamList[k].streamID === streamList[j].streamID) {
@@ -382,10 +403,8 @@ function playMultipleEvent() {
     $('#streamList').text(`StreamList (${playMultipleStreamList.length})`)
   })
   zg.on('roomUserUpdate', (roomID, updateType, userList) => {
-    console.log('sssss');
     if(updateType === 'ADD') {
       for(let i = 0; i < userList.length; i++) {
-        console.log(111);
         playMultipleUserList.push(userList[i]);
         appednHtml(null, userList[i])
       }
@@ -393,7 +412,7 @@ function playMultipleEvent() {
       for(let k = 0; k < playMultipleUserList.length; k++) {
         for(let j = 0; j < userList.length; j++) {
           if(playMultipleUserList[k].userID === userList[j].userID) {
-            removeHtml(playMultipleUserList[k])
+            removeHtml(null, playMultipleUserList[k])
             playMultipleUserList.splice(k--, 1)
             break;
           }
@@ -550,6 +569,12 @@ function addMultiplePlayingEvent(streamId) {
   }, 500))
 }
 
+// tool end
+
+// ============================================================== 
+// This part of the code Initialization web page
+// ============================================================== 
+
 async function render() {
   $('#roomInfo-id').text(roomID)
   $('#RoomID').val(roomID)
@@ -573,3 +598,4 @@ async function render() {
 }
 
 render()
+// Initialization end

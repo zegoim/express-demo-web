@@ -2,6 +2,12 @@
 // let appID = 1739272706;   // from  /src/KeyCenter.js
 // let server = 'wss://webliveroom-test.zego.im/ws';  // from  /src/KeyCenter.js
 // let tokenUrl = 'https://wsliveroom-demo.zego.im:8282/token';  // from  /src/KeyCenter.js
+
+// ============================================================== 
+// This part of the code defines the default values and global values 
+// ============================================================== 
+
+
 let userID = Util.getBrow() + '_' + new Date().getTime();
 let roomID = '0001'
 let streamID = '0001'
@@ -13,6 +19,12 @@ let localStream = null;
 let remoteStream = null;
 let published = false;
 let played = false;
+
+// part end
+
+// ============================================================== 
+// This part of the code uses the SDK
+// ==============================================================  
 
 // Step1 Create ZegoExpressEngine
 function createZegoExpressEngine() {
@@ -95,6 +107,13 @@ async function stopPlayingStream(streamId) {
   zg.stopPlayingStream(streamId)
   clearStream('play')
 }
+
+// uses SDK end
+
+
+// ============================================================== 
+// This part of the code binds the button click event
+// ==============================================================  
 
 $('#CreateZegoExpressEngine').on('click', function () {
   createZegoExpressEngine()
@@ -239,6 +258,13 @@ $('#startPlaying').on('click', util.throttle( async function () {
   }
 }, 500))
 
+// bind event end
+
+
+// ============================================================== 
+// This part of the code bias tool
+// ============================================================== 
+
 function updateButton(button, preText, afterText) {
   if (button.classList.contains('playing')) {
     button.classList.remove('paused', 'playing', 'border-error', 'border-primary');
@@ -257,19 +283,6 @@ function updateButton(button, preText, afterText) {
     button.innerText = afterText
   }
 }
-
-function render() {
-  $('#roomInfo-id').text(roomID)
-  $('#RoomID').val(roomID)
-  $('#UserName').val(userID)
-  $('#PublishID').val(streamID)
-  $('#PlayID').val(streamID)
-  $('#Camera')[0].checked = true
-  $('#Microphone')[0].checked = true
-  $('#Video')[0].checked = true
-}
-
-render()
 
 async function checkSystemRequirements() {
   console.log('sdk version is', zg.getVersion());
@@ -416,3 +429,24 @@ function changeVideo(flag) {
     $('#playVideo').css('transform', 'scale(-1, 1)')
   }
 }
+
+// tool end
+
+// ============================================================== 
+// This part of the code Initialization web page
+// ============================================================== 
+
+function render() {
+  $('#roomInfo-id').text(roomID)
+  $('#RoomID').val(roomID)
+  $('#UserName').val(userID)
+  $('#PublishID').val(streamID)
+  $('#PlayID').val(streamID)
+  $('#Camera')[0].checked = true
+  $('#Microphone')[0].checked = true
+  $('#Video')[0].checked = true
+}
+
+render()
+
+// Initialization end

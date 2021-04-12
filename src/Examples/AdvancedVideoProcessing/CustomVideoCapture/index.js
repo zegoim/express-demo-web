@@ -8,19 +8,16 @@
 // ============================================================== 
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0009'
-let streamID = '0009'
+let roomID = '0014'
+let streamID = '0014'
 
 let zg = null;
+let isChecked = false;
+let isLoginRoom = false;
 let localStream = null;
-let localSecondStream = null;
 let remoteStream = null;
-let remoteSecondStream = null;
 let published = false;
-let played = false;
-let publishedSecond = false;
-let playedSecond = false;
-
+let isPlay = false;
 // part end
 
 // ============================================================== 
@@ -118,9 +115,14 @@ function loginRoom(roomId, userId, userName) {
   })
 }
 
-async function startPublishingStream (streamId, config) {
+async function startPublishingStream (streamId) {
   try {
-    localStream = await zg.createStream(config);
+    const stream = $('#customLocalVideo')[0].captrueStream();
+    localStream = await zg.createStream({
+      custom: {
+        source: stream
+      }
+    });
     zg.startPublishingStream(streamId, localStream);
     $('#pubshlishVideo')[0].srcObject = localStream;
     return true
@@ -130,57 +132,13 @@ async function startPublishingStream (streamId, config) {
   
 }
 
-async function startPublishingSecondStream (streamId, config) {
-  try {
-    localSecondStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localSecondStream);
-    $('#pubshlishSecondVideo')[0].srcObject = localSecondStream;
-    return true
-  } catch(err) {
-    return false
-  }
-  
-}
-
-async function stopPublishingStream(streamId, clearWay) {
+async function stopPublishingStream(streamId) {
   zg.stopPublishingStream(streamId)
-  if(clearWay === 'publish') {
-    if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
-      stopPlayingStream(streamId)
-    }
-  } else {
-    if(remoteSecondStream && $('#PublishSecondID').val() === $('#PlaySecondID').val()) {
-      stopPlayingStream(streamId)
-    }
+  if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
+    stopPlayingStream(streamId)
   }
-  clearStream(clearWay)
+  clearStream('publish')
 }
-
-async function startPlayingStream(streamId, options = {}) {
-  try {
-    remoteStream = await zg.startPlayingStream(streamId, options)
-    $('#playVideo')[0].srcObject = remoteStream;
-    return true
-  } catch (err) {
-    return false
-  }
-}
-
-async function startPlayingSecondStream(streamId, options = {}) {
-  try {
-    remoteSecondStream = await zg.startPlayingStream(streamId, options)
-    $('#playSecondVideo')[0].srcObject = remoteSecondStream;
-    return true
-  } catch (err) {
-    return false
-  }
-}
-
-async function stopPlayingStream(streamId, clearWay) {
-  zg.stopPlayingStream(streamId)
-  clearStream(clearWay)
-}
-
 // uses SDK end
 
 
@@ -188,17 +146,23 @@ async function stopPlayingStream(streamId, clearWay) {
 // This part of the code binds the button click event
 // ==============================================================  
 
+$('#startPlay').on('click', util.throttle( async function () {
+  const url = $('#CustomVideo').val()
+  if(!url) return alert('url is empty')
+  $('#customLocalVideo')[0].src = url
+  isPlay = true
+}, 500))
+
 $('#startPublishing').on('click', util.throttle( async function () {
+  if(!isPlay) return alert('must start play')
   const id = $('#PublishID').val();
   if(!id) return alert('PublishID is empty')
-  if(id === $('#PublishSecondID').val() && publishedSecond) return alert('PublishID already exists')
   this.classList.add('border-primary')
   if(!published) {
       const flag =  await startPublishingStream(id);
       if(flag) {
         updateButton(this, 'Start Publishing', 'Stop Publishing');
         published = true
-        $('#PublishID')[0].disabled = true
       } else {
         this.classList.remove('border-primary');
         this.classList.add('border-error')
@@ -209,99 +173,13 @@ $('#startPublishing').on('click', util.throttle( async function () {
       if(remoteStream && id === $('#PlayID').val()) {
       $('#PlayID')[0].disabled = false
         updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
-        reSetVideoInfo()
       }
-      stopPublishingStream(id, 'publish');
+      stopPublishingStream(id);
       updateButton(this, 'Start Publishing', 'Stop Publishing')
       published = false
       $('#PublishID')[0].disabled = false
-      reSetVideoInfo('publish')
   }
 }, 500))
-
-$('#startPlaying').on('click', util.throttle( async function () {
-  const id = $('#PlayID').val();
-  if(!id) return alert('PublishID is empty')
-  if(id === $('#PublishSecondID').val()) return alert('Don\'t use Screen Channel')
-  this.classList.add('border-primary')
-  if(!played) {
-      const flag =  await startPlayingStream(id);
-      if(flag) {
-        updateButton(this, 'Start Playing', 'Stop Playing');
-        played = true
-      $('#PlayID')[0].disabled = true
-      } else {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Playing Fail'
-      }
-
-  } else {
-      stopPlayingStream(id, 'play');
-      updateButton(this, 'Start Playing', 'Stop Playing')
-      played = false
-      $('#PlayID')[0].disabled = false
-      reSetVideoInfo('play')
-  }
-}, 500))
-
-$('#startSecondPublishing').on('click', util.throttle( async function () {
-  const id = $('#PublishSecondID').val();
-  if(!id) return alert('PublishID is empty')
-  if(id === $('#PublishID').val() && published) return alert('PublishID already exists')
-  this.classList.add('border-primary')
-  if(!publishedSecond) {
-      const flag =  await startPublishingSecondStream(id, {
-        screen: true
-      });
-      if(flag) {
-        updateButton(this, 'Start Publishing', 'Stop Publishing');
-        publishedSecond = true
-        $('#PublishSecondID')[0].disabled = true
-      } else {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Publishing Fail'
-      }
-
-  } else {
-      if(remoteSecondStream && id === $('#PlaySecondID').val()) {
-      $('#PlaySecondID')[0].disabled = false
-        updateButton($('#startSecondPlaying')[0], 'Start Playing', 'Stop Playing')
-      }
-      stopPublishingStream(id, 'publishSecond');
-      updateButton(this, 'Start Publishing', 'Stop Publishing')
-      publishedSecond = false
-      $('#PublishSecondID')[0].disabled = false
-  }
-}, 500))
-
-$('#startSecondPlaying').on('click', util.throttle( async function () {
-  const id = $('#PlaySecondID').val();
-  if(!id) return alert('PublishID is empty')
-  if(id === $('#PublishID').val()) return alert('Don\'t use Camera Channel')
-  this.classList.add('border-primary')
-  if(!playedSecond) {
-      const flag =  await startPlayingSecondStream(id);
-      if(flag) {
-        updateButton(this, 'Start Playing', 'Stop Playing');
-        playedSecond = true
-      $('#PlaySecondID')[0].disabled = true
-      } else {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Playing Fail'
-      }
-
-  } else {
-      stopPlayingStream(id, 'playSeconed');
-      updateButton(this, 'Start Playing', 'Stop Playing')
-      playedSecond = false
-      $('#PlaySecondID')[0].disabled = false
-      reSetVideoInfo('play')
-  }
-}, 500))
-
 
 // bind event end
 
@@ -312,7 +190,6 @@ $('#startSecondPlaying').on('click', util.throttle( async function () {
 
 function initEvent() {
   zg.on('publisherStateUpdate', result => {
-    console.warn('publisherStateUpdate', result);
     if(result.state === "PUBLISHING") {
       $('#pushlishInfo-id').text(result.streamID)
     } else if(result.state === "NO_PUBLISH") {
@@ -320,21 +197,8 @@ function initEvent() {
     }
   })
 
-  zg.on('playerStateUpdate', result => {
-    console.warn('playerStateUpdate', result);
-    if(result.state === "PLAYING") {
-      $('#playInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PLAY") {
-      $('#playInfo-id').text('')
-    }
-  })
-
   zg.on('publishQualityUpdate', (streamId, stats) => {
     console.warn('publishQualityUpdate', streamId, stats);
-  })
-
-  zg.on('playQualityUpdate', (streamId, stats) => {
-      console.warn('publishQualityUpdate', streamId, stats);
   })
 }
 
@@ -358,26 +222,6 @@ function clearStream(flag) {
     $('#playVideo')[0].srcObject = null;
     remoteStream = null;
     played = false
-  }
-
-  if(flag === 'publishSecond') {
-    localSecondStream && zg.destroyStream(localSecondStream);
-    $('#pubshlishSecondVideo')[0].srcObject = null;
-    localSecondStream = null;
-    publishedSecond = false
-    if($('#PublishSecondID').val() === $('#PlaySecondID').val()) {
-      remoteSecondStream && zg.destroyStream(remoteSecondStream);
-      $('#playSecondVideo')[0].srcObject = null;
-      remoteSecondStream = null;
-      playedSecond = false;
-    }
-  }
-
-  if(flag === 'playSeconed') {
-    remoteSecondStream && zg.destroyStream(remoteSecondStream);
-    $('#playSecondVideo')[0].srcObject = null;
-    remoteSecondStream = null;
-    playedSecond = false;
   }
 }
 
@@ -413,35 +257,17 @@ function setLogConfig() {
   }
   zg.setDebugVerbose(DebugVerbose);
 }
-
-function reSetVideoInfo(flag) {
-  if(flag === 'publish' || !flag) {
-    $('#publishResolution').text('') 
-    $('#sendBitrate').text('')
-    $('#sendFPS').text('')
-    $('#sendPacket').text('')
-  }
-  if(flag === 'play' || !flag) {
-    $('#playResolution').text('') 
-    $('#receiveBitrate').text('')
-    $('#receiveFPS').text('')
-    $('#receivePacket').text('')
-  }
-}
-
 // tool end
 
 // ============================================================== 
 // This part of the code Initialization web page
 // ============================================================== 
-
 async function render() {
   $('#roomInfo-id').text(roomID)
   $('#RoomID').val(roomID)
   $('#UserName').val(userID)
   $('#UserID').val(userID)
   $('#PublishID').val(streamID)
-  $('#PlayID').val(streamID)
   createZegoExpressEngine()
   await checkSystemRequirements()
   enumDevices()

@@ -1,10 +1,10 @@
 // require('../../../../jquery')
-// let appID = 1739272706;   // from  /src/KeyCenter.js
-// let server = 'wss://webliveroom-test.zego.im/ws';  // from  /src/KeyCenter.js
-// let tokenUrl = 'https://wsliveroom-demo.zego.im:8282/token';  // from  /src/KeyCenter.js
+// let appID;   // from  /src/KeyCenter.js
+// let server;  // from  /src/KeyCenter.js
+// let tokenUrl;  // from  /src/KeyCenter.js
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0004'
-let streamID = '0004'
+let roomID = '0005'
+let streamID = '0005'
 
 let zg = null;
 let isChecked = false;
@@ -14,259 +14,10 @@ let remoteStream = null;
 let published = false;
 let played = false;
 
-// Step1 Create ZegoExpressEngine
 function createZegoExpressEngine() {
   zg = new ZegoExpressEngine(appID, server);
   window.zg = zg
 }
-
-// Step2 Login room
-function loginRoom(roomId, userId, userName) {
-  return new Promise((resolve, reject) => {
-    $.get(
-      tokenUrl,
-      {
-        app_id: appID,
-        id_name: userID
-      },
-      async (token) => {
-        try {
-          await zg.loginRoom(roomId, token, {
-            userID: userId,
-            userName
-          });
-          resolve()
-        } catch (err) {
-          reject()
-        }
-      }
-    );
-  })
-}
-
-// Step2 Logout room
-function logoutRoom(roomId) {
-  if(localStream) {
-    stopPublishingStream($('#pushlishInfo-id').text())
-  }
-  if(remoteStream) {
-    stopPlayingStream($('#playInfo-id').text())
-  }
-  zg.logoutRoom(roomId)
-  clearStream('room')
-}
-
-// Step3 Start Publishing Stream
-
-async function startPublishingStream (streamId, config) {
-  try {
-    localStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localStream);
-    $('#pubshlishVideo')[0].srcObject = localStream;
-    return true
-  } catch(err) {
-    return false
-  }
-  
-}
-
-//Step3 Stop Publishing Stream
-async function stopPublishingStream(streamId) {
-  zg.stopPublishingStream(streamId)
-  if(remoteStream) {
-    stopPlayingStream($('#playInfo-id').text())
-  }
-  clearStream('publish')
-}
-
-// Step4 Start Play Stream
-async function startPlayingStream(streamId, options = {}) {
-  try {
-    remoteStream = await zg.startPlayingStream(streamId, options)
-    $('#playVideo')[0].srcObject = remoteStream;
-    return true
-  } catch (err) {
-    return false
-  }
-}
-
-// Step4 Stop Play Stream
-async function stopPlayingStream(streamId) {
-  zg.stopPlayingStream(streamId)
-  clearStream()
-}
-
-$('#CreateZegoExpressEngine').on('click', function () {
-  createZegoExpressEngine()
-  // this.setAttribute('class', 'btn-info btn cuBtn')
-  this.setAttribute('disabled', 'disabled')
-  $('#createSuccessSvg').css('display', 'inline-block')
-  initEvent()
-});
-
-$('#CheckSystemRequire').on('click', async function () {
-  if(!zg) return alert('you should create zegoExpressEngine')
-  const result = await checkSystemRequirements();
-  if(result) {
-    this.setAttribute('disabled', 'disabled')
-    $('#checkSuccessSvg').css('display', 'inline-block')
-    enumDevices()
-  } else {
-    this.setAttribute('class', 'btn-outline-danger btn cuBtn')
-    $('#checkErrorSvg').css('display', 'inline-block')
-  }
-  isChecked = true;
-  let config = localStorage.getItem('logConfig')
-  const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
-  if(config) {
-    config = JSON.parse(config)
-    zg.setLogConfig({
-      logLevel: config.logLevel,
-      remoteLogLevel: config.remoteLogLevel,
-      logURL: '',
-  });
-  }
-  zg.setDebugVerbose(DebugVerbose);
-})
-
-$('#LoginRoom').on('click', util.throttle( async function () {
-  if(!zg) return alert('should create zegoExpressEngine')
-  if(!isChecked) return alert('should test compatiblity')
-
-  const userName = $('#UserName').val()
-  const id = $('#RoomID').val()
-
-  if(!userName) return alert('UserName is Empty')
-  if(!id) return alert('RoomID is Empty')
-  this.classList.add('border-primary')
-  if(!isLoginRoom) {
-    try {
-      await loginRoom(id, userID, userName);
-      updateButton(this, 'Login Room', 'Logout Room')
-      isLoginRoom = true;
-      $('#UserName')[0].disabled = true
-      $('#RoomID')[0].disabled = true
-      $('#roomStateSuccessSvg').css('display', 'inline-block')
-      $('#roomStateErrorSvg').css('display', 'none')
-    } catch(err) {
-      this.classList.remove('border-primary');
-      this.classList.add('border-error')
-      this.innerText = 'Login Fail Try Again'
-    }
-  } else {
-      if(localStream) {
-      $('#PublishID')[0].disabled = false
-        updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing')
-      }
-      if(remoteStream) {
-      $('#PlayID')[0].disabled = false
-        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
-      }
-      logoutRoom(id);
-      updateButton(this, 'Login Room', 'Logout Room')
-      isLoginRoom = false;
-      $('#UserName')[0].disabled = false
-      $('#RoomID')[0].disabled = false
-      $('#roomStateSuccessSvg').css('display', 'none')
-      $('#roomStateErrorSvg').css('display', 'inline-block')
-  }
-}, 500))
-
-$('#startPublishing').on('click', util.throttle( async function () {
-  if(!zg) return alert('should create zegoExpressEngine')
-  if(!isChecked) return alert('should test compatiblity')
-  if(!isLoginRoom) return alert('should login room')
-
-  const id = $('#PublishID').val()
-  if(!id) return alert('StreamID is Empty')
-  this.classList.add('border-primary')
-  if(!published) {
-      const flag =  await startPublishingStream(id, getCreateStreamConfig());
-      if(flag) {
-        updateButton(this, 'Start Publishing', 'Stop Publishing');
-        published = true
-        $('#PublishID')[0].disabled = true
-      } else {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Publishing Fail Try Again'
-      }
-
-  } else {
-      if(remoteStream) {
-      $('#PlayID')[0].disabled = false
-        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
-      }
-      stopPublishingStream($('#pushlishInfo-id').text());
-      updateButton(this, 'Start Publishing', 'Stop Publishing')
-      published = false
-      $('#PublishID')[0].disabled = false
-  }
-}, 500))
-
-$('#startPlaying').on('click', util.throttle( async function () {
-  if(!zg) return alert('should create zegoExpressEngine')
-  if(!isChecked) return alert('should test compatiblity')
-  if(!isLoginRoom) return alert('should login room')
-
-  const id = $('#PlayID').val()
-  if(!id) return alert('StreamID is Empty')
-  this.classList.add('border-primary')
-  if(!played) {
-      const config = {
-        video: $('#Video')[0].checked,
-        audio: $('#Audio')[0].checked
-      }
-      const flag =  await startPlayingStream(id, config);
-      if(flag) {
-        updateButton(this, 'Start Playing', 'Stop Playing');
-        played = true
-        $('#PlayID')[0].disabled = true
-      } else {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Playing Fail Try Again'
-      }
-
-  } else {
-      stopPlayingStream($('#playInfo-id').text());
-      updateButton(this, 'Start Playing', 'Stop Playing')
-      played = false
-      $('#PlayID')[0].disabled = false
-  }
-}, 500))
-
-function updateButton(button, preText, afterText) {
-  if (button.classList.contains('playing')) {
-    button.classList.remove('paused', 'playing', 'border-error', 'border-primary');
-    button.classList.add('paused');
-    button.innerText = afterText
-  } else {
-    if (button.classList.contains('paused')) {
-      button.classList.remove('border-error', 'border-primary');
-      button.classList.add('playing');
-      button.innerText = preText
-    }
-  }
-  if (!button.classList.contains('paused')) {
-    button.classList.remove('border-error', 'border-primary');
-    button.classList.add('paused');
-    button.innerText = afterText
-  }
-}
-
-function render() {
-  $('#roomInfo-id').text(roomID)
-  $('#RoomID').val(roomID)
-  $('#UserName').val(userID)
-  $('#PublishID').val(streamID)
-  $('#PlayID').val(streamID)
-  $('#Camera')[0].checked = true
-  $('#Microphone')[0].checked = true
-  $('#Video')[0].checked = true
-}
-
-render()
 
 async function checkSystemRequirements() {
   console.log('sdk version is', zg.getVersion());
@@ -298,7 +49,6 @@ async function checkSystemRequirements() {
       return false;
   }
 }
-
 
 async function enumDevices() {
   const audioInputList = [],
@@ -332,13 +82,145 @@ async function enumDevices() {
   $('#CameraDevices').html(videoInputList.join(''));
 }
 
+function loginRoom(roomId, userId, userName) {
+  return new Promise((resolve, reject) => {
+    $.get(
+      tokenUrl,
+      {
+        app_id: appID,
+        id_name: userID
+      },
+      async (token) => {
+        try {
+          await zg.loginRoom(roomId, token, {
+            userID: userId,
+            userName
+          });
+          resolve()
+        } catch (err) {
+          reject()
+        }
+      }
+    );
+  })
+}
+
+function logoutRoom(roomId) {
+  if(localStream) {
+    stopPublishingStream($('#pushlishInfo-id').text())
+  }
+  if(remoteStream) {
+    stopPlayingStream($('#playInfo-id').text())
+  }
+  zg.logoutRoom(roomId)
+  clearStream('room')
+}
+
+async function startPublishingStream (streamId, config) {
+  try {
+    localStream = await zg.createStream(config);
+    zg.startPublishingStream(streamId, localStream);
+    $('#pubshlishVideo')[0].srcObject = localStream;
+    return true
+  } catch(err) {
+    return false
+  }
+  
+}
+
+async function stopPublishingStream(streamId) {
+  zg.stopPublishingStream(streamId)
+  if(remoteStream) {
+    stopPlayingStream($('#playInfo-id').text())
+  }
+  clearStream('publish')
+}
+
+async function startPlayingStream(streamId, options = {}) {
+  try {
+    remoteStream = await zg.startPlayingStream(streamId, options)
+    $('#playVideo')[0].srcObject = remoteStream;
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+async function stopPlayingStream(streamId) {
+  zg.stopPlayingStream(streamId)
+  clearStream()
+}
+
+
+$('#startPublishing').on('click', util.throttle( async function () {
+  const id = $('#PublishID').val();
+  if(!id) return alert('PublishID is empty')
+  this.classList.add('border-primary')
+  if(!published) {
+      const flag =  await startPublishingStream(id, getCreateStreamConfig());
+      if(flag) {
+        updateButton(this, 'Start Publishing', 'Stop Publishing');
+        published = true
+        $('#PublishID')[0].disabled = true
+        changeVideo()
+      } else {
+        changeVideo(true)
+        this.classList.remove('border-primary');
+        this.classList.add('border-error')
+        this.innerText = 'Publishing Fail'
+      }
+
+  } else {
+      if(remoteStream && id === $('#PlayID').val()) {
+      $('#PlayID')[0].disabled = false
+        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+        reSetVideoInfo()
+      }
+      stopPublishingStream(streamID);
+      updateButton(this, 'Start Publishing', 'Stop Publishing')
+      published = false
+      $('#PublishID')[0].disabled = false
+      reSetVideoInfo('publish')
+  }
+}, 500))
+
+$('#startPlaying').on('click', util.throttle( async function () {
+  const id = $('#PlayID').val();
+  if(!id) return alert('PublishID is empty')
+  this.classList.add('border-primary')
+  if(!played) {
+      const flag =  await startPlayingStream(id);
+      if(flag) {
+        updateButton(this, 'Start Playing', 'Stop Playing');
+        played = true
+      $('#PlayID')[0].disabled = true
+        changeVideo()
+      } else {
+        this.classList.remove('border-primary');
+        this.classList.add('border-error')
+        this.innerText = 'Playing Fail'
+        changeVideo(true)
+      }
+
+  } else {
+      stopPlayingStream(streamID);
+      updateButton(this, 'Start Playing', 'Stop Playing')
+      played = false
+      $('#PlayID')[0].disabled = false
+      reSetVideoInfo('play')
+  }
+}, 500))
+
+
 function getCreateStreamConfig() {
+  const resolution = $('#captureResolution').val().split('*')
   const config = {
     camera: {
-      audioInput: $('#MirrorDevices').val(),
-      videoInput: $('#CameraDevices').val(),
-      video:  $('#Camera')[0].checked,
-      audio: $('#Microphone')[0].checked,
+      videoQuality: 4,
+      frameRate: $('#FPS').val() * 1,
+      width: resolution[0] * 1,
+      height: resolution[1] * 1,
+      bitRate: $('#Bitrate').val()  * 1
     },
   }
   return config
@@ -361,6 +243,19 @@ function initEvent() {
     }
   })
 
+  zg.on('publishQualityUpdate', (streamId, stats) => {
+    $('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
+    $('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+    $('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+    $('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
+  })
+
+  zg.on('playQualityUpdate', (streamId, stats) => {
+      $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
+      $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+      $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+      $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
+  })
 }
 
 function clearStream(flag) {
@@ -374,14 +269,104 @@ function clearStream(flag) {
     $('#pubshlishVideo')[0].srcObject = null;
     localStream = null;
   }
-  $('#playVideo')[0].srcObject = null;
-  remoteStream = null;
+  if(flag === 'publish' && $('#PublishID').val() === $('#PlayID').val()) {
+    $('#playVideo')[0].srcObject = null;
+    remoteStream = null;
+    played = false
+  }
   if(flag === 'room') {
     isLoginRoom = false
   }
   if(flag === 'room' || flag === 'publish') {
     published = false
   }
-
-  played = false
 }
+
+function updateButton(button, preText, afterText) {
+  if (button.classList.contains('playing')) {
+    button.classList.remove('paused', 'playing', 'border-error', 'border-primary');
+    button.classList.add('paused');
+    button.innerText = afterText
+  } else {
+    if (button.classList.contains('paused')) {
+      button.classList.remove('border-error', 'border-primary');
+      button.classList.add('playing');
+      button.innerText = preText
+    }
+  }
+  if (!button.classList.contains('paused')) {
+    button.classList.remove('border-error', 'border-primary');
+    button.classList.add('paused');
+    button.innerText = afterText
+  }
+}
+
+function setLogConfig() {
+  let config = localStorage.getItem('logConfig')
+  const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
+  if(config) {
+    config = JSON.parse(config)
+    zg.setLogConfig({
+      logLevel: config.logLevel,
+      remoteLogLevel: config.remoteLogLevel,
+      logURL: '',
+  });
+  }
+  zg.setDebugVerbose(DebugVerbose);
+}
+
+function changeVideo(flag) {
+  if(flag) {
+    $('#pubshlishVideo').css('transform', 'none')
+    $('#playVideo').css('transform', 'none')
+    return
+  }
+  const value =  $('#Mirror').val()
+  if(value === 'onlyPreview') {
+    $('#pubshlishVideo').css('transform', 'scale(-1, 1)')
+  } else if(value === 'onlyPlay'){
+    $('#playVideo').css('transform', 'scale(-1, 1)')
+  } else if(value === 'both') {
+    $('#pubshlishVideo').css('transform', 'scale(-1, 1)')
+    $('#playVideo').css('transform', 'scale(-1, 1)')
+  }
+}
+
+function reSetVideoInfo(flag) {
+  if(flag === 'publish' || !flag) {
+    $('#publishResolution').text('') 
+    $('#sendBitrate').text('')
+    $('#sendFPS').text('')
+    $('#sendPacket').text('')
+  }
+  if(flag === 'play' || !flag) {
+    $('#playResolution').text('') 
+    $('#receiveBitrate').text('')
+    $('#receiveFPS').text('')
+    $('#receivePacket').text('')
+  }
+}
+
+async function render() {
+  $('#roomInfo-id').text(roomID)
+  $('#RoomID').val(roomID)
+  $('#UserName').val(userID)
+  $('#UserID').val(userID)
+  $('#PublishID').val(streamID)
+  $('#PlayID').val(streamID)
+  createZegoExpressEngine()
+  await checkSystemRequirements()
+  enumDevices()
+  initEvent()
+  setLogConfig()
+  try {
+    await loginRoom(roomID, userID, userID)
+    $('#roomStateSuccessSvg').css('display', 'inline-block')
+    $('#roomStateErrorSvg').css('display', 'none')
+  } catch (err) {
+    $('#roomStateSuccessSvg').css('display', 'none')
+    $('#roomStateErrorSvg').css('display', 'inline-block')
+  }
+}
+
+render()

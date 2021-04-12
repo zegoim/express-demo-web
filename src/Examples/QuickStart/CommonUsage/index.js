@@ -73,7 +73,7 @@ async function startPublishingStream (streamId, config) {
 //Step3 Stop Publishing Stream
 async function stopPublishingStream(streamId) {
   zg.stopPublishingStream(streamId)
-  if(remoteStream) {
+  if(remoteStream && streamId === $('#PlayID').val()) {
     stopPlayingStream($('#playInfo-id').text())
   }
   clearStream('publish')
@@ -195,7 +195,7 @@ $('#startPublishing').on('click', util.throttle( async function () {
       }
 
   } else {
-      if(remoteStream) {
+      if(remoteStream && id === $('#PlayID').val()) {
       $('#PlayID')[0].disabled = false
         updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
       }
@@ -377,16 +377,19 @@ function clearStream(flag) {
     $('#pubshlishVideo')[0].srcObject = null;
     localStream = null;
   }
-  $('#playVideo')[0].srcObject = null;
-  remoteStream = null;
+  const bool = flag === 'publish' && $('#PublishID').val() === $('#PlayID').val()
+  if(bool || flag === 'room') {
+    $('#playVideo')[0].srcObject = null;
+    remoteStream = null;
+    played = false
+  }
+
   if(flag === 'room') {
     isLoginRoom = false
   }
   if(flag === 'room' || flag === 'publish') {
     published = false
   }
-
-  played = false
 }
 
 function changeVideo(flag) {

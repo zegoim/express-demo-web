@@ -30,8 +30,7 @@
             </li>
             <span class="sidebar-title" data-lang="Scenes">场景实践</span>
             <li>
-              <a href="../../Scenes/VideoForMultipleUsers/index.html" class="waves-effect"
-                data-lang="VideoForMultipleUsers">多人视频通话</a>
+              <a href="../../Scenes/VideoForMultipleUsers/index.html" class="waves-effect" data-lang="VideoForMultipleUsers">多人视频通话</a>
             </li>
             <span class="sidebar-title" data-lang="CommonFeatures">常用功能</span>
             <li>
@@ -127,20 +126,45 @@
                 </div>
               </div>
             </div>
-            <div class="row">
+            <div class="row" id="videoList">
               <div class="preview-pushlishInfo col-lg-12 col-6">
-                <div class="pushlishInfo-title">
-                  Preview&emsp;PublishStreamID: <span id="pushlishInfo-id"></span>
-                </div>
                 <div class="preview-content">
+                  <div class="preview-action">
+                    <div class="preview-info">
+                      <div>Resolution: <span id="publishResolution"></span></div>
+                      <div>Video Send Bitrate: <span id="sendBitrate"></span></div>
+                      <div>Video Send FPS: <span id="sendFPS"></span></div>
+                      <div>Packet Loss: <span id="sendPacket"></span></div>
+                    </div>
+                    <div class="preview-video-action">
+                      <div class="m-t-10 m-b-5">
+                        Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
+                      </div>
+                      <button id="startPublishing" class="m-b-5 configBtn play-pause-button">Start Publishing</button>
+                    </div>
+                  </div>
                   <video id="pubshlishVideo" autoplay muted playsinline></video>
                 </div>
-              </div>
-              <div class="preview-playInfo m-t-10 col-lg-12 col-6">
-                <div class="pushlishInfo-title">
-                  Play Stream&emsp;StreamID: <span id="playInfo-id"></span>
+                <div>
+                  StreamID: <span id="t_0004"></span>
                 </div>
+              </div>
+              <div class="preview-playInfo col-lg-12 col-6">
                 <div class="preview-content">
+                  <div class="preview-action">
+                    <div class="preview-info">
+                      <div>Resolution: <span id="playResolution"></span></div>
+                      <div>Video Send Bitrate: <span id="receiveBitrate"></span></div>
+                      <div>Video Send FPS: <span id="receiveFPS"></span></div>
+                      <div>Packet Loss: <span id="receivePacket"></span></div>
+                    </div>
+                    <div class="preview-video-action">
+                      <div class="m-t-10 m-b-5">
+                        Playing StreamID <input class="m-l-10" type="text" id="PlayID" />
+                      </div>
+                      <button id="startPlaying" class="m-b-5 configBtn play-pause-button">Start Playing</button>
+                    </div>
+                  </div>
                   <video id="playVideo" autoplay muted playsinline></video>
                 </div>
               </div>
@@ -148,137 +172,44 @@
           </div>
           <div class="col-12 col-lg-6 action-wrapper">
             <div class="action-step">
-              <div class="action-title">
-                Step1&emsp;<span class="action-info">Create ZegoExpressEngine</span>
-              </div>
-              <div class="btn-wrapper">
-                <button id="CreateZegoExpressEngine" type="button" class="btn-outline-info btn cuBtn">
-                  <div class="success-svg" id="createSuccessSvg" style="display: none;">
-                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height=15 width="15"
-                      viewBox="0 0 48 48" aria-hidden="true">
-                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
-                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
-                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
-                    </svg>
-                  </div>
-                  Create Egine
-                </button>
-              </div>
-            </div>
-            <div class="action-step">
-              <div class="action-title">
-                Step2&emsp;<span class="action-info">Test Compatiblity</span>
-              </div>
-              <div class="btn-wrapper">
-                <button id="CheckSystemRequire" type="button" class="btn-outline-info btn cuBtn">
-                  <div class="success-svg" id="checkSuccessSvg" style="display: none;">
-                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
-                      viewBox="0 0 48 48" aria-hidden="true">
-                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
-                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
-                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
-                    </svg>
-                  </div>
-                  <div class="error-svg" id="checkErrorSvg" style="display: none;">
-                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
-                      viewBox="0 0 48 48" aria-hidden="true">
-                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
-                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
-                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 14 34 34 M34 14 14 34" />
-                    </svg>
-                  </div>
-                  <div class="warn-svg" id="checkWarnSvg" style="display: none;">
-                    <svg t="1617876217862" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                      xmlns="http://www.w3.org/2000/svg" p-id="8340" width="15" height="15">
-                      <circle class="circle" fill="#5bb543" cx="512" cy="512" r="510" />
-                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
-                        d="M512 736.1m-63 0a63 63 0 1 0 126 0 63 63 0 1 0-126 0Z" fill="#FFFFFF" p-id="8344"></path>
-                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
-                        stroke-miterlimit="10"
-                        d="M512 611.8s63-220.5 63-306.3S549.5 204 512 204s-63 15.8-63 101.5 63 306.3 63 306.3z"></path>
-                    </svg>
-                  </div>
-                  Test Compatiblity
-                </button>
-              </div>
-            </div>
-            <div class="action-step">
-              <div class="action-title">
-                Step3&emsp;<span class="action-info">Login Room</span>
-              </div>
               <div class="action-content">
                 <div class="action-room font-14">
-                  <div class="action-roomId">
-                    RoomID <input type="text" id="RoomID" />
+                  <div class="f-b-5">
+                    RoomID <input type="text" id="RoomID" disabled />
                   </div>
-                  <div class="action-userName">
-                    UserName <input type="text" id="UserName" />
+                  <div class="f-b-5">
+                    UserId <input type="text" id="UserID" disabled />
                   </div>
-                </div>
-                <!-- <button id="LoginRoom" type="button" class="btn-outline-info btn cuBtn">Login Room</button> -->
-                <button id="LoginRoom" class="play-pause-button">Login Room</button>
-              </div>
-            </div>
-            <div class="action-step">
-              <div class="action-title">
-                Step4&emsp;<span class="action-info">Start Publishing Stream</span>
-                <div class="action-content">
-                  <div class="publish-setting m-t-10">
-                    <div class="action-input font-14 m-b-15">
-                      Publish StreamID <input type="text" id="PublishID" />
-                    </div>
-                    <div class="font-12 publish-check m-b-15">
-                      <div class="check-wrappre m-r-5">
-                        <label class="form-check-label m-r-5" for="Camera">Camera</label>
-                        <input class="check-input" type="checkbox" id="Camera" disabled>
-                      </div>
-                      <div class="check-wrappre">
-                        <label class="form-check-label m-r-5" for="Microphone">Microphone</label>
-                        <input class="check-input" type="checkbox" id="Microphone">
-                      </div>
-                    </div>
-                  </div>
-                  <!-- <button id="startPublishing" type="button" class="btn-outline-info btn cuBtn">Start
-                    Publishing</button> -->
-                  <button id="startPublishing" class="play-pause-button">Start Publishing</button>
-                  <div class="publish-setting m-t-10">
-                    <div class="font-12 select-wrapper">
-                      Mirror
-                      <select class="form-control form-control-sm m-l-5" id="Mirror">
-                        <option value="onlyPreview">onlyPreview</option>
-                        <option value="onlyPlay">onlyPlay</option>
-                        <option value="both">both</option>
-                      </select>
-                    </div>
-                    <div class="font-12 select-wrapper">
-                      Camera Switch
-                      <select class="form-control form-control-sm m-l-5" id="CameraDevices">
-                      </select>
-                    </div>
+                  <div class="f-b-5 m-t-10">
+                    UserName <input type="text" id="UserName" disabled />
                   </div>
                 </div>
-              </div>
-            </div>
-            <div class="action-step">
-              <div class="action-title">
-                Step5&emsp;<span class="action-info">Start Play Stream</span>
-                <div class="action-content">
-                  <div class="publish-setting m-t-5">
-                    <div class="action-input font-14 m-b-15">
-                      Play StreamID <input type="text" id="PlayID" />
-                    </div>
-                    <div class="font-12 publish-check m-b-15">
-                      <div class="check-wrappre m-r-5">
-                        <label class="form-check-label m-r-5" for="Video">Video</label>
-                        <input class="check-input" type="checkbox" id="Video" disabled>
-                      </div>
-                      <div class="check-wrappre">
-                        <label class="form-check-label m-r-5" for="Audio">Audio</label>
-                        <input class="check-input" type="checkbox" id="Audio">
-                      </div>
-                    </div>
+                <div class="font-14 select-wrapper m-b-10">
+                  Capture Resolution
+                  <select class="form-control form-control-sm m-l-5" id="captureResolution">
+                    <option value="320*240">320 * 240</option>
+                    <option value="640*480">640 * 480</option>
+                    <option value="1280*720">1280 * 720</option>
+                  </select>
+                </div>
+                <div class="videoQuality">
+                  <div class="font-14 f-b-5">
+                    FPS <input type="text" class="t-a-r" id="FPS" value="15" /> fps
                   </div>
-                  <button id="startPlaying" class="play-pause-button">Start Playing</button>
+                  <div class="font-14 f-b-5">
+                    Bitrate <input type="text" class="t-a-r" id="Bitrate" value="300" /> kbps
+                  </div>
+                </div>
+                <div class="flex-c">
+                  <div class="select-wrapper">
+                    Mirror
+                    <select class="form-control form-control-sm m-l-5" id="Mirror">
+                      <option value="none">none</option>
+                      <option value="onlyPreview">onlyPreview</option>
+                      <option value="onlyPlay">onlyPlay</option>
+                      <option value="both">both</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>

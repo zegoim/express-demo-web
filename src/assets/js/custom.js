@@ -108,6 +108,8 @@ $(function() {
   $("body").trigger("resize");
 });
 
+var vConsole = new VConsole();
+
 const util = {}
 
 util.getBrow = () =>  {

@@ -3,8 +3,8 @@
 // let server;  // from  /src/KeyCenter.js
 // let tokenUrl;  // from  /src/KeyCenter.js
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0005'
-let streamID = '0005'
+let roomID = '0007'
+let streamID = '0007'
 
 let zg = null;
 let isChecked = false;

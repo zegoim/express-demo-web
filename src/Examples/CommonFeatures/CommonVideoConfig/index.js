@@ -105,17 +105,6 @@ function loginRoom(roomId, userId, userName) {
   })
 }
 
-function logoutRoom(roomId) {
-  if(localStream) {
-    stopPublishingStream($('#pushlishInfo-id').text())
-  }
-  if(remoteStream) {
-    stopPlayingStream($('#playInfo-id').text())
-  }
-  zg.logoutRoom(roomId)
-  clearStream('room')
-}
-
 async function startPublishingStream (streamId, config) {
   try {
     localStream = await zg.createStream(config);
@@ -130,8 +119,8 @@ async function startPublishingStream (streamId, config) {
 
 async function stopPublishingStream(streamId) {
   zg.stopPublishingStream(streamId)
-  if(remoteStream) {
-    stopPlayingStream($('#playInfo-id').text())
+  if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
+    stopPlayingStream(streamId)
   }
   clearStream('publish')
 }
@@ -148,7 +137,7 @@ async function startPlayingStream(streamId, options = {}) {
 
 async function stopPlayingStream(streamId) {
   zg.stopPlayingStream(streamId)
-  clearStream()
+  clearStream('play')
 }
 
 
@@ -176,7 +165,7 @@ $('#startPublishing').on('click', util.throttle( async function () {
         updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
         reSetVideoInfo()
       }
-      stopPublishingStream(streamID);
+      stopPublishingStream(id);
       updateButton(this, 'Start Publishing', 'Stop Publishing')
       published = false
       $('#PublishID')[0].disabled = false
@@ -203,7 +192,7 @@ $('#startPlaying').on('click', util.throttle( async function () {
       }
 
   } else {
-      stopPlayingStream(streamID);
+      stopPlayingStream(id);
       updateButton(this, 'Start Playing', 'Stop Playing')
       played = false
       $('#PlayID')[0].disabled = false
@@ -259,26 +248,25 @@ function initEvent() {
 }
 
 function clearStream(flag) {
-  if(localStream && flag) {
-    zg.destroyStream(localStream);
-  }
-  if(remoteStream) {
-    zg.destroyStream(remoteStream);
-  }
-  if(flag) {
+
+  if(flag === 'publish') {
+    localStream && zg.destroyStream(localStream);
     $('#pubshlishVideo')[0].srcObject = null;
     localStream = null;
+    published = false
+    if($('#PublishID').val() === $('#PlayID').val()) {
+      remoteStream && zg.destroyStream(remoteStream);
+      $('#playVideo')[0].srcObject = null;
+      remoteStream = null;
+      played = false
+    }
   }
-  if(flag === 'publish' && $('#PublishID').val() === $('#PlayID').val()) {
+
+  if(flag === 'play') {
+    remoteStream && zg.destroyStream(remoteStream);
     $('#playVideo')[0].srcObject = null;
     remoteStream = null;
     played = false
-  }
-  if(flag === 'room') {
-    isLoginRoom = false
-  }
-  if(flag === 'room' || flag === 'publish') {
-    published = false
   }
 }
 

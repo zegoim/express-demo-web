@@ -3,12 +3,10 @@
 // let server;  // from  /src/KeyCenter.js
 // let tokenUrl;  // from  /src/KeyCenter.js
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0005'
-let streamID = '0005'
+let roomID = '0006'
+let streamID = '0006'
 
 let zg = null;
-let isChecked = false;
-let isLoginRoom = false;
 let localStream = null;
 let remoteStream = null;
 let published = false;
@@ -50,18 +48,36 @@ async function checkSystemRequirements() {
   }
 }
 
-function setLogConfig() {
-  let config = localStorage.getItem('logConfig')
-  const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
-  if(config) {
-    config = JSON.parse(config)
-    zg.setLogConfig({
-      logLevel: config.logLevel,
-      remoteLogLevel: config.remoteLogLevel,
-      logURL: '',
-  });
-  }
-  zg.setDebugVerbose(DebugVerbose);
+async function enumDevices() {
+  const audioInputList = [],
+      videoInputList = [];
+  const deviceInfo = await zg.enumDevices();
+
+  deviceInfo &&
+      deviceInfo.microphones.map((item, index) => {
+          if (!item.deviceName) {
+              item.deviceName = 'microphone' + index;
+          }
+          audioInputList.push(' <option value="' + item.deviceID + '">' + item.deviceName + '</option>');
+          console.log('microphone: ' + item.deviceName);
+          return item;
+      });
+
+  deviceInfo &&
+      deviceInfo.cameras.map((item, index) => {
+          if (!item.deviceName) {
+              item.deviceName = 'camera' + index;
+          }
+          videoInputList.push(' <option value="' + item.deviceID + '">' + item.deviceName + '</option>');
+          console.log('camera: ' + item.deviceName);
+          return item;
+      });
+
+  audioInputList.push('<option value="0">禁止</option>');
+  videoInputList.push('<option value="0">禁止</option>');
+
+  $('#MirrorDevices').html(audioInputList.join(''));
+  $('#CameraDevices').html(videoInputList.join(''));
 }
 
 function loginRoom(roomId, userId, userName) {
@@ -102,7 +118,7 @@ async function startPublishingStream (streamId, config) {
 async function stopPublishingStream(streamId) {
   zg.stopPublishingStream(streamId)
   if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
-    stopPlayingStream($('#playInfo-id').text())
+    stopPlayingStream(streamId)
   }
   clearStream('publish')
 }
@@ -122,42 +138,6 @@ async function stopPlayingStream(streamId) {
   clearStream('play')
 }
 
-async function sendBroadcastMessage(roomId, message) {
-  try {
-    const data = await zg.sendBroadcastMessage(roomId, message)
-    return data
-  } catch (err) {
-    return {errorCode: 1, extendedData: JSON.stringify(err)}
-  }
-}
-
-async function sendBarrageMessage(roomId, message) {
-  try {
-    const data = await zg.sendBarrageMessage(roomId, message)
-    return data
-  } catch (err) {
-    return {errorCode: 1, extendedData: JSON.stringify(err)}
-  }
-}
-
-async function sendCustomCommand(roomId, message, userId) {
-  try {
-    const data = await zg.sendCustomCommand(roomId, message, [userId])
-    return data
-  } catch (err) {
-    return {errorCode: 1, extendedData: JSON.stringify(err)}
-  }
-}
-
-async function setRoomExtraInfo(roomId, key, value) {
-  try {
-    const data = await zg.setRoomExtraInfo(roomId, key, value)
-    return data
-  } catch (err) {
-    return {errorCode: 1, extendedData: JSON.stringify(err)}
-  }
-}
-
 
 $('#startPublishing').on('click', util.throttle( async function () {
   const id = $('#PublishID').val();
@@ -169,9 +149,7 @@ $('#startPublishing').on('click', util.throttle( async function () {
         updateButton(this, 'Start Publishing', 'Stop Publishing');
         published = true
         $('#PublishID')[0].disabled = true
-        changeVideo()
       } else {
-        changeVideo(true)
         this.classList.remove('border-primary');
         this.classList.add('border-error')
         this.innerText = 'Publishing Fail'
@@ -201,12 +179,10 @@ $('#startPlaying').on('click', util.throttle( async function () {
         updateButton(this, 'Start Playing', 'Stop Playing');
         played = true
       $('#PlayID')[0].disabled = true
-        changeVideo()
       } else {
         this.classList.remove('border-primary');
         this.classList.add('border-error')
         this.innerText = 'Playing Fail'
-        changeVideo(true)
       }
 
   } else {
@@ -218,73 +194,9 @@ $('#startPlaying').on('click', util.throttle( async function () {
   }
 }, 500))
 
-$('#BoradcastMessageBtn').on('click', util.throttle(async function() {
-  const message = $('#BoradcastMessage').val()
-  if(!message) return alert('message is empty')
-
-  updateLogger('[action] sendBroadcastMessage')
-  const result = await sendBroadcastMessage(roomID, message)
-  if(result.errorCode === 0) {
-    updateLogger('[info] sendBroadcastMessage success')
-    updateLogger(`[BroadcastMessage] ${userID}: ${message}`)
-    $('#BoradcastMessage').val('')
-  } else {
-    updateLogger(`[info] sendBroadcastMessage fail, extendedData: ${result.extendedData || ''}`)
-  }
-}, 500))
-
-$('#BarrageMessageBtn').on('click', util.throttle(async function() {
-  const message = $('#BarrageMessage').val()
-  if(!message) return alert('message is empty')
-
-  updateLogger('[action] sendBarrageMessage')
-  const result = await sendBarrageMessage(roomID, message)
-  if(result.errorCode  === 0) {
-    updateLogger('[info] sendBarrageMessage success')
-    updateLogger(`[BarrageMessage] ${userID}: ${message}`)
-    $('#BarrageMessage').val('')
-  } else {
-    updateLogger(`[info] sendBarrageMessage fail, extendedData: ${result.extendedData || ''}`)
-  }
-}, 500))
-
-$('#CustomCommandBtn').on('click', util.throttle(async function() {
-  const message = $('#CustomCommand').val()
-  const userId = $('#CustomCommandUserId').val()
-  if(!message) return alert('message is empty')
-  if(!userId) return alert('userId is empty')
-
-  updateLogger('[action] sendCustomCommand')
-  const result = await sendCustomCommand(roomID, message, userId)
-  if(result.errorCode  === 0) {
-    updateLogger('[info] sendCustomCommand success')
-    updateLogger(`[sendCustomCommand] ${userID}: ${message}`)
-    $('#CustomCommand').val('')
-    $('#CustomCommandUserId').val('')
-  } else {
-    updateLogger(`[info] sendCustomCommand fail, extendedData: ${result.extendedData || ''}`)
-  }
-}, 500))
-
-$('#RoomExtraInfoBtn').on('click', util.throttle(async function() {
-
-  const key = $('#RoomExtraInfoKey').val()
-  const value = $('#RoomExtraInfoValue').val()
-  if(!key) return alert('key is empty')
-  if(!value) return alert('value is empty')
-
-  updateLogger('[action] setRoomExtraInfo')
-  const result = await setRoomExtraInfo(roomID, key, value)
-  if(result.errorCode  === 0) {
-    updateLogger('[info] setRoomExtraInfo success')
-  } else {
-    updateLogger(`[info] setRoomExtraInfo fail, extendedData: ${result.extendedData || ''}`)
-  }
-}, 500))
-
-
 function initEvent() {
   zg.on('publisherStateUpdate', result => {
+    console.warn('publisherStateUpdate', result);
     if(result.state === "PUBLISHING") {
       $('#pushlishInfo-id').text(result.streamID)
     } else if(result.state === "NO_PUBLISH") {
@@ -293,6 +205,7 @@ function initEvent() {
   })
 
   zg.on('playerStateUpdate', result => {
+    console.warn('playerStateUpdate', result);
     if(result.state === "PLAYING") {
       $('#playInfo-id').text(result.streamID)
     } else if(result.state === "NO_PLAY") {
@@ -301,6 +214,7 @@ function initEvent() {
   })
 
   zg.on('publishQualityUpdate', (streamId, stats) => {
+    console.warn('publishQualityUpdate', streamId, stats);
     $('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
     $('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
     $('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
@@ -308,34 +222,11 @@ function initEvent() {
   })
 
   zg.on('playQualityUpdate', (streamId, stats) => {
+      console.warn('publishQualityUpdate', streamId, stats);
       $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
       $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
       $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
       $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
-  })
-
-  zg.on('IMRecvBroadcastMessage', (roomID, messageInfo) => {
-    for(let i = 0; i < messageInfo.length; i++) {
-      updateLogger(`[BroadcastMessage] ${messageInfo[i].fromUser.userName}: ${messageInfo[i].message}`)
-    }
-  })
-  zg.on('IMRecvBarrageMessage', (roomID, chatData) => {
-    for(let i = 0; i < chatData.length; i++) {
-      updateLogger(`[BroadcastMessage] ${chatData[i].fromUser.userName}: ${chatData[i].message}`)
-    }
-  })
-  zg.on('IMRecvCustomCommand', (roomID, fromUser, command) => {
-    updateLogger(`[CustomCommand] ${fromUser.userName}: ${command}`)
-  })
-  zg.on('roomExtraInfoUpdate', (roomID, roomExtraInfoList) => {
-    for(let i = 0 ; i< roomExtraInfoList.length; i++) {
-      updateLogger(`[roomExtraInfo] ${roomExtraInfoList[i].updateUser.userName} 
-      set key: ${roomExtraInfoList[i].key } value: ${roomExtraInfoList[i].value}`)
-    }
-  })
-
-  zg.on('roomUserUpdate', (roomID, updateType, userList) => {
-    console.log(userList);
   })
 }
 
@@ -381,27 +272,18 @@ function updateButton(button, preText, afterText) {
   }
 }
 
-function updateLogger(text) {
-  $('#logger').append(`
-    <div>${text}</div>
-  `)
-}
-
-function changeVideo(flag) {
-  if(flag) {
-    $('#pubshlishVideo').css('transform', 'none')
-    $('#playVideo').css('transform', 'none')
-    return
+function setLogConfig() {
+  let config = localStorage.getItem('logConfig')
+  const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
+  if(config) {
+    config = JSON.parse(config)
+    zg.setLogConfig({
+      logLevel: config.logLevel,
+      remoteLogLevel: config.remoteLogLevel,
+      logURL: '',
+  });
   }
-  const value =  $('#Mirror').val()
-  if(value === 'onlyPreview') {
-    $('#pubshlishVideo').css('transform', 'scale(-1, 1)')
-  } else if(value === 'onlyPlay'){
-    $('#playVideo').css('transform', 'scale(-1, 1)')
-  } else if(value === 'both') {
-    $('#pubshlishVideo').css('transform', 'scale(-1, 1)')
-    $('#playVideo').css('transform', 'scale(-1, 1)')
-  }
+  zg.setDebugVerbose(DebugVerbose);
 }
 
 function reSetVideoInfo(flag) {
@@ -426,14 +308,12 @@ async function render() {
   $('#UserID').val(userID)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
-  updateLogger(`[action] create ExpressEngine`)
   createZegoExpressEngine()
-  updateLogger(`[action] checkSystemRequirements`)
   await checkSystemRequirements()
+  enumDevices()
   initEvent()
   setLogConfig()
   try {
-    updateLogger(`[action] LoginRoom RoomID: ${roomID}`)
     await loginRoom(roomID, userID, userID)
     $('#roomStateSuccessSvg').css('display', 'inline-block')
     $('#roomStateErrorSvg').css('display', 'none')

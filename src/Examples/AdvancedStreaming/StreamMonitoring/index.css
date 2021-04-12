@@ -5,7 +5,7 @@
 .preview-content {
   position: relative;
   width: auto;
-  height: 220px;
+  height: 200px;
   border: 1px solid #ccc;
 }
 
@@ -103,18 +103,13 @@
   font-size: 14px;
 }
 
-.action-item {
-  border-top: 1px solid rgba(0,0,0,.1);
-  margin-bottom: 15px;
-}
-
 .cuBtn {
-  display: inline-block;
+  display: block;
   padding: 0 12px;
   font-size: 13px;
   cursor: pointer;
-  height: 21px;
-  /* width: 95%; */
+  height: 30px;
+  width: 95%;
 }
 
 .action-room {
@@ -157,7 +152,7 @@
 }
 
 input {
-  width: 35% ;
+  width: 40% ;
   height: 21px ;
   border: 1px solid #ced4da;
   border-radius: .25rem;

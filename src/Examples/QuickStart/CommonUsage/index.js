@@ -74,7 +74,7 @@ async function startPublishingStream (streamId, config) {
 async function stopPublishingStream(streamId) {
   zg.stopPublishingStream(streamId)
   if(remoteStream && streamId === $('#PlayID').val()) {
-    stopPlayingStream($('#playInfo-id').text())
+    stopPlayingStream(streamId)
   }
   clearStream('publish')
 }
@@ -93,7 +93,7 @@ async function startPlayingStream(streamId, options = {}) {
 // Step4 Stop Play Stream
 async function stopPlayingStream(streamId) {
   zg.stopPlayingStream(streamId)
-  clearStream()
+  clearStream('play')
 }
 
 $('#CreateZegoExpressEngine').on('click', function () {
@@ -367,28 +367,36 @@ function initEvent() {
 }
 
 function clearStream(flag) {
-  if(localStream && flag) {
-    zg.destroyStream(localStream);
-  }
-  if(remoteStream) {
-    zg.destroyStream(remoteStream);
-  }
-  if(flag) {
+
+  if(flag === 'room') {
+    localStream && zg.destroyStream(localStream);
     $('#pubshlishVideo')[0].srcObject = null;
     localStream = null;
+    published = false;
+    remoteStream && zg.destroyStream(remoteStream);
+    $('#playVideo')[0].srcObject = null;
+    remoteStream = null;
+    played = false;
   }
-  const bool = flag === 'publish' && $('#PublishID').val() === $('#PlayID').val()
-  if(bool || flag === 'room') {
+
+  if(flag === 'publish') {
+    localStream && zg.destroyStream(localStream);
+    $('#pubshlishVideo')[0].srcObject = null;
+    localStream = null;
+    published = false
+    if($('#PublishID').val() === $('#PlayID').val()) {
+      remoteStream && zg.destroyStream(remoteStream);
+      $('#playVideo')[0].srcObject = null;
+      remoteStream = null;
+      played = false
+    }
+  }
+
+  if(flag === 'play') {
+    remoteStream && zg.destroyStream(remoteStream);
     $('#playVideo')[0].srcObject = null;
     remoteStream = null;
     played = false
-  }
-
-  if(flag === 'room') {
-    isLoginRoom = false
-  }
-  if(flag === 'room' || flag === 'publish') {
-    published = false
   }
 }
 

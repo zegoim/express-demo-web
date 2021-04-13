@@ -8,8 +8,8 @@
 // ============================================================== 
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0014'
-let streamID = '0014'
+let roomID = '0017'
+let streamID = '0017'
 
 let zg = null;
 let isChecked = false;
@@ -17,7 +17,8 @@ let isLoginRoom = false;
 let localStream = null;
 let remoteStream = null;
 let published = false;
-let isPlay = false;
+let played = false;
+
 // part end
 
 // ============================================================== 
@@ -115,14 +116,9 @@ function loginRoom(roomId, userId, userName) {
   })
 }
 
-async function startPublishingStream (streamId) {
+async function startPublishingStream (streamId, config) {
   try {
-    const stream = $('#customLocalVideo')[0].captrueStream();
-    localStream = await zg.createStream({
-      custom: {
-        source: stream
-      }
-    });
+    localStream = await zg.createStream(config);
     zg.startPublishingStream(streamId, localStream);
     $('#pubshlishVideo')[0].srcObject = localStream;
     return true
@@ -139,38 +135,40 @@ async function stopPublishingStream(streamId) {
   }
   clearStream('publish')
 }
+
+async function startPlayingStream(streamId, options = {}) {
+  try {
+    remoteStream = await zg.startPlayingStream(streamId, options)
+    $('#playVideo')[0].srcObject = remoteStream;
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+async function stopPlayingStream(streamId) {
+  zg.stopPlayingStream(streamId)
+  clearStream('play')
+}
+
 // uses SDK end
 
 
 // ============================================================== 
-// This part of the code binds the button click event
+// This part of the code binds the button click event and onchange event
 // ==============================================================  
 
-$('#startPlay').on('click', util.throttle( async function () {
-  const url = $('#CustomVideo').val()
-  if(!url) return alert('url is empty')
-
-  $('#customLocalVideo')[0].src = url
-  const flag = await checkVideo()
-  if(flag) {
-    isPlay = true
-  } else {
-    isPlay = false
-    $('#CustomVideo').val('')
-    alert('Playback failed')
-  }
-}, 500))
-
 $('#startPublishing').on('click', util.throttle( async function () {
-  if(!isPlay) return alert('must start play')
   const id = $('#PublishID').val();
   if(!id) return alert('PublishID is empty')
   this.classList.add('border-primary')
   if(!published) {
-      const flag =  await startPublishingStream(id);
+      const flag =  await startPublishingStream(id, getCreateStreamConfig());
       if(flag) {
         updateButton(this, 'Start Publishing', 'Stop Publishing');
         published = true
+        $('#PublishID')[0].disabled = true
+        setHeadphoneMonitor($('#HeadphoneMonitor')[0].checked)
       } else {
         this.classList.remove('border-primary');
         this.classList.add('border-error')
@@ -181,13 +179,50 @@ $('#startPublishing').on('click', util.throttle( async function () {
       if(remoteStream && id === $('#PlayID').val()) {
       $('#PlayID')[0].disabled = false
         updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+        reSetVideoInfo()
       }
       stopPublishingStream(id);
       updateButton(this, 'Start Publishing', 'Stop Publishing')
       published = false
       $('#PublishID')[0].disabled = false
+      setHeadphoneMonitor(false)
+      reSetVideoInfo('publish')
   }
 }, 500))
+
+$('#startPlaying').on('click', util.throttle( async function () {
+  const id = $('#PlayID').val();
+  if(!id) return alert('PublishID is empty')
+  this.classList.add('border-primary')
+  if(!played) {
+      const flag =  await startPlayingStream(id);
+      if(flag) {
+        updateButton(this, 'Start Playing', 'Stop Playing');
+        played = true
+      $('#PlayID')[0].disabled = true
+        changeVideo()
+      } else {
+        this.classList.remove('border-primary');
+        this.classList.add('border-error')
+        this.innerText = 'Playing Fail'
+        changeVideo(true)
+      }
+
+  } else {
+      stopPlayingStream(id);
+      updateButton(this, 'Start Playing', 'Stop Playing')
+      played = false
+      $('#PlayID')[0].disabled = false
+      reSetVideoInfo('play')
+  }
+}, 500))
+
+$('#HeadphoneMonitor').on('change', async function({target}) {
+})
+
+$('#VolumeInput').on('change', async function({ target }) {
+  $('#VolumeValue').text(target.value)
+})
 
 // bind event end
 
@@ -195,6 +230,17 @@ $('#startPublishing').on('click', util.throttle( async function () {
 // ============================================================== 
 // This part of the code bias tool
 // ============================================================== 
+
+function getCreateStreamConfig() {
+  const config = {
+    camera: {
+      video: true,
+      audio: true,
+      channelCount: $('#Channel').val() * 1
+    }
+  }
+  return config
+}
 
 function initEvent() {
   zg.on('publisherStateUpdate', result => {
@@ -205,8 +251,26 @@ function initEvent() {
     }
   })
 
+  zg.on('playerStateUpdate', result => {
+    if(result.state === "PLAYING") {
+      $('#playInfo-id').text(result.streamID)
+    } else if(result.state === "NO_PLAY") {
+      $('#playInfo-id').text('')
+    }
+  })
+
   zg.on('publishQualityUpdate', (streamId, stats) => {
-    console.warn('publishQualityUpdate', streamId, stats);
+    $('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
+    $('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+    $('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+    $('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
+  })
+
+  zg.on('playQualityUpdate', (streamId, stats) => {
+      $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
+      $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+      $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+      $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
   })
 }
 
@@ -266,30 +330,59 @@ function setLogConfig() {
   zg.setDebugVerbose(DebugVerbose);
 }
 
-function checkVideo() {
-  return new Promise((resolve) => {
-    $('#customLocalVideo').on('error', function() {
-      resolve(false)
-    })
-    $('#customLocalVideo').on('loadeddata', function() {
-      resolve(true)
-    })
-    setTimeout(() => {
-      resolve(false)
-    }, 3000)
-  })
+function changeVideo(flag) {
+  if(flag) {
+    $('#pubshlishVideo').css('transform', 'none')
+    $('#playVideo').css('transform', 'none')
+    return
+  }
+  const value =  $('#Mirror').val()
+  if(value === 'onlyPreview') {
+    $('#pubshlishVideo').css('transform', 'scale(-1, 1)')
+  } else if(value === 'onlyPlay'){
+    $('#playVideo').css('transform', 'scale(-1, 1)')
+  } else if(value === 'both') {
+    $('#pubshlishVideo').css('transform', 'scale(-1, 1)')
+    $('#playVideo').css('transform', 'scale(-1, 1)')
+  }
 }
+
+function reSetVideoInfo(flag) {
+  if(flag === 'publish' || !flag) {
+    $('#publishResolution').text('') 
+    $('#sendBitrate').text('')
+    $('#sendFPS').text('')
+    $('#sendPacket').text('')
+  }
+  if(flag === 'play' || !flag) {
+    $('#playResolution').text('') 
+    $('#receiveBitrate').text('')
+    $('#receiveFPS').text('')
+    $('#receivePacket').text('')
+  }
+}
+
+function setHeadphoneMonitor(flag) {
+  if(flag) {
+    $('#pubshlishVideo').attr('volume', $('#VolumeInput').val())
+  } else {
+    $('#pubshlishVideo').removeAttr('volume')
+  }
+}
+
 // tool end
 
 // ============================================================== 
 // This part of the code Initialization web page
 // ============================================================== 
+
 async function render() {
   $('#roomInfo-id').text(roomID)
   $('#RoomID').val(roomID)
   $('#UserName').val(userID)
   $('#UserID').val(userID)
   $('#PublishID').val(streamID)
+  $('#PlayID').val(streamID)
   createZegoExpressEngine()
   await checkSystemRequirements()
   enumDevices()

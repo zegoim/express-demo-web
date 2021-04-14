@@ -61,6 +61,85 @@ async function checkSystemRequirements() {
   }
 }
 
+function initEvent() {
+  zg.on('publisherStateUpdate', result => {
+    if(result.state === "PUBLISHING") {
+      $('#pushlishInfo-id').text(result.streamID)
+    } else if(result.state === "NO_PUBLISH") {
+      $('#pushlishInfo-id').text('')
+    }
+  })
+
+  zg.on('playerStateUpdate', result => {
+    if(result.state === "PLAYING") {
+      $('#playInfo-id').text(result.streamID)
+    } else if(result.state === "NO_PLAY") {
+      $('#playInfo-id').text('')
+    }
+  })
+
+  zg.on('publishQualityUpdate', (streamId, stats) => {
+    $('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
+    $('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+    $('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+    $('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
+  })
+
+  zg.on('playQualityUpdate', (streamId, stats) => {
+      $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
+      $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+      $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+      $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
+  })
+
+  zg.on('IMRecvBroadcastMessage', (roomID, messageInfo) => {
+    for(let i = 0; i < messageInfo.length; i++) {
+      updateLogger(`[BroadcastMessage] ${messageInfo[i].fromUser.userName}: ${messageInfo[i].message}`)
+    }
+  })
+  zg.on('IMRecvBarrageMessage', (roomID, chatData) => {
+    for(let i = 0; i < chatData.length; i++) {
+      updateLogger(`[BroadcastMessage] ${chatData[i].fromUser.userName}: ${chatData[i].message}`)
+    }
+  })
+  zg.on('IMRecvCustomCommand', (roomID, fromUser, command) => {
+    updateLogger(`[CustomCommand] ${fromUser.userName}: ${command}`)
+  })
+  zg.on('roomExtraInfoUpdate', (roomID, roomExtraInfoList) => {
+    for(let i = 0 ; i< roomExtraInfoList.length; i++) {
+      updateLogger(`[roomExtraInfo] ${roomExtraInfoList[i].updateUser.userName} 
+      set key: ${roomExtraInfoList[i].key } value: ${roomExtraInfoList[i].value}`)
+    }
+  })
+
+  zg.on('roomUserUpdate', (roomID, updateType, userList) => {
+    console.log(userList);
+  })
+}
+
+function clearStream(flag) {
+
+  if(flag === 'publish') {
+    localStream && zg.destroyStream(localStream);
+    $('#pubshlishVideo')[0].srcObject = null;
+    localStream = null;
+    published = false
+    if($('#PublishID').val() === $('#PlayID').val()) {
+      remoteStream && zg.destroyStream(remoteStream);
+      $('#playVideo')[0].srcObject = null;
+      remoteStream = null;
+      played = false
+    }
+  }
+
+  if(flag === 'play') {
+    remoteStream && zg.destroyStream(remoteStream);
+    $('#playVideo')[0].srcObject = null;
+    remoteStream = null;
+    played = false
+  }
+}
+
 function setLogConfig() {
   let config = localStorage.getItem('logConfig')
   const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
@@ -305,85 +384,6 @@ $('#RoomExtraInfoBtn').on('click', util.throttle(async function() {
 // ============================================================== 
 // This part of the code bias tool
 // ============================================================== 
-
-function initEvent() {
-  zg.on('publisherStateUpdate', result => {
-    if(result.state === "PUBLISHING") {
-      $('#pushlishInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PUBLISH") {
-      $('#pushlishInfo-id').text('')
-    }
-  })
-
-  zg.on('playerStateUpdate', result => {
-    if(result.state === "PLAYING") {
-      $('#playInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PLAY") {
-      $('#playInfo-id').text('')
-    }
-  })
-
-  zg.on('publishQualityUpdate', (streamId, stats) => {
-    $('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
-    $('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
-    $('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
-    $('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
-  })
-
-  zg.on('playQualityUpdate', (streamId, stats) => {
-      $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
-      $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
-      $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
-      $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
-  })
-
-  zg.on('IMRecvBroadcastMessage', (roomID, messageInfo) => {
-    for(let i = 0; i < messageInfo.length; i++) {
-      updateLogger(`[BroadcastMessage] ${messageInfo[i].fromUser.userName}: ${messageInfo[i].message}`)
-    }
-  })
-  zg.on('IMRecvBarrageMessage', (roomID, chatData) => {
-    for(let i = 0; i < chatData.length; i++) {
-      updateLogger(`[BroadcastMessage] ${chatData[i].fromUser.userName}: ${chatData[i].message}`)
-    }
-  })
-  zg.on('IMRecvCustomCommand', (roomID, fromUser, command) => {
-    updateLogger(`[CustomCommand] ${fromUser.userName}: ${command}`)
-  })
-  zg.on('roomExtraInfoUpdate', (roomID, roomExtraInfoList) => {
-    for(let i = 0 ; i< roomExtraInfoList.length; i++) {
-      updateLogger(`[roomExtraInfo] ${roomExtraInfoList[i].updateUser.userName} 
-      set key: ${roomExtraInfoList[i].key } value: ${roomExtraInfoList[i].value}`)
-    }
-  })
-
-  zg.on('roomUserUpdate', (roomID, updateType, userList) => {
-    console.log(userList);
-  })
-}
-
-function clearStream(flag) {
-
-  if(flag === 'publish') {
-    localStream && zg.destroyStream(localStream);
-    $('#pubshlishVideo')[0].srcObject = null;
-    localStream = null;
-    published = false
-    if($('#PublishID').val() === $('#PlayID').val()) {
-      remoteStream && zg.destroyStream(remoteStream);
-      $('#playVideo')[0].srcObject = null;
-      remoteStream = null;
-      played = false
-    }
-  }
-
-  if(flag === 'play') {
-    remoteStream && zg.destroyStream(remoteStream);
-    $('#playVideo')[0].srcObject = null;
-    remoteStream = null;
-    played = false
-  }
-}
 
 function updateButton(button, preText, afterText) {
   if (button.classList.contains('playing')) {

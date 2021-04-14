@@ -93,6 +93,48 @@ async function enumDevices() {
 	$('#CameraDevices').html(videoInputList.join(''));
 }
 
+// init SDK Event
+function initEvent() {
+	zg.on('publisherStateUpdate', (result) => {
+		console.log('publisherStateUpdate', result);
+	});
+
+	zg.on('playerStateUpdate', (result) => {
+		console.log('playerStateUpdate', result);
+	});
+
+	zg.on('publishQualityUpdate', (streamId, stats) => {
+		console.log('publishQualityUpdate', streamId, stats);
+	});
+
+	zg.on('playQualityUpdate', (streamId, stats) => {
+		console.log('playQualityUpdate', streamId, stats);
+	});
+
+	zg.on('soundLevelUpdate', (streamList) => {
+		streamList.forEach((stream) => {
+      if(stream.streamID === streamID) {
+        const value = Math.round(stream.soundLevel)
+        $('#SoundLevelProgressbar').progressbar(value)
+      }
+		});
+	});
+}
+
+function setLogConfig() {
+	let config = localStorage.getItem('logConfig');
+	const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false;
+	if (config) {
+		config = JSON.parse(config);
+		zg.setLogConfig({
+			logLevel: config.logLevel,
+			remoteLogLevel: config.remoteLogLevel,
+			logURL: ''
+		});
+	}
+	zg.setDebugVerbose(DebugVerbose);
+}
+
 function loginRoom(roomId, userId, userName) {
 	return new Promise((resolve, reject) => {
 		$.get(
@@ -146,6 +188,7 @@ $('#SoundLevelMonitor').on('change', function({ target }) {
 		startSoundLevelDelegate(500)
 	} else {
     stopSoundLevelDelegate()
+		$('#SoundLevelProgressbar').progressbar(0)
 	}
 });
 
@@ -158,48 +201,6 @@ $('#SoundLevelMonitor').on('change', function({ target }) {
 function getCreateStreamConfig() {
 	const config = { camera: { video: false } };
 	return config;
-}
-
-// init SDK Event
-function initEvent() {
-	zg.on('publisherStateUpdate', (result) => {
-		console.log('publisherStateUpdate', result);
-	});
-
-	zg.on('playerStateUpdate', (result) => {
-		console.log('playerStateUpdate', result);
-	});
-
-	zg.on('publishQualityUpdate', (streamId, stats) => {
-		console.log('publishQualityUpdate', streamId, stats);
-	});
-
-	zg.on('playQualityUpdate', (streamId, stats) => {
-		console.log('playQualityUpdate', streamId, stats);
-	});
-
-	zg.on('soundLevelUpdate', (streamList) => {
-		streamList.forEach((stream) => {
-      if(stream.streamID === streamID) {
-        const value = Math.round(stream.soundLevel)
-        $('#SoundLevelProgressbar').progressbar(value)
-      }
-		});
-	});
-}
-
-function setLogConfig() {
-	let config = localStorage.getItem('logConfig');
-	const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false;
-	if (config) {
-		config = JSON.parse(config);
-		zg.setLogConfig({
-			logLevel: config.logLevel,
-			remoteLogLevel: config.remoteLogLevel,
-			logURL: ''
-		});
-	}
-	zg.setDebugVerbose(DebugVerbose);
 }
 
 // tool end
@@ -218,14 +219,6 @@ Progressbar.prototype.update = function(value) {
 	$div.attr('aria-valuenow', value);
 	$div.css('width', value + '%');
 	$span.text(value + '% Complete');
-};
-
-Progressbar.prototype.finish = function() {
-	this.update(100);
-};
-
-Progressbar.prototype.reset = function() {
-	this.update(0);
 };
 
 // PROGRESSBAR PLUGIN DEFINITION
@@ -249,10 +242,6 @@ $.fn.progressbar = function(option) {
 async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
-	$('#UserName').val(userID);
-	$('#UserID').val(userID);
-	$('#PublishID').val(streamID);
-	$('#PlayID').val(streamID);
 	createZegoExpressEngine();
 	await checkSystemRequirements();
 	enumDevices();

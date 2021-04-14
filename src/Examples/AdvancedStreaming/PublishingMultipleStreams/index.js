@@ -118,6 +118,91 @@ function loginRoom(roomId, userId, userName) {
   })
 }
 
+function initEvent() {
+  zg.on('publisherStateUpdate', result => {
+    console.warn('publisherStateUpdate', result);
+    if(result.state === "PUBLISHING") {
+      $('#pushlishInfo-id').text(result.streamID)
+    } else if(result.state === "NO_PUBLISH") {
+      $('#pushlishInfo-id').text('')
+    }
+  })
+
+  zg.on('playerStateUpdate', result => {
+    console.warn('playerStateUpdate', result);
+    if(result.state === "PLAYING") {
+      $('#playInfo-id').text(result.streamID)
+    } else if(result.state === "NO_PLAY") {
+      $('#playInfo-id').text('')
+    }
+  })
+
+  zg.on('publishQualityUpdate', (streamId, stats) => {
+    console.warn('publishQualityUpdate', streamId, stats);
+  })
+
+  zg.on('playQualityUpdate', (streamId, stats) => {
+      console.warn('publishQualityUpdate', streamId, stats);
+  })
+}
+
+function clearStream(flag) {
+
+  if(flag === 'publish') {
+    localStream && zg.destroyStream(localStream);
+    $('#pubshlishVideo')[0].srcObject = null;
+    localStream = null;
+    published = false
+    if($('#PublishID').val() === $('#PlayID').val()) {
+      remoteStream && zg.destroyStream(remoteStream);
+      $('#playVideo')[0].srcObject = null;
+      remoteStream = null;
+      played = false
+    }
+  }
+
+  if(flag === 'play') {
+    remoteStream && zg.destroyStream(remoteStream);
+    $('#playVideo')[0].srcObject = null;
+    remoteStream = null;
+    played = false
+  }
+
+  if(flag === 'publishSecond') {
+    localSecondStream && zg.destroyStream(localSecondStream);
+    $('#pubshlishSecondVideo')[0].srcObject = null;
+    localSecondStream = null;
+    publishedSecond = false
+    if($('#PublishSecondID').val() === $('#PlaySecondID').val()) {
+      remoteSecondStream && zg.destroyStream(remoteSecondStream);
+      $('#playSecondVideo')[0].srcObject = null;
+      remoteSecondStream = null;
+      playedSecond = false;
+    }
+  }
+
+  if(flag === 'playSeconed') {
+    remoteSecondStream && zg.destroyStream(remoteSecondStream);
+    $('#playSecondVideo')[0].srcObject = null;
+    remoteSecondStream = null;
+    playedSecond = false;
+  }
+}
+
+function setLogConfig() {
+  let config = localStorage.getItem('logConfig')
+  const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
+  if(config) {
+    config = JSON.parse(config)
+    zg.setLogConfig({
+      logLevel: config.logLevel,
+      remoteLogLevel: config.remoteLogLevel,
+      logURL: '',
+  });
+  }
+  zg.setDebugVerbose(DebugVerbose);
+}
+
 async function startPublishingStream (streamId, config) {
   try {
     localStream = await zg.createStream(config);
@@ -310,77 +395,6 @@ $('#startSecondPlaying').on('click', util.throttle( async function () {
 // This part of the code bias tool
 // ============================================================== 
 
-function initEvent() {
-  zg.on('publisherStateUpdate', result => {
-    console.warn('publisherStateUpdate', result);
-    if(result.state === "PUBLISHING") {
-      $('#pushlishInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PUBLISH") {
-      $('#pushlishInfo-id').text('')
-    }
-  })
-
-  zg.on('playerStateUpdate', result => {
-    console.warn('playerStateUpdate', result);
-    if(result.state === "PLAYING") {
-      $('#playInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PLAY") {
-      $('#playInfo-id').text('')
-    }
-  })
-
-  zg.on('publishQualityUpdate', (streamId, stats) => {
-    console.warn('publishQualityUpdate', streamId, stats);
-  })
-
-  zg.on('playQualityUpdate', (streamId, stats) => {
-      console.warn('publishQualityUpdate', streamId, stats);
-  })
-}
-
-function clearStream(flag) {
-
-  if(flag === 'publish') {
-    localStream && zg.destroyStream(localStream);
-    $('#pubshlishVideo')[0].srcObject = null;
-    localStream = null;
-    published = false
-    if($('#PublishID').val() === $('#PlayID').val()) {
-      remoteStream && zg.destroyStream(remoteStream);
-      $('#playVideo')[0].srcObject = null;
-      remoteStream = null;
-      played = false
-    }
-  }
-
-  if(flag === 'play') {
-    remoteStream && zg.destroyStream(remoteStream);
-    $('#playVideo')[0].srcObject = null;
-    remoteStream = null;
-    played = false
-  }
-
-  if(flag === 'publishSecond') {
-    localSecondStream && zg.destroyStream(localSecondStream);
-    $('#pubshlishSecondVideo')[0].srcObject = null;
-    localSecondStream = null;
-    publishedSecond = false
-    if($('#PublishSecondID').val() === $('#PlaySecondID').val()) {
-      remoteSecondStream && zg.destroyStream(remoteSecondStream);
-      $('#playSecondVideo')[0].srcObject = null;
-      remoteSecondStream = null;
-      playedSecond = false;
-    }
-  }
-
-  if(flag === 'playSeconed') {
-    remoteSecondStream && zg.destroyStream(remoteSecondStream);
-    $('#playSecondVideo')[0].srcObject = null;
-    remoteSecondStream = null;
-    playedSecond = false;
-  }
-}
-
 function updateButton(button, preText, afterText) {
   if (button.classList.contains('playing')) {
     button.classList.remove('paused', 'playing', 'border-error', 'border-primary');
@@ -398,20 +412,6 @@ function updateButton(button, preText, afterText) {
     button.classList.add('paused');
     button.innerText = afterText
   }
-}
-
-function setLogConfig() {
-  let config = localStorage.getItem('logConfig')
-  const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
-  if(config) {
-    config = JSON.parse(config)
-    zg.setLogConfig({
-      logLevel: config.logLevel,
-      remoteLogLevel: config.remoteLogLevel,
-      logURL: '',
-  });
-  }
-  zg.setDebugVerbose(DebugVerbose);
 }
 
 function reSetVideoInfo(flag) {

@@ -117,7 +117,7 @@ function loginRoom(roomId, userId, userName) {
 
 async function startPublishingStream (streamId) {
   try {
-    const stream = $('#customLocalVideo')[0].captrueStream();
+    const stream = $('#customLocalVideo')[0].captureStream();
     localStream = await zg.createStream({
       custom: {
         source: stream
@@ -127,6 +127,7 @@ async function startPublishingStream (streamId) {
     $('#pubshlishVideo')[0].srcObject = localStream;
     return true
   } catch(err) {
+    console.error(err);
     return false
   }
   
@@ -267,16 +268,18 @@ function setLogConfig() {
 }
 
 function checkVideo() {
+  const timer = setTimeout(() => {
+    resolve(false)
+  }, 3000)
   return new Promise((resolve) => {
     $('#customLocalVideo').on('error', function() {
       resolve(false)
+      clearTimeout(timer)
     })
     $('#customLocalVideo').on('loadeddata', function() {
       resolve(true)
+      clearTimeout(timer)
     })
-    setTimeout(() => {
-      resolve(false)
-    }, 3000)
   })
 }
 // tool end

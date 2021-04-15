@@ -127,33 +127,33 @@
               </div>
             </div>
             <div class="row" id="videoList">
-              <div class="preview-pushlishInfo col-lg-12 col-6">
+              <div class="preview-pushlishInfo col-lg-12 col-6 m-b-15">
                 <div class="pushlishInfo-title">
-                  Preview&emsp;PublishStreamID: <span id="pushlishInfo-id"></span>
+                  <span data-lang="Preview">Preview</span>&emsp;PublishStreamID: <span id="pushlishInfo-id"></span>
                 </div>
                 <div class="preview-content">
                   <input class="m-l-10" type="hidden" id="PublishID" value="0010" />
-                  <video id="pubshlishVideo" autoplay muted playsinline></video>
+                  <video id="pubshlishVideo" autoplay playsinline></video>
                 </div>
               </div>
               <div class="preview-playInfo col-lg-12 col-6">
                 <div class="pushlishInfo-title">
-                  Play Stream&emsp; PlayStreamID: <span id="playInfo-id"></span>
+                  <span data-lang="PlayStream">Play Stream</span>&emsp; PlayStreamID: <span id="playInfo-id"></span>
                 </div>
                 <div class="preview-content" id="CdnPlay">
                   <input class="m-l-10" type="hidden" id="PlayID" value="0010" />
                   <!-- <video id="playVideo" autoplay muted playsinline></video> -->
-                  <video id="playVideo" autoplay muted preload="auto" x-webkit-airplay="true" x5-video-player-type="h5-page"
+                  <video id="playVideo" autoplay preload="auto" x-webkit-airplay="true" x5-video-player-type="h5-page"
                     webkit-playsinline="true" playsinline></video>
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-12 col-lg-6 action-wrapper">
+          <div class="col-12 col-lg-6 action-wrapper font-bold">
             <div class="action-step">
               <div class="action-content font-12">
                 <div data-lang="TurnPublishingCDN" class="font-bold font-14">转推CDN</div>
-                <div data-lang="TurnPublishingCDNInfo" class="font-12">将音视频流从 Zego 实时音视频转推到 CDN</div>
+                <div data-lang="TurnPublishingCDNInfo" class="font-12 font-medium">将音视频流从 Zego 实时音视频转推到 CDN</div>
                 <div class="m-t-10 m-b-10">
                   Step1 <span class="font-12">Start Publishing</span>
                   <button id="startPublishing" class="m-b-5 cuBtn play-pause-button">Start Publishing</button>
@@ -177,19 +177,22 @@
                           stroke-linejoin="round" stroke-miterlimit="10" d="M14 14 34 34 M34 14 14 34" />
                       </svg>
                     </div>
-                    AddPublishCdnUrl
+                    <span data-lang="AddPublishCdnUrl">AddPublishCdnUrl</span>
                   </button>
                 </div>
                 <div class="m-b-10">
-                  Publish CDN URL
+                  <span data-lang="PublishCDNURL">Publish CDN URL</span>
                   <input id="PublishCdnUrl" type="text" class="font-medium m-l-10">
                 </div>
-                <div data-lang="StreamByUrl" class="b-t p-t-10 font-14 font-bold m-b-10">通过Url拉流</div>
+                <div data-lang="StreamByUrl" class="b-t p-t-10 font-14 font-bold m-b-10" data-lang="PlayStreamFromURL">
+                  Play Stream From URL</div>
                 <div class="m-b-10">
                   CDN URL
                   <input id="CdnUrl" type="text" class="font-medium m-l-10">
                 </div>
-                <button id="PlayStreamFromURL" type="button" class="btn-info btn configBtn">Play Stream From URL</button>
+                <button id="PlayStreamFromURL" type="button" class="btn-info btn configBtn"
+                  data-lang="PlayStreamFromURL">Play Stream From
+                  URL</button>
               </div>
             </div>
           </div>

@@ -127,7 +127,7 @@
               </div>
             </div>
             <div class="row" id="videoList">
-              <div class="preview-pushlishInfo col-lg-12 col-6">
+              <div class="preview-pushlishInfo col-lg-12 col-6 m-b-15">
                 <div class="preview-content">
                   <div class="preview-action">
                     <div class="preview-info">
@@ -143,10 +143,7 @@
                       <button id="startPublishing" class="m-b-5 configBtn play-pause-button">Start Publishing</button>
                     </div>
                   </div>
-                  <video id="pubshlishVideo" autoplay muted playsinline></video>
-                </div>
-                <div>
-                  StreamID: <span id="t_0004"></span>
+                  <video id="pubshlishVideo" autoplay playsinline></video>
                 </div>
               </div>
               <div class="preview-playInfo col-lg-12 col-6">
@@ -165,13 +162,13 @@
                       <button id="startPlaying" class="m-b-5 configBtn play-pause-button">Start Playing</button>
                     </div>
                   </div>
-                  <video id="playVideo" autoplay muted playsinline></video>
+                  <video id="playVideo" autoplay playsinline></video>
                 </div>
               </div>
             </div>
           </div>
           <div class="col-12 col-lg-6 action-wrapper">
-            <div class="action-step">
+            <div class="action-step font-bold">
               <div class="action-content">
                 <div class="action-room font-14">
                   <div class="f-b-5">
@@ -184,8 +181,8 @@
                     UserName <input type="text" id="UserName" disabled />
                   </div>
                 </div>
-                <div class="font-14 select-wrapper m-b-10">
-                  Capture Resolution
+                <div class="font-14 select-wrapper m-b-15">
+                  <span data-lang="CaptureResolution">Capture Resolution</span>
                   <select class="form-control form-control-sm m-l-5" id="captureResolution">
                     <option value="320*240">320 * 240</option>
                     <option value="640*480">640 * 480</option>
@@ -194,15 +191,15 @@
                 </div>
                 <div class="videoQuality">
                   <div class="font-14 f-b-5">
-                    FPS <input type="text" class="t-a-r" id="FPS" value="15" /> fps
+                    <span data-lang="FPS">FPS</span> <input type="text" class="t-a-r" id="FPS" value="15" /> fps
                   </div>
                   <div class="font-14 f-b-5">
-                    Bitrate <input type="text" class="t-a-r" id="Bitrate" value="300" /> kbps
+                    <span data-lang="Bitrate"></span> <input type="text" class="t-a-r" id="Bitrate" value="300" /> kbps
                   </div>
                 </div>
                 <div class="flex-c">
                   <div class="select-wrapper">
-                    Mirror
+                    <span data-lang="Mirror"></span>
                     <select class="form-control form-control-sm m-l-5" id="Mirror">
                       <option value="none">none</option>
                       <option value="onlyPreview">onlyPreview</option>

@@ -9,7 +9,7 @@
 
 let userID = util.getBrow() + '_' + new Date().getTime();
 let roomID = '0004';
-let streamID = '0004';
+let streamID = parseInt(Math.random() * 999999) + '';
 
 let zg = null;
 let isChecked = false;
@@ -171,26 +171,23 @@ function initEventPlay() {
 }
 
 function clearStream(flag) {
-	if (localStream && flag) {
-		zg.destroyStream(localStream);
-	}
-	if (remoteStream) {
-		zg.destroyStream(remoteStream);
-	}
-	if (flag) {
+	if (flag === 'publish') {
+		localStream && zg.destroyStream(localStream);
 		$('#pubshlishVideo')[0].srcObject = null;
 		localStream = null;
-	}
-	$('#playVideo')[0].srcObject = null;
-	remoteStream = null;
-	if (flag === 'room') {
-		isLoginRoom = false;
-	}
-	if (flag === 'room' || flag === 'publish') {
 		published = false;
+		remoteStream && zg.destroyStream(remoteStream);
+		$('#playVideo')[0].srcObject = null;
+		remoteStream = null;
+		played = false;
 	}
 
-	played = false;
+	if (flag === 'play') {
+		remoteStream && zg.destroyStream(remoteStream);
+		$('#playVideo')[0].srcObject = null;
+		remoteStream = null;
+		played = false;
+	}
 }
 
 function setLogConfig() {
@@ -260,7 +257,7 @@ async function startPublishingStream(streamId, config) {
 async function stopPublishingStream(streamId) {
 	zg.stopPublishingStream(streamId);
 	if (remoteStream) {
-		stopPlayingStream($('#playInfo-id').text());
+		stopPlayingStream(streamId);
 	}
 	clearStream('publish');
 }
@@ -287,7 +284,7 @@ async function startPlayingMultipleStream(streamId, options = {}) {
 
 async function stopPlayingStream(streamId) {
 	zg.stopPlayingStream(streamId);
-	clearStream();
+	clearStream('play');
 }
 
 // uses SDK end
@@ -312,15 +309,15 @@ $('#startPublishing').on(
 				this.classList.add('border-error');
 				this.innerText = 'Publishing Fail';
 			}
+			$('#publishStreamID-info').text(streamID)
 		} else {
 			if (remoteStream) {
-				// $('#PlayID')[0].disabled = false
 				updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing');
 			}
 			stopPublishingStream(streamID);
 			updateButton(this, 'Start Publishing', 'Stop Publishing');
 			published = false;
-			// $('#PublishID')[0].disabled = false
+			$('#publishStreamID-info').text('')
 		}
 	}, 500)
 );
@@ -398,24 +395,29 @@ function updateButton(button, preText, afterText) {
 
 function changeVideo(flag) {
 	if (flag) {
-		$('#pubshlishVideo').css('transform', 'none');
-		$('#playVideo').css('transform', 'none');
+		$('video').each((index, video) => {
+			video.setAttribute('transform', 'none')
+		})
 		return;
 	}
 	const value = $('#Mirror').val();
 	if (value === 'onlyPreview') {
 		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
 	} else if (value === 'onlyPlay') {
-		$('#playVideo').css('transform', 'scale(-1, 1)');
+		$('video').each((index, video) => {
+			if(video.id !== 'pubshlishVideo')
+			video.setAttribute('transform', 'scale(-1, 1)')
+		})
 	} else if (value === 'both') {
-		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
-		$('#playVideo').css('transform', 'scale(-1, 1)');
+		$('video').each((index, video) => {
+			video.setAttribute('transform', 'scale(-1, 1)')
+		})
 	}
 }
 
 function playMultipleEvent() {
 	zg.on('playQualityUpdate', (streamId, stats) => {
-		if (streamId === '0004') {
+		if (streamId === streamID) {
 			$('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
 			$('#receiveBitrate').text(parseInt(stats.video.videoBitrate));
 			$('#receiveFPS').text(parseInt(stats.video.videoFPS));
@@ -506,15 +508,15 @@ function appednHtml(streamId, user) {
         <video autoplay muted playsinline></video>
       </div>
       <div class="font-12 t-nowrap">
-        <span class="m-r-5">${user.userName}</span>
-        StreamID: <span>${streamId}</span>
+			StreamID: <span>${streamId}</span>
+        <div>UserName: <span class="m-r-5">${user.userName}</span></div>
       </div>
     </div>`
 		);
 		$('#streamListUl').append(`
     <li id="l-${streamId}">
     <div class="drop-item">
-      <span class="f-b-3 t-nowrap m-r-5">StreamID: ${streamId}</span>
+      <span class="f-b-3 t-nowrap m-r-10">StreamID: ${streamId}</span>
       <span class="f-b-3 t-nowrap m-r-5">UserID: ${user.userID}</span>
       <span class="f-b-3 t-nowrap ">Name: ${user.userName}</span>
     </div>

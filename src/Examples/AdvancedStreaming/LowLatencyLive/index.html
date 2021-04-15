@@ -130,18 +130,18 @@
             <div class="row">
               <div class="preview-pushlishInfo col-lg-12 col-6">
                 <div class="pushlishInfo-title">
-                  Preview&emsp;PublishStreamID: <span id="pushlishInfo-id"></span>
+                  <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id"></span>
                 </div>
                 <div class="preview-content">
-                  <video id="pubshlishVideo" autoplay muted playsinline></video>
+                  <video id="pubshlishVideo" autoplay playsinline></video>
                 </div>
               </div>
               <div class="preview-playInfo m-t-10 col-lg-12 col-6">
                 <div class="pushlishInfo-title">
-                  Play Stream&emsp;StreamID: <span id="playInfo-id"></span>
+                  <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id"></span>
                 </div>
                 <div class="preview-content">
-                  <video id="playVideo" autoplay muted playsinline></video>
+                  <video id="playVideo" autoplay playsinline></video>
                 </div>
               </div>
             </div>
@@ -229,11 +229,11 @@
                     </div>
                     <div class="font-12 publish-check m-b-15">
                       <div class="check-wrappre m-r-5">
-                        <label class="form-check-label m-r-5" for="Camera">Camera</label>
-                        <input class="check-input" type="checkbox" id="Camera" disabled>
+                        <label class="form-check-label m-r-5" for="Camera" data-lang="Camera">Camera</label>
+                        <input class="check-input" type="checkbox" id="Camera">
                       </div>
                       <div class="check-wrappre">
-                        <label class="form-check-label m-r-5" for="Microphone">Microphone</label>
+                        <label class="form-check-label m-r-5" for="Microphone" data-lang="Microphone">Microphone</label>
                         <input class="check-input" type="checkbox" id="Microphone">
                       </div>
                     </div>
@@ -243,7 +243,7 @@
                   <button id="startPublishing" class="play-pause-button">Start Publishing</button>
                   <div class="publish-setting m-t-10">
                     <div class="font-12 select-wrapper">
-                      Mirror
+                      <span data-lang="Mirror">Mirror</span>
                       <select class="form-control form-control-sm m-l-5" id="Mirror">
                         <option value="none">none</option>
                         <option value="onlyPreview">onlyPreview</option>
@@ -252,7 +252,7 @@
                       </select>
                     </div>
                     <div class="font-12 select-wrapper">
-                      Camera Switch
+                      <span data-lang="Camera">Camera Switch</span>
                       <select class="form-control form-control-sm m-l-5" id="CameraDevices">
                       </select>
                     </div>
@@ -270,11 +270,11 @@
                     </div>
                     <div class="font-12 publish-check m-b-15">
                       <div class="check-wrappre m-r-5">
-                        <label class="form-check-label m-r-5" for="Video">Video</label>
-                        <input class="check-input" type="checkbox" id="Video" disabled>
+                        <label class="form-check-label m-r-5" for="Video" data-lang="Video">Video</label>
+                        <input class="check-input" type="checkbox" id="Video">
                       </div>
                       <div class="check-wrappre">
-                        <label class="form-check-label m-r-5" for="Audio">Audio</label>
+                        <label class="form-check-label m-r-5" for="Audio" data-lang="Audio">Audio</label>
                         <input class="check-input" type="checkbox" id="Audio">
                       </div>
                     </div>

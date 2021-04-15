@@ -229,7 +229,7 @@ $('#startPublishing').on(
 		if (!published) {
 			const flag = await startPublishingStream(id, getCreateStreamConfig());
 			if (flag) {
-				updateButton(this, 'Start Publishing', 'Stop Publishing');
+				updateButton(this, 'Start Screen Capture', 'Stop Screen Capture');
 				published = true;
 				$('#PublishID')[0].disabled = true;
 				changeVideo();
@@ -246,7 +246,7 @@ $('#startPublishing').on(
 				reSetVideoInfo();
 			}
 			stopPublishingStream(id);
-			updateButton(this, 'Start Publishing', 'Stop Publishing');
+			updateButton(this, 'Start Screen Capture', 'Stop Screen Capture');
 			published = false;
 			$('#PublishID')[0].disabled = false;
 			reSetVideoInfo('publish');

@@ -314,8 +314,8 @@ $('#startPlaying').on('click', util.throttle( async function () {
   }
 }, 500))
 
-$('#BoradcastMessageBtn').on('click', util.throttle(async function() {
-  const message = $('#BoradcastMessage').val()
+$('#BroadcastMessageBtn').on('click', util.throttle(async function() {
+  const message = $('#BroadcastMessage').val()
   if(!message) return alert('message is empty')
 
   updateLogger('[action] sendBroadcastMessage')
@@ -323,7 +323,7 @@ $('#BoradcastMessageBtn').on('click', util.throttle(async function() {
   if(result.errorCode === 0) {
     updateLogger('[info] sendBroadcastMessage success')
     updateLogger(`[BroadcastMessage] ${userID}: ${message}`)
-    $('#BoradcastMessage').val('')
+    $('#BroadcastMessage').val('')
   } else {
     updateLogger(`[info] sendBroadcastMessage fail, extendedData: ${result.extendedData || ''}`)
   }

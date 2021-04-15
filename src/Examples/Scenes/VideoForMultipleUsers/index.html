@@ -139,7 +139,7 @@
                     <div class="preview-video-action">
                       <div class="flex-c">
                         <div class="select-wrapper">
-                          Mirror
+                          <span data-lang="Mirror">Mirror</span>
                           <select class="form-control form-control-sm m-l-5" id="Mirror">
                             <option value="none">none</option>
                             <option value="onlyPreview">onlyPreview</option>
@@ -148,28 +148,28 @@
                           </select>
                         </div>
                         <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Camera">Camera</label>
+                          <label class="form-check-label m-r-5" for="Camera" data-lang="Camera">Camera</label>
                           <input class="check-input" type="checkbox" id="Camera" checked>
                         </div>
                       </div>
                       <div class="flex-c">
                         <div class="select-wrapper">
-                          Camera
+                          <span data-lang="Camera">Camera</span>
                           <select class="form-control form-control-sm m-l-5" id="CameraDevices">
                           </select>
                         </div>
                         <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Microphone">Microphone</label>
+                          <label class="form-check-label m-r-5" for="Microphone" data-lang="Microphone">Microphone</label>
                           <input class="check-input" type="checkbox" id="Microphone" checked>
                         </div>
                       </div>
                       <button id="startPublishing" class="m-b-5 play-pause-button">Start Publishing</button>
                     </div>
                   </div>
-                  <video id="pubshlishVideo" autoplay muted playsinline></video>
+                  <video id="pubshlishVideo" autoplay playsinline></video>
                 </div>
-                <div>
-                  StreamID: <span id="t_0004"></span>
+                <div class="font-12">
+                  StreamID: <span id="publishStreamID-info"></span>
                 </div>
               </div>
               <div class="preview-playInfo col-6">
@@ -184,18 +184,18 @@
                     <div class="preview-video-action">
                       <div class="font-12 publish-check m-b-5 m-t-5">
                         <div class="check-wrappre m-r-5">
-                          <label class="form-check-label m-r-5" for="Video">Video</label>
+                          <label class="form-check-label m-r-5" for="Video" data-lang="Video">Video</label>
                           <input class="check-input" type="checkbox" id="Video" checked>
                         </div>
                         <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Audio">Audio</label>
+                          <label class="form-check-label m-r-5" for="Audio" data-lang="Audio">Audio</label>
                           <input class="check-input" type="checkbox" id="Audio" checked>
                         </div>
                       </div>
                       <button id="startPlaying" class="m-b-5 play-pause-button">Start Playing</button>
                     </div>
                   </div>
-                  <video id="playVideo" autoplay muted playsinline></video>
+                  <video id="playVideo" autoplay playsinline></video>
                 </div>
               </div>
             </div>
@@ -215,7 +215,7 @@
                   </div>
                 </div>
                 <div class="font-14 select-wrapper m-b-10 font-bold">
-                  Capture Resolution
+                  <span data-lang="CaptureResolution">Capture Resolution</span>
                   <select class="form-control form-control-sm m-l-5" id="captureResolution">
                     <option value="320*240">320 * 240</option>
                     <option value="640*480">640 * 480</option>
@@ -224,10 +224,10 @@
                 </div>
                 <div class="videoQuality font-bold">
                   <div class="font-14 f-b-5">
-                    FPS <input type="text" class="t-a-r" id="FPS" value="15" /> fps
+                    <span data-lang="FPS">FPS</span> <input type="text" class="t-a-r" id="FPS" value="15" /> fps
                   </div>
                   <div class="font-14 f-b-5">
-                    Bitrate <input type="text" class="t-a-r" id="Bitrate" value="300" /> kbps
+                    <span data-lang="FPS">Bitrate</span> <input type="text" class="t-a-r" id="Bitrate" value="300" /> kbps
                   </div>
                 </div>
                 <div class="dropdown-wrapper">

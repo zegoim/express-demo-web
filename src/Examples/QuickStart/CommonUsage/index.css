@@ -96,13 +96,12 @@ input {
 }
 
 .publish-check {
-  /* flex-basis: 50%; */
+  flex-basis: 50%;
   display: flex;
   justify-content: space-around;
 }
 
 .check-wrappre {
-  /* flex-basis: 50%; */
   text-align: center;
   display: flex;
   align-items: center;

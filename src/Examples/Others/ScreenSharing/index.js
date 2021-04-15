@@ -8,8 +8,8 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0005';
-let streamID = '0005';
+let roomID = '0033';
+let streamID = '0033';
 
 let zg = null;
 let isChecked = false;
@@ -118,6 +118,7 @@ function loginRoom(roomId, userId, userName) {
 
 function initEvent() {
 	zg.on('publisherStateUpdate', (result) => {
+		console.warn('publisherStateUpdate', result);
 		if (result.state === 'PUBLISHING') {
 			$('#pushlishInfo-id').text(result.streamID);
 		} else if (result.state === 'NO_PUBLISH') {
@@ -126,6 +127,7 @@ function initEvent() {
 	});
 
 	zg.on('playerStateUpdate', (result) => {
+		console.warn('playerStateUpdate', result);
 		if (result.state === 'PLAYING') {
 			$('#playInfo-id').text(result.streamID);
 		} else if (result.state === 'NO_PLAY') {
@@ -134,17 +136,11 @@ function initEvent() {
 	});
 
 	zg.on('publishQualityUpdate', (streamId, stats) => {
-		$('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
-		$('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps');
-		$('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s');
-		$('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%');
+		console.warn('publishQualityUpdate', streamId, stats);
 	});
 
 	zg.on('playQualityUpdate', (streamId, stats) => {
-		$('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
-		$('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps');
-		$('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s');
-		$('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%');
+		console.warn('playQualityUpdate', streamId, stats);
 	});
 }
 
@@ -294,15 +290,8 @@ $('#startPlaying').on(
 // ==============================================================
 
 function getCreateStreamConfig() {
-	const resolution = $('#captureResolution').val().split('*');
 	const config = {
-		camera: {
-			videoQuality: 4,
-			frameRate: $('#FPS').val() * 1,
-			width: resolution[0] * 1,
-			height: resolution[1] * 1,
-			bitRate: $('#Bitrate').val() * 1
-		}
+		screen: true
 	};
 	return config;
 }

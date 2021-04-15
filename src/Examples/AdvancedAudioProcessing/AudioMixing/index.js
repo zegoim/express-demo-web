@@ -8,16 +8,13 @@
 // ============================================================== 
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0014'
-let streamID = '0014'
+let roomID = '0020'
+let streamID = '0020'
 
 let zg = null;
-let isChecked = false;
-let isLoginRoom = false;
+let isStart = false;
 let localStream = null;
 let remoteStream = null;
-let published = false;
-let isPlay = false;
 // part end
 
 // ============================================================== 
@@ -106,27 +103,15 @@ function initEvent() {
   })
 }
 
-function clearStream(flag) {
+function clearStream() {
 
-  if(flag === 'publish') {
-    localStream && zg.destroyStream(localStream);
-    $('#pubshlishVideo')[0].srcObject = null;
-    localStream = null;
-    published = false
-    if($('#PublishID').val() === $('#PlayID').val()) {
-      remoteStream && zg.destroyStream(remoteStream);
-      $('#playVideo')[0].srcObject = null;
-      remoteStream = null;
-      played = false
-    }
-  }
-
-  if(flag === 'play') {
-    remoteStream && zg.destroyStream(remoteStream);
-    $('#playVideo')[0].srcObject = null;
-    remoteStream = null;
-    played = false
-  }
+  localStream && zg.destroyStream(localStream);  
+  remoteStream && zg.destroyStream(remoteStream);
+  remoteStream = null;
+  localStream = null;
+  $('#pubshlishVideo')[0].srcObject = null;
+  $('#playVideo')[0].srcObject = null;
+  isStart = false
 }
 
 function setLogConfig() {
@@ -166,14 +151,13 @@ function loginRoom(roomId, userId, userName) {
   })
 }
 
+function logoutRoom(roomId) {
+	zg.logoutRoom(roomId);
+}
+
 async function startPublishingStream (streamId) {
   try {
-    const video = $('#customLocalVideo')[0];
-    localStream = await zg.createStream({
-      custom: {
-        source: video
-      }
-    });
+    localStream = await zg.createStream();
     zg.startPublishingStream(streamId, localStream);
     $('#pubshlishVideo')[0].srcObject = localStream;
     return true
@@ -186,61 +170,108 @@ async function startPublishingStream (streamId) {
 
 async function stopPublishingStream(streamId) {
   zg.stopPublishingStream(streamId)
-  if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
-    stopPlayingStream(streamId)
-  }
-  clearStream('publish')
+}
+
+async function startPlayingStream(streamId, options = {}) {
+	try {
+		remoteStream = await zg.startPlayingStream(streamId, options);
+		$('#playVideo')[0].srcObject = remoteStream;
+		return true;
+	} catch (err) {
+		return false;
+	}
+}
+
+async function stopPlayingStream(streamId) {
+	zg.stopPlayingStream(streamId);
+}
+
+async function startMixingAudio(streamId) {
+	const result = zg.startMixingAudio(streamId, [$('#customAudio')[0]]);
+  console.warn('audioMixing', result);
+}
+
+async function stopMixingAudio(streamId) {
+	zg.stopMixingAudio(streamId);
 }
 // uses SDK end
 
 
 // ============================================================== 
-// This part of the code binds the button click event
+// This part of the code binds the some  event
 // ==============================================================  
 
-$('#startPlay').on('click', util.throttle( async function () {
-  const url = $('#CustomVideo').val()
-  if(!url) return alert('url is empty')
+$('#start').on('click', util.throttle( async function () {
+  const RoomId = $('#RoomID').val();
+  if(!RoomId) alert('RoomId is empty')
+  const PublishId = $('#PublishID').val();
+  if(!PublishId) alert('PublishId is empty')
+  // const PlayID = $('#PlayID').val();
+  // if(!PlayID) alert('PlayID is empty')
 
-  $('#customLocalVideo')[0].src = url
-  const flag = await checkVideo()
-  if(flag) {
-    isPlay = true
-  } else {
-    isPlay = false
-    $('#CustomVideo').val('')
-    alert('Playback failed')
-  }
-}, 500))
-
-$('#startPublishing').on('click', util.throttle( async function () {
-  if(!isPlay) return alert('must start play')
-  const id = $('#PublishID').val();
-  if(!id) return alert('PublishID is empty')
   this.classList.add('border-primary')
-  if(!published) {
-      const flag =  await startPublishingStream(id);
-      if(flag) {
-        updateButton(this, 'Start Publishing', 'Stop Publishing');
-        published = true
-      } else {
+  if(!isStart) {
+      //  Step1 loginRoom
+      try {
+        await loginRoom(RoomId, userID, userID)
+        $('#roomStateSuccessSvg').css('display', 'inline-block')
+        $('#roomStateErrorSvg').css('display', 'none')
+      $('#RoomID')[0].disabled = true
+      } catch (err) {
+        $('#roomStateSuccessSvg').css('display', 'none')
+        $('#roomStateErrorSvg').css('display', 'inline-block')
         this.classList.remove('border-primary');
         this.classList.add('border-error')
-        this.innerText = 'Publishing Fail'
+        this.innerText = 'Start Fail'
+        return
       }
 
-  } else {
-      if(remoteStream && id === $('#PlayID').val()) {
-      $('#PlayID')[0].disabled = false
-        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+      // Step2 PublishingStream
+      const flagPublish =  await startPublishingStream(PublishId);
+      if(!flagPublish) {
+        this.classList.remove('border-primary');
+        this.classList.add('border-error')
+        this.innerText = 'Start Fail'
+        return
       }
-      stopPublishingStream(id);
-      updateButton(this, 'Start Publishing', 'Stop Publishing')
-      published = false
+      $('#PublishID')[0].disabled = true
+      $('#AudioMixing')[0].disabled = false
+
+      // Step3 PlayingStream
+      // const flagPlay =  await startPlayingStream(PlayID);
+      // if(!flagPlay) {
+      //   this.classList.remove('border-primary');
+      //   this.classList.add('border-error')
+      //   this.innerText = 'Start Fail'
+      // }
+
+      updateButton(this, 'Start', 'Stop');
+      isStart = true
+      // $('#PlayID')[0].disabled = true
+      $('#customAudio')[0].play()
+  } else {
+      stopPlayingStream(PlayID)
+      stopPublishingStream(PublishId);
+      logoutRoom(roomID)
+      updateButton(this, 'Start', 'Stop')
+      isStart = false
+      $('#RoomID')[0].disabled = false
       $('#PublishID')[0].disabled = false
+      $('#PlayID')[0].disabled = false
+      $('#AudioMixing')[0].disabled = true
+      $('#roomStateSuccessSvg').css('display', 'none')
+      $('#roomStateErrorSvg').css('display', 'inline-block')
+      clearStream()
   }
 }, 500))
 
+$('#AudioMixing').on('change', function({ target }) {
+  if(target.checked) {
+    startMixingAudio($('#PublishID').val())
+  } else {
+    stopMixingAudio($('#PublishID').val())
+  }
+})
 // bind event end
 
 
@@ -293,19 +324,13 @@ async function render() {
   $('#UserName').val(userID)
   $('#UserID').val(userID)
   $('#PublishID').val(streamID)
+  $('#PlayID').val(streamID)
+  $('#AudioMixing')[0].disabled = true
   createZegoExpressEngine()
   await checkSystemRequirements()
   enumDevices()
   initEvent()
   setLogConfig()
-  try {
-    await loginRoom(roomID, userID, userID)
-    $('#roomStateSuccessSvg').css('display', 'inline-block')
-    $('#roomStateErrorSvg').css('display', 'none')
-  } catch (err) {
-    $('#roomStateSuccessSvg').css('display', 'none')
-    $('#roomStateErrorSvg').css('display', 'inline-block')
-  }
 }
 
 render()

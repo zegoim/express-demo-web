@@ -92,6 +92,77 @@ async function enumDevices() {
   $('#CameraDevices').html(videoInputList.join(''));
 }
 
+function initEvent() {
+  zg.on('publisherStateUpdate', result => {
+    if(result.state === "PUBLISHING") {
+      $('#pushlishInfo-id').text(result.streamID)
+    } else if(result.state === "NO_PUBLISH") {
+      $('#pushlishInfo-id').text('')
+    }
+  })
+
+  zg.on('playerStateUpdate', result => {
+    if(result.state === "PLAYING") {
+      $('#playInfo-id').text(result.streamID)
+    } else if(result.state === "NO_PLAY") {
+      $('#playInfo-id').text('')
+    }
+  })
+
+  zg.on('publishQualityUpdate', (streamId, stats) => {
+    $('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`)
+    $('#sendVideoCodec').text(stats.video.googCodecName)
+    $('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+    $('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+    $('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
+  })
+
+  zg.on('playQualityUpdate', (streamId, stats) => {
+      $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`)
+      $('#receiveVideoCodec').text(stats.video.googCodecName)
+      $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+      $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+      $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
+  })
+}
+
+function clearStream(flag) {
+
+  if(flag === 'publish') {
+    localStream && zg.destroyStream(localStream);
+    $('#pubshlishVideo')[0].srcObject = null;
+    localStream = null;
+    published = false
+    if($('#PublishID').val() === $('#PlayID').val()) {
+      remoteStream && zg.destroyStream(remoteStream);
+      $('#playVideo')[0].srcObject = null;
+      remoteStream = null;
+      played = false
+    }
+  }
+
+  if(flag === 'play') {
+    remoteStream && zg.destroyStream(remoteStream);
+    $('#playVideo')[0].srcObject = null;
+    remoteStream = null;
+    played = false
+  }
+}
+
+function setLogConfig() {
+  let config = localStorage.getItem('logConfig')
+  const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
+  if(config) {
+    config = JSON.parse(config)
+    zg.setLogConfig({
+      logLevel: config.logLevel,
+      remoteLogLevel: config.remoteLogLevel,
+      logURL: '',
+  });
+  }
+  zg.setDebugVerbose(DebugVerbose);
+}
+
 function loginRoom(roomId, userId, userName) {
   return new Promise((resolve, reject) => {
     $.get(
@@ -229,63 +300,6 @@ function getCodecConfig() {
   return config
 }
 
-function initEvent() {
-  zg.on('publisherStateUpdate', result => {
-    if(result.state === "PUBLISHING") {
-      $('#pushlishInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PUBLISH") {
-      $('#pushlishInfo-id').text('')
-    }
-  })
-
-  zg.on('playerStateUpdate', result => {
-    if(result.state === "PLAYING") {
-      $('#playInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PLAY") {
-      $('#playInfo-id').text('')
-    }
-  })
-
-  zg.on('publishQualityUpdate', (streamId, stats) => {
-    $('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`)
-    $('#sendVideoCodec').text(stats.video.googCodecName)
-    $('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
-    $('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
-    $('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
-  })
-
-  zg.on('playQualityUpdate', (streamId, stats) => {
-      $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`)
-      $('#receiveVideoCodec').text(stats.video.googCodecName)
-      $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
-      $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
-      $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
-  })
-}
-
-function clearStream(flag) {
-
-  if(flag === 'publish') {
-    localStream && zg.destroyStream(localStream);
-    $('#pubshlishVideo')[0].srcObject = null;
-    localStream = null;
-    published = false
-    if($('#PublishID').val() === $('#PlayID').val()) {
-      remoteStream && zg.destroyStream(remoteStream);
-      $('#playVideo')[0].srcObject = null;
-      remoteStream = null;
-      played = false
-    }
-  }
-
-  if(flag === 'play') {
-    remoteStream && zg.destroyStream(remoteStream);
-    $('#playVideo')[0].srcObject = null;
-    remoteStream = null;
-    played = false
-  }
-}
-
 function updateButton(button, preText, afterText) {
   if (button.classList.contains('playing')) {
     button.classList.remove('paused', 'playing', 'border-error', 'border-primary');
@@ -303,20 +317,6 @@ function updateButton(button, preText, afterText) {
     button.classList.add('paused');
     button.innerText = afterText
   }
-}
-
-function setLogConfig() {
-  let config = localStorage.getItem('logConfig')
-  const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
-  if(config) {
-    config = JSON.parse(config)
-    zg.setLogConfig({
-      logLevel: config.logLevel,
-      remoteLogLevel: config.remoteLogLevel,
-      logURL: '',
-  });
-  }
-  zg.setDebugVerbose(DebugVerbose);
 }
 
 function reSetVideoInfo(flag) {

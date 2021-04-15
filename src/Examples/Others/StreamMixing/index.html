@@ -4,9 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-lang="Quickstart">快速开始</title>
+  <title data-lang="StreamMixing">多路混流</title>
   <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../../../assets/css/style.css">
+  <link rel="stylesheet" href="./index.css">
+  <script src="../../../assets/js/ZegoExpressWebRTC-2.4.0.js"></script>
 </head>
 
 <body class="fix-sidebar card-no-border">
@@ -18,83 +20,199 @@
 
   <div class="container main-wrapper">
     <!-- <div class="row"> -->
-      <aside class="left-sidebar">
-        <div class="scroll-sidebar">
-          <nav class="sidebar-nav">
-            <ul id="sidebarnav">
-              <span class="sidebar-title" data-lang="Quickstart">快速开始</span>
-              <li>
-                <a href="../../QuickStart/CommonUsage/index.html" class="waves-effect" data-lang="CommonUsage">实现流程</a>
-              </li>
-              <span class="sidebar-title" data-lang="CommonFeatures">常用功能</span>
-              <li>
-                <a href="index.html" class="waves-effect" data-lang="StreamMixing">多路混流</a>
-              </li>
-              <li>
-                <a href="../../CommonFeatures/RoomMessage/index.html" class="waves-effect" data-lang="RoomMessage">实时消息</a>
-              </li>
-              <span class="sidebar-title" data-lang="AdvancedStreaming">推拉流进阶</span>
-              <li>
-                <a href="../../AdvancedStreaming/StreamMonitoring/index.html" class="waves-effect" data-lang="StreamMonitoring">监测推拉流质量</a>
-              </li>
-              <li>
-                <a href="../../AdvancedStreaming/PublishingMultipleStreams/index.html" class="waves-effect" data-lang="PublishingMultipleStreams">推多路流</a>
-              </li>
-              <li>
-                <a href="../../AdvancedStreaming/StreamByUrl/index.html" class="waves-effect" data-lang="StreamByUrl">通过URL拉流</a>
-              </li>
-              <li>
-                <a href="../../AdvancedStreaming/TurnPublishingCDN/index.html" class="waves-effect" data-lang="TurnPublishingCDN">转推CDN</a>
-              </li>
-              <span class="sidebar-title" data-lang="AdvancedVideoProcessing">视频进阶</span>
-              <li>
-                <a href="../../AdvancedVideoProcessing/CustomVideoCapture/index.html" class="waves-effect" data-lang="CustomVideoCapture">自定义视频采集</a>
-              </li>
-              <li>
-                <a href="../../AdvancedVideoProcessing/EncodingAndDecoding/index.html" class="waves-effect" data-lang="SetVideoProperties">设置视频属性</a>
-              </li>
-              <li>
-                <a href="../ScreenSharing/index.html" class="waves-effect" data-lang="ScreenSharing">屏幕共享</a>
-              </li>
-              <span class="sidebar-title" data-lang="AdvancedAudioProcessing">音频进阶</span>
-              <li>
-                <a href="../../AdvancedAudioProcessing/SoundLevelAndAudioSpectrum/index.html" class="waves-effect" data-lang="StreamMixing">音频频谱与声浪</a>
-              </li>
-              <li>
-                <a href="../../AdvancedAudioProcessing/EarReturnAndChannelSettings/index.html" class="waves-effect" data-lang="EarReturnAndChannelSettings">耳返</a>
-              </li>
-              <li>
-                <a href="../../AdvancedAudioProcessing/CustomAudioCaptureAndRendering/index.html" class="waves-effect"
-                   data-lang="CustomAudioCaptureAndRendering">自定义音频采集与渲染</a>
-              </li>
-              <li>
-                <a href="../../AdvancedAudioProcessing/AudioMixing/index.html" class="waves-effect" data-lang="AudioMixing">混音</a>
-              </li>
-              <li>
-                <a href="../../AdvancedAudioProcessing/DualChannel/index.html" class="waves-effect" data-lang="DualChannel">双声道</a>
-              </li>
-              <span class="sidebar-title" data-lang="Others">其他功能</span>
-              <li>
-                <a href="../checkSystemRequire/index.html" class="waves-effect" data-lang="CheckSystemRequirements">检查浏览器支持</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </aside>
+    <aside class="left-sidebar">
+      <div class="scroll-sidebar">
+        <nav class="sidebar-nav">
+          <ul id="sidebarnav">
+            <span class="sidebar-title" data-lang="Quickstart">快速开始</span>
+            <li>
+              <a href="../../QuickStart/CommonUsage/index.html" class="waves-effect" data-lang="CommonUsage">实现流程</a>
+            </li>
+            <span class="sidebar-title" data-lang="Scenes">场景实践</span>
+            <li>
+              <a href="../../Scenes/VideoForMultipleUsers/index.html" class="waves-effect"
+                data-lang="VideoForMultipleUsers">多人视频通话</a>
+            </li>
+            <span class="sidebar-title" data-lang="CommonFeatures">常用功能</span>
+            <li>
+              <a href="../../CommonFeatures/CommonVideoConfig/index.html" class="waves-effect"
+                data-lang="CommonVideoConfig">常用视频配置</a>
+            </li>
+            <li>
+              <a href="../../CommonFeatures/RoomMessage/index.html" class="waves-effect"
+                data-lang="RoomMessage">实时消息</a>
+            </li>
+            <span class="sidebar-title" data-lang="AdvancedStreaming">推拉流进阶</span>
+            <li>
+              <a href="../../AdvancedStreaming/StreamMonitoring/index.html" class="waves-effect"
+                data-lang="StreamMonitoring">推拉流信息监测</a>
+            </li>
+            <li>
+              <a href="../../AdvancedStreaming/PublishingMultipleStreams/index.html" class="waves-effect"
+                data-lang="PublishingMultipleStreams">推多路流</a>
+            </li>
+            <li>
+              <a href="../../AdvancedStreaming/StreamByCDN/index.html" class="waves-effect"
+                data-lang="StreamByCDN">通过CDN推拉流</a>
+            </li>
+            <li>
+              <a href="../../AdvancedStreaming/TurnPublishingCDN/index.html" class="waves-effect"
+                data-lang="LowLatencyLive">低延迟直播</a>
+            </li>
+            <span class="sidebar-title" data-lang="AdvancedVideoProcessing">视频进阶</span>
+            <li>
+              <a href="../../AdvancedVideoProcessing/CustomVideoCapture/index.html" class="waves-effect"
+                data-lang="CustomVideoCapture">自定义视频采集</a>
+            </li>
+            <li>
+              <a href="../../AdvancedVideoProcessing/EncodingAndDecoding/index.html" class="waves-effect"
+                data-lang="SetVideoProperties">设置视频属性</a>
+            </li>
+            <span class="sidebar-title" data-lang="AdvancedAudioProcessing">音频进阶</span>
+            <li>
+              <a href="../../AdvancedAudioProcessing/SoundLevelAndAudioSpectrum/index.html" class="waves-effect"
+                data-lang="SoundLevelAndAudioSpectrum">音频频谱与声浪</a>
+            </li>
+            <li>
+              <a href="../../AdvancedAudioProcessing/EarReturnAndChannelSettings/index.html" class="waves-effect"
+                data-lang="EarReturnAndChannelSettings">耳返</a>
+            </li>
+            <li>
+              <a href="../../AdvancedAudioProcessing/CustomAudioCaptureAndRendering/index.html" class="waves-effect"
+                data-lang="CustomAudioCaptureAndRendering">自定义音频采集与渲染</a>
+            </li>
+            <li>
+              <a href="../../AdvancedAudioProcessing/AEC_ANS_AGC/index.html" class="waves-effect"
+                data-lang="AEC_ANS_AGC ">音频3A处理</a>
+            </li>
+            <li>
+              <a href="../../AdvancedAudioProcessing/AudioMixing/index.html" class="waves-effect"
+                data-lang="AudioMixing">混音</a>
+            </li>
+            <span class="sidebar-title" data-lang="Others">其他功能</span>
+            <li>
+              <a href="index.html" class="waves-effect" data-lang="StreamMixing">多路混流</a>
+            </li>
+            <li>
+              <a href="../../Others/ScreenSharing/index.html" class="waves-effect" data-lang="ScreenSharing">屏幕共享</a>
+            </li>
+            <span class="sidebar-title" data-lang="DebugAndConfig">调试与配置</span>
+            <li>
+              <a href="../../DebugAndConfig/LogAndVersionAndDebug/index.html" class="waves-effect"
+                data-lang="Log_Version_Debug">日志、版本号、调试信息</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
 
-      <div class="page-wrapper">
-        <div class="container-fluid">
-          多路混流
+    <div class="page-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 preview-wrapper">
+            <div class="preview-roomInfo">
+              RoomID:&nbsp;<div id="roomInfo-id" class="m-r-10"></div>
+              RoomState:&nbsp;<div id="roomInfo-state">
+                <div class="success-svg" id="roomStateSuccessSvg" style="display: none;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+                <div class="error-svg" id="roomStateErrorSvg" style="display: inline-block;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <h4>Step1 Publish Stream</h4>
+            <div class="row" id="videoList">
+              <div class="preview-pushlishInfo col-6 m-t-15">
+                <div class="preview-content">
+                  <div class="preview-action">
+                    <div class="preview-info">
+                      Publish First Channel
+                    </div>
+                    <div class="preview-video-action">
+                      <div class="m-t-10 m-b-5">
+                        First StreamID: <span id="PublishFirstID"></span>
+                      </div>
+                      <button id="startFirstPublishing" class="m-b-5 configBtn play-pause-button">Start
+                        Publishing</button>
+                    </div>
+                  </div>
+                  <video id="pubshlishFirstVideo" autoplay muted playsinline></video>
+                </div>
+              </div>
+              <div class="preview-playInfo col-6 m-t-15">
+                <div class="preview-content">
+                  <div class="preview-action">
+                    <div class="preview-info">
+                      Publish Second Channel
+                    </div>
+                    <div class="preview-video-action">
+                      <div class="m-t-10 m-b-5">
+                        Second StreamID <span id="PublishSecondID"></span>
+                      </div>
+                      <button id="startSecondPublishing" class="m-b-5 configBtn play-pause-button">Start
+                        Publishing</button>
+                    </div>
+                  </div>
+                  <video id="pubshlishSecondVideo" autoplay muted playsinline></video>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row m-t-10">
+          <div class="col-12 col-lg-6">
+            <h4>Step2 Mix Stream</h4>
+            <div class="font-14">
+              <div class="m-t-15 m-b-15">
+                First StreamID <input class="m-l-10" type="text" id="FirstStreamID" />
+              </div>
+              <div class="m-t-15 m-b-15">
+                Second StreamID <input class="m-l-10" type="text" id="SecondStreamID" />
+              </div>
+              <div class="m-t-15 m-b-15">
+                Mixed StreamID <input class="m-l-10" type="text" id="MixedStreamID" />
+              </div>
+            </div>
+            <button id="startMixTask" class="m-b-5 configBtn play-pause-button">Start Mix Task</button>
+          </div>
+          <div class="col-12 col-lg-6">
+            <h4>Step3 Play Mixed Stream</h4>
+            <div class="preview-content-playmix">
+              <div class="preview-action">
+                <div class="preview-video-action">
+                  <!-- <div class="m-t-10 m-b-5">
+                    Mixed StreamID <input class="m-l-10" type="text" id="PlayID" />
+                  </div> -->
+                  <button id="StartPlayingMixedStream" class="m-t-10 m-b-5 configBtn play-pause-button">
+                    Start Playing Mixed Stream</button>
+                </div>
+              </div>
+              <video id="playVideo" autoplay muted playsinline></video>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
     <!-- </div> -->
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery-i18n-properties@1.2.7/jquery.i18n.properties.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/metismenu@3.0.6/dist/metisMenu.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery-slimscroll@1.3.8/jquery.slimscroll.min.js"></script>
+  <script src="../../../assets/js/jquery.min.js"></script>
+  <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
+  <script src="../../../assets/js/metisMenu.min.js"></script>
+  <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
+  <script src="../../../assets/js/bootstrap.min.js"></script>
+  <script src="../../../assets/js/vconsole.min.js"></script>
   <script src="../../../assets/js/custom.js"></script>
+  <script src="../../../assets/js/flv.min.js"></script>
+  <script src="../../../KeyCenter.js"></script>
+  <script src="index.js"></script>
 </body>
 
 </html>

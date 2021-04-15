@@ -8,16 +8,24 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0005';
-let streamID = '0005';
+let roomID = '0025';
+let streamFirstID = '0025';
+let streamSecondID = '0026';
+let taskID = streamFirstID + streamSecondID;
+let mixStreamID = 'mix_' + taskID;
 
 let zg = null;
 let isChecked = false;
 let isLoginRoom = false;
-let localStream = null;
+let firstStream = null;
+let secondStream = null;
 let remoteStream = null;
-let published = false;
+let firstPublished = false;
+let secondPublished = false;
+let mixed = false;
 let played = false;
+let mixerOutputList = null;
+let flvPlayer = null;
 
 // part end
 
@@ -118,55 +126,57 @@ function loginRoom(roomId, userId, userName) {
 
 function initEvent() {
 	zg.on('publisherStateUpdate', (result) => {
+		console.warn('publisherStateUpdate', result);
 		if (result.state === 'PUBLISHING') {
-			$('#pushlishInfo-id').text(result.streamID);
+			$('#pushlishInfo-id').text(result.streamFirstID);
 		} else if (result.state === 'NO_PUBLISH') {
 			$('#pushlishInfo-id').text('');
 		}
 	});
 
 	zg.on('playerStateUpdate', (result) => {
+		console.warn('playerStateUpdate', result);
 		if (result.state === 'PLAYING') {
-			$('#playInfo-id').text(result.streamID);
+			$('#playInfo-id').text(result.streamFirstID);
 		} else if (result.state === 'NO_PLAY') {
 			$('#playInfo-id').text('');
 		}
 	});
 
 	zg.on('publishQualityUpdate', (streamId, stats) => {
-		$('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
-		$('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps');
-		$('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s');
-		$('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%');
+		console.warn('publishQualityUpdate', streamId, stats);
 	});
 
 	zg.on('playQualityUpdate', (streamId, stats) => {
-		$('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
-		$('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps');
-		$('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s');
-		$('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%');
+		console.warn('playQualityUpdate', streamId, stats);
 	});
 }
 
 function clearStream(flag) {
-	if (flag === 'publish') {
-		localStream && zg.destroyStream(localStream);
-		$('#pubshlishVideo')[0].srcObject = null;
-		localStream = null;
-		published = false;
-		if ($('#PublishID').val() === $('#PlayID').val()) {
-			remoteStream && zg.destroyStream(remoteStream);
-			$('#playVideo')[0].srcObject = null;
-			remoteStream = null;
-			played = false;
-		}
+	if (flag === 'first') {
+		firstStream && zg.destroyStream(firstStream);
+		$('#pubshlishFirstVideo')[0].srcObject = null;
+		firstStream = null;
+		firstPublished = false;
 	}
 
-	if (flag === 'play') {
+	if (flag === 'second') {
+		secondStream && zg.destroyStream(secondStream);
+		$('#pubshlishSecondVideo')[0].srcObject = null;
+		secondStream = null;
+		secondPublished = false;
+	}
+
+	if (flag === 'play' || flag === 'mixed') {
 		remoteStream && zg.destroyStream(remoteStream);
 		$('#playVideo')[0].srcObject = null;
 		remoteStream = null;
 		played = false;
+		if (flvPlayer) {
+			flvPlayer.destroy();
+			flvPlayer = null;
+		}
+		updateButton($('#StartPlayingMixedStream')[0], 'Start Playing Mixed Stream', 'Stop Playing Mixed Stream');
 	}
 }
 
@@ -186,26 +196,39 @@ function setLogConfig() {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream(config);
-		zg.startPublishingStream(streamId, localStream);
-		$('#pubshlishVideo')[0].srcObject = localStream;
+		firstStream = await zg.createStream(config);
+		zg.startPublishingStream(streamId, firstStream);
+		$('#pubshlishFirstVideo')[0].srcObject = firstStream;
 		return true;
 	} catch (err) {
 		return false;
 	}
 }
 
-async function stopPublishingStream(streamId) {
+async function startPublishingSecondStream(streamId, config) {
+	try {
+		secondStream = await zg.createStream(config);
+		zg.startPublishingStream(streamId, secondStream);
+		$('#pubshlishSecondVideo')[0].srcObject = secondStream;
+		return true;
+	} catch (err) {
+		return false;
+	}
+}
+
+async function stopPublishingStream(streamId, way) {
 	zg.stopPublishingStream(streamId);
 	if (remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
 		stopPlayingStream(streamId);
 	}
-	clearStream('publish');
+	clearStream(way);
 }
 
 async function startPlayingStream(streamId, options = {}) {
 	try {
+		console.log('play 123123');
 		remoteStream = await zg.startPlayingStream(streamId, options);
+		console.log('play end');
 		$('#playVideo')[0].srcObject = remoteStream;
 		return true;
 	} catch (err) {
@@ -218,71 +241,162 @@ async function stopPlayingStream(streamId) {
 	clearStream('play');
 }
 
+async function startMixerTask(taskID, streamList, mixStreamId) {
+	try {
+		const res = await zg.startMixerTask({
+			taskID,
+			inputList: streamList,
+			outputList: [ mixStreamId ],
+			outputConfig: {
+				outputBitrate: 300,
+				outputFPS: 15,
+				outputWidth: 320,
+				outputHeight: 480
+			}
+		});
+		mixerOutputList = JSON.parse(res.extendedData).mixerOutputList;
+		return res.errorCode;
+	} catch (err) {
+		return 1;
+	}
+}
+
+async function stopMixerTask(taskID) {
+	await zg.stopMixerTask(taskID);
+	clearStream('mixed');
+}
+
 // uses SDK end
 
 // ==============================================================
 // This part of the code binds the button click event
 // ==============================================================
 
-$('#startPublishing').on(
+$('#startFirstPublishing').on(
 	'click',
 	util.throttle(async function() {
-		const id = $('#PublishID').val();
-		if (!id) return alert('PublishID is empty');
+		const id = streamFirstID;
 		this.classList.add('border-primary');
-		if (!published) {
-			const flag = await startPublishingStream(id, getCreateStreamConfig());
+		if (!firstPublished) {
+			const flag = await startPublishingStream(id);
 			if (flag) {
 				updateButton(this, 'Start Publishing', 'Stop Publishing');
-				published = true;
-				$('#PublishID')[0].disabled = true;
-				changeVideo();
+				firstPublished = true;
+				$('#FirstStreamID')[0].disabled = true;
 			} else {
-				changeVideo(true);
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Publishing Fail';
 			}
 		} else {
-			if (remoteStream && id === $('#PlayID').val()) {
-				$('#PlayID')[0].disabled = false;
-				updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing');
-				reSetVideoInfo();
-			}
-			stopPublishingStream(id);
+			stopPublishingStream(id, 'first');
 			updateButton(this, 'Start Publishing', 'Stop Publishing');
-			published = false;
-			$('#PublishID')[0].disabled = false;
-			reSetVideoInfo('publish');
+			firstPublished = false;
+			$('#FirstStreamID')[0].disabled = false;
 		}
 	}, 500)
 );
 
-$('#startPlaying').on(
+$('#startSecondPublishing').on(
 	'click',
 	util.throttle(async function() {
-		const id = $('#PlayID').val();
-		if (!id) return alert('PlayID is empty');
+		const id = streamSecondID;
 		this.classList.add('border-primary');
-		if (!played) {
-			const flag = await startPlayingStream(id);
+		if (!secondPublished) {
+			const flag = await startPublishingSecondStream(id, getCreateStreamConfig());
 			if (flag) {
-				updateButton(this, 'Start Playing', 'Stop Playing');
-				played = true;
-				$('#PlayID')[0].disabled = true;
-				changeVideo();
+				updateButton(this, 'Start Publishing', 'Stop Publishing');
+				secondPublished = true;
+				$('#SecondStreamID')[0].disabled = true;
 			} else {
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
-				this.innerText = 'Playing Fail';
-				changeVideo(true);
+				this.innerText = 'Publishing Fail';
 			}
 		} else {
-			stopPlayingStream(id);
-			updateButton(this, 'Start Playing', 'Stop Playing');
-			played = false;
-			$('#PlayID')[0].disabled = false;
-			reSetVideoInfo('play');
+			stopPublishingStream(id, 'second');
+			updateButton(this, 'Start Publishing', 'Stop Publishing');
+			secondPublished = false;
+			$('#SecondStreamID')[0].disabled = false;
+		}
+	}, 500)
+);
+
+$('#startMixTask').on(
+	'click',
+	util.throttle(async function() {
+		const firstId = $('#FirstStreamID').val();
+		const secondId = $('#SecondStreamID').val();
+		const mixTask = $('#MixedStreamID').val();
+
+		const streamList = [
+			{
+				streamID: firstId,
+				layout: {
+					top: 0,
+					left: 0,
+					bottom: 240,
+					right: 320
+				}
+			},
+			{
+				streamID: secondId,
+				layout: {
+					top: 240,
+					left: 0,
+					bottom: 480,
+					right: 320
+				}
+			}
+		];
+
+		this.classList.add('border-primary');
+		if (!mixed) {
+			const flag = await startMixerTask(mixTask, streamList, mixStreamID);
+			if (flag === 0) {
+				updateButton(this, 'Start Mix Task', 'Stop Mix Task');
+				mixed = true;
+				$('#MixedStreamID')[0].disabled = true;
+			} else {
+				this.classList.remove('border-primary');
+				this.classList.add('border-error');
+				this.innerText = 'Publishing Fail';
+			}
+		} else {
+			stopMixerTask(mixTask);
+			updateButton(this, 'Start Mix Task', 'Stop Mix Task');
+			mixed = false;
+			$('#MixedStreamID')[0].disabled = false;
+		}
+	}, 500)
+);
+
+$('#StartPlayingMixedStream').on(
+	'click',
+	util.throttle(async function() {
+		if (!firstStream) return alert('no first stream');
+		if (!secondStream) return alert('no second stream');
+		if (!mixerOutputList) return alert('no mixed Stream');
+		const videoEle = $('#playVideo')[0];
+		if (!played) {
+			if (navigator.userAgent.indexOf('iPhone') !== -1 && getBrowser() == 'Safari' && mixerOutputList[0].hlsURL) {
+				const hlsUrl = mixerOutputList[0].hlsURL.replace('http', 'https');
+				videoEle.src = hlsUrl;
+			} else if (mixerOutputList[0].flvURL) {
+				const flvUrl = mixerOutputList[0].flvURL.replace('http', 'https');
+				if (flvjs.isSupported()) {
+					flvPlayer = flvjs.createPlayer({
+						type: 'flv',
+						url: flvUrl
+					});
+					flvPlayer.attachMediaElement(videoEle);
+					flvPlayer.load();
+				}
+			}
+			updateButton(this, 'Start Playing Mixed Stream', 'Stop Playing Mixed Stream');
+			played = true;
+		} else {
+			clearStream('play');
 		}
 	}, 500)
 );
@@ -294,15 +408,8 @@ $('#startPlaying').on(
 // ==============================================================
 
 function getCreateStreamConfig() {
-	const resolution = $('#captureResolution').val().split('*');
 	const config = {
-		camera: {
-			videoQuality: 4,
-			frameRate: $('#FPS').val() * 1,
-			width: resolution[0] * 1,
-			height: resolution[1] * 1,
-			bitRate: $('#Bitrate').val() * 1
-		}
+		screen: true
 	};
 	return config;
 }
@@ -325,37 +432,6 @@ function updateButton(button, preText, afterText) {
 		button.innerText = afterText;
 	}
 }
-function changeVideo(flag) {
-	if (flag) {
-		$('#pubshlishVideo').css('transform', 'none');
-		$('#playVideo').css('transform', 'none');
-		return;
-	}
-	const value = $('#Mirror').val();
-	if (value === 'onlyPreview') {
-		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
-	} else if (value === 'onlyPlay') {
-		$('#playVideo').css('transform', 'scale(-1, 1)');
-	} else if (value === 'both') {
-		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
-		$('#playVideo').css('transform', 'scale(-1, 1)');
-	}
-}
-
-function reSetVideoInfo(flag) {
-	if (flag === 'publish' || !flag) {
-		$('#publishResolution').text('');
-		$('#sendBitrate').text('');
-		$('#sendFPS').text('');
-		$('#sendPacket').text('');
-	}
-	if (flag === 'play' || !flag) {
-		$('#playResolution').text('');
-		$('#receiveBitrate').text('');
-		$('#receiveFPS').text('');
-		$('#receivePacket').text('');
-	}
-}
 
 // tool end
 
@@ -365,11 +441,12 @@ function reSetVideoInfo(flag) {
 
 async function render() {
 	$('#roomInfo-id').text(roomID);
-	$('#RoomID').val(roomID);
-	$('#UserName').val(userID);
-	$('#UserID').val(userID);
-	$('#PublishID').val(streamID);
-	$('#PlayID').val(streamID);
+	$('#PublishFirstID').text(streamFirstID);
+	$('#PublishSecondID').text(streamSecondID);
+	$('#PlayID').val(mixStreamID);
+	$('#FirstStreamID').val(streamFirstID);
+	$('#SecondStreamID').val(streamSecondID);
+	$('#MixedStreamID').val(mixStreamID);
 	createZegoExpressEngine();
 	await checkSystemRequirements();
 	enumDevices();

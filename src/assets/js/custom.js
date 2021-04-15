@@ -83,9 +83,12 @@ $(function() {
   // Internationalization
   // ============================================================== 
   $(function() {
-    let lang = navigator.language || navigator.userLanguage;
-    lang = lang.substr(0, 2);
-    // lang = 'en'
+    let lang = localStorage.getItem('Language')
+    console.log(lang);
+    if(!lang) {
+        const temp = navigator.language || navigator.userLanguage;
+        lang = temp.substr(0, 2);
+    }
     
     jQuery.i18n.properties({
       name: lang,

@@ -9,10 +9,10 @@
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
 let roomID = '0025';
-let streamFirstID = '0025';
-let streamSecondID = '0026';
+let streamFirstID = '00251';
+let streamSecondID = '00252';
 let taskID = streamFirstID + streamSecondID;
-let mixStreamID = 'mix_' + taskID;
+let mixStreamID = 'mix_0025';
 
 let zg = null;
 let isChecked = false;

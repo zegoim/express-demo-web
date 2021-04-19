@@ -495,7 +495,7 @@ function removeHtml(streamId, user) {
 	}
 
 	if (!streamId && user) {
-		$(`${user.userID}`).remove();
+		$(`#${user.userID}`).remove();
 	}
 }
 

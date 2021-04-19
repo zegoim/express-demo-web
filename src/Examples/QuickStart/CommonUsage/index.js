@@ -21,37 +21,6 @@ let remoteStream = null;
 // This part of the code uses the SDK
 // ==============================================================
 
-async function checkSystemRequirements() {
-	console.log('sdk version is', zg.getVersion());
-	try {
-		const result = await zg.checkSystemRequirements();
-
-		console.warn('checkSystemRequirements ', result);
-		!result.videoCodec.H264 && $('#videoCodeType option:eq(1)').attr('disabled', 'disabled');
-		!result.videoCodec.VP8 && $('#videoCodeType option:eq(2)').attr('disabled', 'disabled');
-
-		if (!result.webRTC) {
-			console.log('browser is not support webrtc!!');
-			return false;
-		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
-			console.log('browser is not support H264 and VP8');
-			return false;
-		} else if (result.videoCodec.H264) {
-			supportScreenSharing = result.screenSharing;
-			if (!supportScreenSharing) console.log('browser is not support screenSharing');
-			previewVideo = $('#previewVideo')[0];
-			// start();
-		} else {
-			console.log('不支持H264，请前往混流转码测试');
-		}
-
-		return true;
-	} catch (err) {
-		console.error('checkSystemRequirements', err);
-		return false;
-	}
-}
-
 async function enumDevices() {
 	const audioInputList = [],
 		videoInputList = [];
@@ -109,7 +78,39 @@ function createZegoExpressEngine() {
 	window.zg = zg;
 }
 
-// Step2 Login room
+// Step1 Check system requirements
+async function checkSystemRequirements() {
+	console.log('sdk version is', zg.getVersion());
+	try {
+		const result = await zg.checkSystemRequirements();
+
+		console.warn('checkSystemRequirements ', result);
+		!result.videoCodec.H264 && $('#videoCodeType option:eq(1)').attr('disabled', 'disabled');
+		!result.videoCodec.VP8 && $('#videoCodeType option:eq(2)').attr('disabled', 'disabled');
+
+		if (!result.webRTC) {
+			console.log('browser is not support webrtc!!');
+			return false;
+		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
+			console.log('browser is not support H264 and VP8');
+			return false;
+		} else if (result.videoCodec.H264) {
+			supportScreenSharing = result.screenSharing;
+			if (!supportScreenSharing) console.log('browser is not support screenSharing');
+			previewVideo = $('#previewVideo')[0];
+			// start();
+		} else {
+			console.log('不支持H264，请前往混流转码测试');
+		}
+
+		return true;
+	} catch (err) {
+		console.error('checkSystemRequirements', err);
+		return false;
+	}
+}
+
+// Step3 Login room
 function loginRoom(roomId, userId, userName) {
 	return new Promise((resolve, reject) => {
 		// Need to get the token before logging in to the room
@@ -134,7 +135,7 @@ function loginRoom(roomId, userId, userName) {
 	});
 }
 
-// Step3 Start Publishing Stream
+// Step4 Start Publishing Stream
 async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
@@ -146,7 +147,7 @@ async function startPublishingStream(streamId, config) {
 	}
 }
 
-// Step4 Start Play Stream
+// Step5 Start Play Stream
 async function startPlayingStream(streamId, options = {}) {
 	try {
 		remoteStream = await zg.startPlayingStream(streamId, options);

@@ -36,8 +36,6 @@ async function checkSystemRequirements() {
 		const result = await zg.checkSystemRequirements();
 
 		console.warn('checkSystemRequirements ', result);
-		!result.videoCodec.H264 && $('#videoCodeType option:eq(1)').attr('disabled', 'disabled');
-		!result.videoCodec.VP8 && $('#videoCodeType option:eq(2)').attr('disabled', 'disabled');
 
 		if (!result.webRTC) {
 			console.log('browser is not support webrtc!!');
@@ -46,10 +44,7 @@ async function checkSystemRequirements() {
 			console.log('browser is not support H264 and VP8');
 			return false;
 		} else if (result.videoCodec.H264) {
-			supportScreenSharing = result.screenSharing;
-			if (!supportScreenSharing) console.log('browser is not support screenSharing');
-			previewVideo = $('#previewVideo')[0];
-			// start();
+			if (!result.screenSharing) console.log('browser is not support screenSharing');
 		} else {
 			console.log('不支持H264，请前往混流转码测试');
 		}

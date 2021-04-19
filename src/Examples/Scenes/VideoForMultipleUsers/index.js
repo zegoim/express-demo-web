@@ -122,51 +122,67 @@ function initEvent() {
 	});
 }
 
-function initEventPlay() {
-	zg.on('roomStreamUpdate', async (roomID, updateType, streamList, extendedData) => {
-		if (updateType == 'ADD') {
-			for (let i = 0; i < streamList.length; i++) {
-				console.info(streamList[i].streamID + ' was added');
-				let remoteStream;
-				let playOption;
+function playMultipleEvent() {
+	zg.on('playQualityUpdate', (streamId, stats) => {
+		if (streamId === streamID) {
+			$('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
+			$('#receiveBitrate').text(parseInt(stats.video.videoBitrate));
+			$('#receiveFPS').text(parseInt(stats.video.videoFPS));
+			$('#receivePacket').text(parseInt(stats.video.videoPacketsLostRate));
+		} else {
+			const spanList = $(`#${streamId} span`);
+			spanList[0].innerText = `${stats.video.frameWidth} * ${stats.video.frameHeight}`;
+			spanList[1].innerText = parseInt(stats.video.videoBitrate);
+			spanList[2].innerText = parseInt(stats.video.videoFPS);
+			spanList[3].innerText = parseInt(stats.video.videoPacketsLostRate);
+		}
+	});
 
-				zg
-					.startPlayingStream(streamList[i].streamID, playOption)
-					.then((stream) => {
-						remoteStream = stream;
-						useLocalStreamList.push(streamList[i]);
-						let videoTemp = $(
-							`<video id=${streamList[i].streamID} autoplay muted playsinline controls></video>`
-						);
-						//queue.push(videoTemp)
-						$('.remoteVideo').append(videoTemp);
-						const video = $('.remoteVideo video:last')[0];
-						console.warn('video', video, remoteStream);
-						video.srcObject = remoteStream;
-						video.muted = false;
-						// videoTemp = null;
-					})
-					.catch((err) => {
-						console.error('err', err);
-					});
+	zg.on('roomStreamUpdate', async (roomID, updateType, streamList, extendedData) => {
+		if (updateType === 'ADD') {
+			for (let i = 0; i < streamList.length; i++) {
+				playMultipleStreamList.push(streamList[i]);
+				palyedObj[streamList[i].streamID] = false;
+				appednHtml(streamList[i].streamID, streamList[i].user);
+				addMultiplePlayingEvent(streamList[i].streamID);
 			}
 		} else if (updateType == 'DELETE') {
-			for (let k = 0; k < useLocalStreamList.length; k++) {
+			for (let k = 0; k < playMultipleStreamList.length; k++) {
 				for (let j = 0; j < streamList.length; j++) {
-					if (useLocalStreamList[k].streamID === streamList[j].streamID) {
+					if (playMultipleStreamList[k].streamID === streamList[j].streamID) {
 						try {
-							zg.stopPlayingStream(useLocalStreamList[k].streamID);
+							zg.stopPlayingStream(playMultipleStreamList[k].streamID);
 						} catch (error) {
 							console.error(error);
 						}
-
-						$('.remoteVideo video:eq(' + k + ')').remove();
-						useLocalStreamList.splice(k--, 1);
+						removeHtml(playMultipleStreamList[k].streamID, streamList[k].user);
+						playMultipleStreamList.splice(k--, 1);
 						break;
 					}
 				}
 			}
 		}
+
+		$('#streamList').text(`StreamList (${playMultipleStreamList.length})`);
+	});
+	zg.on('roomUserUpdate', (roomID, updateType, userList) => {
+		if (updateType === 'ADD') {
+			for (let i = 0; i < userList.length; i++) {
+				playMultipleUserList.push(userList[i]);
+				appednHtml(null, userList[i]);
+			}
+		} else {
+			for (let k = 0; k < playMultipleUserList.length; k++) {
+				for (let j = 0; j < userList.length; j++) {
+					if (playMultipleUserList[k].userID === userList[j].userID) {
+						removeHtml(null, playMultipleUserList[k]);
+						playMultipleUserList.splice(k--, 1);
+						break;
+					}
+				}
+			}
+		}
+		$('#userList').text(`UserList (${playMultipleUserList.length})`);
 	});
 }
 
@@ -413,70 +429,6 @@ function changeVideo(flag) {
 			video.setAttribute('transform', 'scale(-1, 1)')
 		})
 	}
-}
-
-function playMultipleEvent() {
-	zg.on('playQualityUpdate', (streamId, stats) => {
-		if (streamId === streamID) {
-			$('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
-			$('#receiveBitrate').text(parseInt(stats.video.videoBitrate));
-			$('#receiveFPS').text(parseInt(stats.video.videoFPS));
-			$('#receivePacket').text(parseInt(stats.video.videoPacketsLostRate));
-		} else {
-			const spanList = $(`#${streamId} span`);
-			spanList[0].innerText = `${stats.video.frameWidth} * ${stats.video.frameHeight}`;
-			spanList[1].innerText = parseInt(stats.video.videoBitrate);
-			spanList[2].innerText = parseInt(stats.video.videoFPS);
-			spanList[3].innerText = parseInt(stats.video.videoPacketsLostRate);
-		}
-	});
-
-	zg.on('roomStreamUpdate', async (roomID, updateType, streamList, extendedData) => {
-		if (updateType === 'ADD') {
-			for (let i = 0; i < streamList.length; i++) {
-				playMultipleStreamList.push(streamList[i]);
-				palyedObj[streamList[i].streamID] = false;
-				appednHtml(streamList[i].streamID, streamList[i].user);
-				addMultiplePlayingEvent(streamList[i].streamID);
-			}
-		} else if (updateType == 'DELETE') {
-			for (let k = 0; k < playMultipleStreamList.length; k++) {
-				for (let j = 0; j < streamList.length; j++) {
-					if (playMultipleStreamList[k].streamID === streamList[j].streamID) {
-						try {
-							zg.stopPlayingStream(playMultipleStreamList[k].streamID);
-						} catch (error) {
-							console.error(error);
-						}
-						removeHtml(playMultipleStreamList[k].streamID, streamList[k].user);
-						playMultipleStreamList.splice(k--, 1);
-						break;
-					}
-				}
-			}
-		}
-
-		$('#streamList').text(`StreamList (${playMultipleStreamList.length})`);
-	});
-	zg.on('roomUserUpdate', (roomID, updateType, userList) => {
-		if (updateType === 'ADD') {
-			for (let i = 0; i < userList.length; i++) {
-				playMultipleUserList.push(userList[i]);
-				appednHtml(null, userList[i]);
-			}
-		} else {
-			for (let k = 0; k < playMultipleUserList.length; k++) {
-				for (let j = 0; j < userList.length; j++) {
-					if (playMultipleUserList[k].userID === userList[j].userID) {
-						removeHtml(null, playMultipleUserList[k]);
-						playMultipleUserList.splice(k--, 1);
-						break;
-					}
-				}
-			}
-		}
-		$('#userList').text(`UserList (${playMultipleUserList.length})`);
-	});
 }
 
 function appednHtml(streamId, user) {

@@ -8,14 +8,19 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0020';
-let streamID = '0020';
+let roomID = '0036';
+let streamID = '0036';
 
 let zg = null;
+let isChecked = false;
 let isLoginRoom = false;
-let isStart = false;
 let localStream = null;
-let remoteStream = null;
+let screenStream = null;
+let cameraStream = null;
+let MicrophoneStream = null;
+let isMicrophone = false;
+let published = false;
+
 // part end
 
 // ==============================================================
@@ -88,60 +93,6 @@ async function enumDevices() {
 	$('#CameraDevices').html(videoInputList.join(''));
 }
 
-function initEvent() {
-	zg.on('roomStateUpdate', (roomId, state) => {
-		if (state === 'CONNECTED' && isLoginRoom) {
-			console.log(111);
-			$('#roomStateSuccessSvg').css('display', 'inline-block');
-			$('#roomStateErrorSvg').css('display', 'none');
-		}
-
-		if (state === 'DISCONNECTED' && !isLoginRoom) {
-			$('#roomStateSuccessSvg').css('display', 'none');
-			$('#roomStateErrorSvg').css('display', 'inline-block');
-		}
-
-		if (state === 'DISCONNECTED' && isLoginRoom) {
-			location.reload();
-		}
-	});
-  
-	zg.on('publisherStateUpdate', (result) => {
-		if (result.state === 'PUBLISHING') {
-			$('#pushlishInfo-id').text(result.streamID);
-		} else if (result.state === 'NO_PUBLISH') {
-			$('#pushlishInfo-id').text('');
-		}
-	});
-
-	zg.on('publishQualityUpdate', (streamId, stats) => {
-		console.warn('publishQualityUpdate', streamId, stats);
-	});
-}
-
-function clearStream() {
-	localStream && zg.destroyStream(localStream);
-	remoteStream && zg.destroyStream(remoteStream);
-	remoteStream = null;
-	localStream = null;
-	$('#pubshlishVideo')[0].srcObject = null;
-	isStart = false;
-}
-
-function setLogConfig() {
-	let config = localStorage.getItem('logConfig');
-	const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false;
-	if (config) {
-		config = JSON.parse(config);
-		zg.setLogConfig({
-			logLevel: config.logLevel,
-			remoteLogLevel: config.remoteLogLevel,
-			logURL: ''
-		});
-	}
-	zg.setDebugVerbose(DebugVerbose);
-}
-
 function loginRoom(roomId, userId, userName) {
 	return new Promise((resolve, reject) => {
 		$.get(
@@ -165,93 +116,209 @@ function loginRoom(roomId, userId, userName) {
 	});
 }
 
-function logoutRoom(roomId) {
-	zg.logoutRoom(roomId);
+function initEvent() {
+	zg.on('roomStateUpdate', (roomId, state) => {
+		if (state === 'CONNECTED' && isLoginRoom) {
+			console.log(111);
+			$('#roomStateSuccessSvg').css('display', 'inline-block');
+			$('#roomStateErrorSvg').css('display', 'none');
+		}
+
+		if (state === 'DISCONNECTED' && !isLoginRoom) {
+			$('#roomStateSuccessSvg').css('display', 'none');
+			$('#roomStateErrorSvg').css('display', 'inline-block');
+		}
+
+		if (state === 'DISCONNECTED' && isLoginRoom) {
+			location.reload();
+		}
+	});
+
+	zg.on('publisherStateUpdate', (result) => {
+		if (result.state === 'PUBLISHING') {
+			$('#pushlishInfo-id').text(result.streamID);
+		} else if (result.state === 'NO_PUBLISH') {
+			$('#pushlishInfo-id').text('');
+		}
+	});
+
+	zg.on('playerStateUpdate', (result) => {
+		if (result.state === 'PLAYING') {
+			$('#playInfo-id').text(result.streamID);
+		} else if (result.state === 'NO_PLAY') {
+			$('#playInfo-id').text('');
+		}
+	});
+
+	zg.on('publishQualityUpdate', (streamId, stats) => {
+		$('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
+		$('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps');
+		$('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s');
+		$('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%');
+	});
+
+	zg.on('playQualityUpdate', (streamId, stats) => {
+		$('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
+		$('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps');
+		$('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s');
+		$('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%');
+	});
 }
 
-async function startPublishingStream(streamId) {
+function clearStream(flag) {
+	if (flag === 'publish') {
+		localStream && zg.destroyStream(localStream);
+		$('#pubshlishVideo')[0].srcObject = null;
+		localStream = null;
+		published = false;
+		if(screenStream) {
+			zg.destroyStream(screenStream);
+			screenStream = null;
+		}
+		if(cameraStream) {
+			zg.destroyStream(cameraStream);
+			cameraStream = null;
+		}
+		MicrophoneStream && zg.destroyStream(MicrophoneStream);
+		$('#radio-one')[0].checked = true;
+		$('#radio-two')[0].checked = false;
+		$('#Microphone')[0].checked = true;
+		$('#CustomAudio')[0].checked = false;
+	}
+}
+
+function setLogConfig() {
+	let config = localStorage.getItem('logConfig');
+	const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false;
+	if (config) {
+		config = JSON.parse(config);
+		zg.setLogConfig({
+			logLevel: config.logLevel,
+			remoteLogLevel: config.remoteLogLevel,
+			logURL: ''
+		});
+	}
+	zg.setDebugVerbose(DebugVerbose);
+}
+
+async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream();
+		localStream = await zg.createStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec: "VP8" });
 		$('#pubshlishVideo')[0].srcObject = localStream;
 		return true;
 	} catch (err) {
-		console.error(err);
 		return false;
 	}
 }
 
 async function stopPublishingStream(streamId) {
 	zg.stopPublishingStream(streamId);
+	clearStream('publish');
 }
 
-async function startPlayingStream(streamId, options = {}) {
-	try {
-		remoteStream = await zg.startPlayingStream(streamId, options);
-		$('#playVideo')[0].srcObject = remoteStream;
-		return true;
-	} catch (err) {
-		return false;
-	}
+async function replaceTrack(track) {
+	const { errorCode } = await zg.replaceTrack(localStream, track);
+	return errorCode;
 }
 
-async function stopPlayingStream(streamId) {
-	zg.stopPlayingStream(streamId);
-}
-
-async function startMixingAudio(streamId) {
-	const result = zg.startMixingAudio(streamId, [ $('#customAudio')[0] ]);
-	console.warn('audioMixing', result);
-}
-
-async function stopMixingAudio(streamId) {
-	zg.stopMixingAudio(streamId);
-}
 // uses SDK end
 
 // ==============================================================
-// This part of the code binds the some  event
+// This part of the code binds  event
 // ==============================================================
 
-$('#start').on(
+$('#startPublishing').on(
 	'click',
 	util.throttle(async function() {
-		const PublishId = $('#PublishID').val();
-		if (!PublishId) alert('PublishId is empty');
-
+		const id = $('#PublishID').val();
+		if (!id) return alert('PublishID is empty');
 		this.classList.add('border-primary');
-		if (!isStart) {
-
-			const flagPublish = await startPublishingStream(PublishId);
-			if (!flagPublish) {
+		if (!published) {
+			const flag = await startPublishingStream(id);
+			if (flag) {
+				updateButton(this, 'Start Publishing', 'Stop Publishing');
+				published = true;
+				setDisabled(true, 'publish');
+				$('#PublishID').addClass('color-w');
+			} else {
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
-				this.innerText = 'Start Fail';
-				return;
+				this.innerText = 'Publishing Fail';
 			}
-			$('#PublishID')[0].disabled = true;
-			$('#AudioMixing')[0].disabled = false;
-
-			updateButton(this, 'Start', 'Stop');
-			isStart = true;
-			$('#customAudio')[0].play();
 		} else {
-			stopPublishingStream(PublishId);
-			updateButton(this, 'Start', 'Stop');
-			isStart = false;
-			$('#PublishID')[0].disabled = false;
-			$('#AudioMixing')[0].disabled = true;
-			$('#AudioMixing').prop("checked",false);
-			clearStream();
+			stopPublishingStream(id);
+			updateButton(this, 'Start Publishing', 'Stop Publishing');
+			published = false;
+			setDisabled(false, 'publish');
+			reSetVideoInfo('publish');
+			$('#PublishID').removeClass('color-w');
 		}
 	}, 500)
 );
 
-$('#AudioMixing').on('change', function({ target }) {
+$('#radio-one').on('change', async function({ target }) {
 	if (target.checked) {
-		startMixingAudio($('#PublishID').val());
-	} else {
-		stopMixingAudio($('#PublishID').val());
+		try {
+			if (!cameraStream) {
+				cameraStream = await zg.createStream({
+					camera: {
+						audio: false
+					}
+				});
+			}
+			replaceTrack(cameraStream.getVideoTracks()[0]);
+		} catch (err) {
+			cameraStream = null;
+			console.log(err);
+		}
+	}
+});
+
+$('#radio-two').on('change', async function({ target }) {
+	if (target.checked) {
+		try {
+			if (!screenStream) {
+				screenStream = await zg.createStream({ screen:  true });
+			}
+			replaceTrack(screenStream.getVideoTracks()[0]);
+		} catch (err) {
+			screenStream = null
+			$('#radio-one')[0].checked = true;
+			$('#radio-two')[0].checked = false;
+		}
+	}
+});
+
+$('#Microphone').on('change', async function({ target }) {
+	if (target.checked) {
+		$('#customAudio')[0].pause()
+		try {
+			if (!isMicrophone) {
+				cameraStream = await zg.createStream({
+					camera: {
+						video: false
+					}
+				});
+			}
+			replaceTrack(cameraStream.getAudioTracks()[0]);
+			isMicrophone = true;
+		} catch (err) {
+			isMicrophone = false;
+			console.log(err);
+		}
+	}
+});
+
+$('#CustomAudio').on('change', async function({ target }) {
+	if (target.checked) {
+		$('#customAudio')[0].play()
+		try {
+			const track = $('#customAudio')[0].captureStream().getAudioTracks()[0]
+			replaceTrack(track);
+		} catch (err) {
+			console.log(err);
+		}
 	}
 });
 // bind event end
@@ -279,26 +346,39 @@ function updateButton(button, preText, afterText) {
 	}
 }
 
-function checkVideo() {
-	const timer = setTimeout(() => {
-		resolve(false);
-	}, 3000);
-	return new Promise((resolve) => {
-		$('#customLocalVideo').on('error', function() {
-			resolve(false);
-			clearTimeout(timer);
-		});
-		$('#customLocalVideo').on('loadeddata', function() {
-			resolve(true);
-			clearTimeout(timer);
-		});
-	});
+function reSetVideoInfo(flag) {
+	if (flag === 'publish' || !flag) {
+		$('#publishResolution').text('');
+		$('#sendBitrate').text('');
+		$('#sendFPS').text('');
+		$('#sendPacket').text('');
+	}
+	if (flag === 'play' || !flag) {
+		$('#playResolution').text('');
+		$('#receiveBitrate').text('');
+		$('#receiveFPS').text('');
+		$('#receivePacket').text('');
+	}
 }
+
+function setDisabled(flag, type) {
+	if (type === 'publish') {
+		$('#PublishID')[0].disabled = flag;
+		$('#radio-one')[0].disabled = !flag;
+		$('#radio-two')[0].disabled = !flag;
+		$('#Microphone')[0].disabled = !flag;
+		$('#CustomAudio')[0].disabled = !flag;
+	} else {
+		$('#PlayID')[0].disabled = flag;
+	}
+}
+
 // tool end
 
 // ==============================================================
 // This part of the code Initialization web page
 // ==============================================================
+
 async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
@@ -306,14 +386,13 @@ async function render() {
 	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
-	$('#AudioMixing')[0].disabled = true;
 	createZegoExpressEngine();
 	await checkSystemRequirements();
 	enumDevices();
 	initEvent();
 	setLogConfig();
 	try {
-    isLoginRoom = true;
+		isLoginRoom = true;
 		await loginRoom(roomID, userID, userID);
 	} catch (err) {
 		isLoginRoom = false;

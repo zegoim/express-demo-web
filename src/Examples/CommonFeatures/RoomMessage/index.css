@@ -23,7 +23,7 @@
 }
 
 .preview-info {
-  opacity: 1;
+  opacity: 0;
   color: #000;
   font-size: 8px;
   font-weight: 400;
@@ -104,7 +104,7 @@
 }
 
 .action-item {
-  border-top: 1px solid rgba(0,0,0,.1);
+  border-top: 1px solid rgba(0,0,0,.2);
   margin-bottom: 15px;
 }
 
@@ -128,10 +128,16 @@
   flex-basis: 50%;
 }
 .f-b-3 {
-  flex-basis: 33.3%;
+  flex-basis: 30%;
+}
+.f-b-7 {
+  flex-basis: 70%;
 }
 .t-a-r {
   text-align: right;
+}
+.w-70 {
+  width: 70%;
 }
 .drop-item {
   display: flex;

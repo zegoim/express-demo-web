@@ -7,20 +7,19 @@
 // This part of the code defines the default values and global values
 // ==============================================================
 
-let userID = util.getBrow() + '_' + new Date().getTime();
+let userID = util.queryObj['userID'] || util.getBrow() + '_' + new Date().getTime();
 let roomID = '0004';
-let streamID = '0004';
+let streamID = parseInt(Math.random() * 999999) + '';
 
 let zg = null;
 let isChecked = false;
 let isLoginRoom = false;
 let localStream = null;
-let remoteStream = null;
 let published = false;
-let played = false;
 let playMultipleStreamList = [];
 let palyedObj = {};
 let playMultipleUserList = [];
+let playObj = {};
 
 // part end
 
@@ -33,36 +32,35 @@ function createZegoExpressEngine() {
 	window.zg = zg;
 }
 
+// Step1 Check system requirements
 async function checkSystemRequirements() {
 	console.log('sdk version is', zg.getVersion());
 	try {
 		const result = await zg.checkSystemRequirements();
 
 		console.warn('checkSystemRequirements ', result);
-		!result.videoCodec.H264 && $('#videoCodeType option:eq(1)').attr('disabled', 'disabled');
-		!result.videoCodec.VP8 && $('#videoCodeType option:eq(2)').attr('disabled', 'disabled');
 
 		if (!result.webRTC) {
-			console.log('browser is not support webrtc!!');
+			console.error('browser is not support webrtc!!');
 			return false;
 		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
-			console.log('browser is not support H264 and VP8');
+			console.error('browser is not support H264 and VP8');
 			return false;
-		} else if (result.videoCodec.H264) {
-			supportScreenSharing = result.screenSharing;
-			if (!supportScreenSharing) console.log('browser is not support screenSharing');
-			previewVideo = $('#previewVideo')[0];
-			// start();
+		} else if (!result.camera && !result.microphones) {
+			console.error('camera and microphones not allowed to use');
+			return false;
+		} else if (result.videoCodec.VP8) {
+			if (!result.screenSharing) console.warn('browser is not support screenSharing');
 		} else {
-			console.log('不支持H264，请前往混流转码测试');
+			console.log('不支持VP8，请前往混流转码测试');
 		}
-
 		return true;
 	} catch (err) {
 		console.error('checkSystemRequirements', err);
 		return false;
 	}
 }
+
 
 async function enumDevices() {
 	const audioInputList = [],
@@ -97,6 +95,23 @@ async function enumDevices() {
 }
 
 function initEvent() {
+	zg.on('roomStateUpdate', (roomId, state) => {
+		if(state === 'CONNECTED' && isLoginRoom) {
+			console.log(111);
+			$('#roomStateSuccessSvg').css('display', 'inline-block');
+			$('#roomStateErrorSvg').css('display', 'none');
+		}
+		
+		if (state === 'DISCONNECTED' && !isLoginRoom) {
+			$('#roomStateSuccessSvg').css('display', 'none');
+			$('#roomStateErrorSvg').css('display', 'inline-block');
+		}
+
+		if(state === 'DISCONNECTED' && isLoginRoom) {
+			location.reload()
+		}
+	})
+
 	zg.on('publisherStateUpdate', (result) => {
 		if (result.state === 'PUBLISHING') {
 			$('#pushlishInfo-id').text(result.streamID);
@@ -122,75 +137,95 @@ function initEvent() {
 	});
 }
 
-function initEventPlay() {
+function playMultipleEvent() {
+	zg.on('playQualityUpdate', (streamId, stats) => {
+		if (streamId === streamID) {
+			$('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
+			$('#receiveBitrate').text(parseInt(stats.video.videoBitrate));
+			$('#receiveFPS').text(parseInt(stats.video.videoFPS));
+			$('#receivePacket').text(parseInt(stats.video.videoPacketsLostRate));
+		} else {
+			const spanList = $(`[data-id=${streamId}] span`);
+			spanList[0].innerText = `${stats.video.frameWidth} * ${stats.video.frameHeight}`;
+			spanList[1].innerText = parseInt(stats.video.videoBitrate);
+			spanList[2].innerText = parseInt(stats.video.videoFPS);
+			spanList[3].innerText = parseInt(stats.video.videoPacketsLostRate);
+		}
+	});
+
 	zg.on('roomStreamUpdate', async (roomID, updateType, streamList, extendedData) => {
-		if (updateType == 'ADD') {
+
+		// streams added
+		if (updateType === 'ADD') {
 			for (let i = 0; i < streamList.length; i++) {
-				console.info(streamList[i].streamID + ' was added');
-				let remoteStream;
-				let playOption;
+				playMultipleStreamList.push(streamList[i]);
 
-				zg
-					.startPlayingStream(streamList[i].streamID, playOption)
-					.then((stream) => {
-						remoteStream = stream;
-						useLocalStreamList.push(streamList[i]);
-						let videoTemp = $(
-							`<video id=${streamList[i].streamID} autoplay muted playsinline controls></video>`
-						);
-						//queue.push(videoTemp)
-						$('.remoteVideo').append(videoTemp);
-						const video = $('.remoteVideo video:last')[0];
-						console.warn('video', video, remoteStream);
-						video.srcObject = remoteStream;
-						video.muted = false;
-						// videoTemp = null;
-					})
-					.catch((err) => {
-						console.error('err', err);
-					});
+				// add item to streamList
+				appednHtml(streamList[i].streamID, streamList[i].user);
+				if (playObj[streamList[i].user.userID]) {
+					$(`#m-${streamList[i].user.userID}`).attr('data-id', streamList[i].streamID);
+					stopTostart(playObj[streamList[i].user.userID], streamList[i].streamID);
+					$(`#s-${streamList[i].user.userID}`).text(streamList[i].streamID);
+				}
+				playObj[streamList[i].user.userID] = streamList[i].streamID;
 			}
-		} else if (updateType == 'DELETE') {
-			for (let k = 0; k < useLocalStreamList.length; k++) {
-				for (let j = 0; j < streamList.length; j++) {
-					if (useLocalStreamList[k].streamID === streamList[j].streamID) {
-						try {
-							zg.stopPlayingStream(useLocalStreamList[k].streamID);
-						} catch (error) {
-							console.error(error);
-						}
+		} else if (updateType == 'DELETE') { 	//  streams deleted
 
-						$('.remoteVideo video:eq(' + k + ')').remove();
-						useLocalStreamList.splice(k--, 1);
+			for (let k = 0; k < playMultipleStreamList.length; k++) {
+				for (let j = 0; j < streamList.length; j++) {
+					if (playMultipleStreamList[k].streamID === streamList[j].streamID) {
+						stopPlayingStream(playMultipleStreamList[k].streamID);
+						// remove item from streamList
+						removeHtml(playMultipleStreamList[k].streamID);
+						const node = $(`[data-id=${streamList[j].streamID}]`)[0];
+						if (node) {
+							const id = node.id.split('-')[1];
+							stopToChangeUI.call($(`#b-${id}`)[0], id);
+						}
+						playMultipleStreamList.splice(k--, 1);
 						break;
 					}
 				}
 			}
 		}
+
+		$('#streamList').text(`StreamList (${playMultipleStreamList.length})`);
+	});
+
+	zg.on('roomUserUpdate', (roomID, updateType, userList) => {
+		if (updateType === 'ADD') { 	// users added
+
+			for (let i = 0; i < userList.length; i++) {
+				playMultipleUserList.push(userList[i]);
+				palyedObj[userList[i].userID] = false;
+				// add play cell to playList and add item to userList
+				appednHtml(null, userList[i]);
+				// bind event by userId
+				addMultiplePlayingEvent(userList[i].userID);
+			}
+		} else if (updateType == 'DELETE') { // users deleted
+			for (let k = 0; k < playMultipleUserList.length; k++) {
+				for (let j = 0; j < userList.length; j++) {
+					if (playMultipleUserList[k].userID === userList[j].userID) {
+						// remove cell from playList and remove item from userList
+						removeHtml(null, playMultipleUserList[k]);
+						playMultipleUserList.splice(k--, 1);
+						break;
+					}
+				}
+			}
+		}
+		$('#userList').text(`UserList (${playMultipleUserList.length})`);
 	});
 }
 
 function clearStream(flag) {
-	if (localStream && flag) {
-		zg.destroyStream(localStream);
-	}
-	if (remoteStream) {
-		zg.destroyStream(remoteStream);
-	}
-	if (flag) {
+	if (flag === 'publish') {
+		localStream && zg.destroyStream(localStream);
 		$('#pubshlishVideo')[0].srcObject = null;
 		localStream = null;
-	}
-	$('#playVideo')[0].srcObject = null;
-	remoteStream = null;
-	if (flag === 'room') {
-		isLoginRoom = false;
-	}
-	if (flag === 'room' || flag === 'publish') {
 		published = false;
 	}
-
-	played = false;
 }
 
 function setLogConfig() {
@@ -249,7 +284,7 @@ function logoutRoom(roomId) {
 async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
-		zg.startPublishingStream(streamId, localStream);
+		zg.startPublishingStream(streamId, localStream, { videoCodec: 'VP8' });
 		$('#pubshlishVideo')[0].srcObject = localStream;
 		return true;
 	} catch (err) {
@@ -259,26 +294,13 @@ async function startPublishingStream(streamId, config) {
 
 async function stopPublishingStream(streamId) {
 	zg.stopPublishingStream(streamId);
-	if (remoteStream) {
-		stopPlayingStream($('#playInfo-id').text());
-	}
 	clearStream('publish');
-}
-
-async function startPlayingStream(streamId, options = {}) {
-	try {
-		remoteStream = await zg.startPlayingStream(streamId, options);
-		$('#playVideo')[0].srcObject = remoteStream;
-		return true;
-	} catch (err) {
-		return false;
-	}
 }
 
 async function startPlayingMultipleStream(streamId, options = {}) {
 	try {
 		const stream = await zg.startPlayingStream(streamId, options);
-		$(`#${streamId} video`)[0].srcObject = stream;
+		$(`[data-id=${streamId}] video`)[0].srcObject = stream;
 		return true;
 	} catch (err) {
 		return false;
@@ -287,7 +309,10 @@ async function startPlayingMultipleStream(streamId, options = {}) {
 
 async function stopPlayingStream(streamId) {
 	zg.stopPlayingStream(streamId);
-	clearStream();
+	const video = $(`[data-id=${streamId}] video`)[0];
+	if (video) {
+		video.srcObject = null;
+	}
 }
 
 // uses SDK end
@@ -306,49 +331,20 @@ $('#startPublishing').on(
 				updateButton(this, 'Start Publishing', 'Stop Publishing');
 				published = true;
 				changeVideo();
+				setDisabled(true);
 			} else {
 				changeVideo(true);
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Publishing Fail';
 			}
+			$('#publishStreamID-info').text(streamID);
 		} else {
-			if (remoteStream) {
-				// $('#PlayID')[0].disabled = false
-				updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing');
-			}
 			stopPublishingStream(streamID);
 			updateButton(this, 'Start Publishing', 'Stop Publishing');
 			published = false;
-			// $('#PublishID')[0].disabled = false
-		}
-	}, 500)
-);
-
-$('#startPlaying').on(
-	'click',
-	util.throttle(async function() {
-		this.classList.add('border-primary');
-		if (!played) {
-			const config = {
-				video: $('#Video')[0].checked,
-				audio: $('#Audio')[0].checked
-			};
-			const flag = await startPlayingStream(streamID, config);
-			if (flag) {
-				updateButton(this, 'Start Playing', 'Stop Playing');
-				played = true;
-				changeVideo();
-			} else {
-				this.classList.remove('border-primary');
-				this.classList.add('border-error');
-				this.innerText = 'Playing Fail';
-				changeVideo(true);
-			}
-		} else {
-			stopPlayingStream(streamID);
-			updateButton(this, 'Start Playing', 'Stop Playing');
-			played = false;
+			$('#publishStreamID-info').text('');
+			setDisabled(false);
 		}
 	}, 500)
 );
@@ -398,89 +394,45 @@ function updateButton(button, preText, afterText) {
 
 function changeVideo(flag) {
 	if (flag) {
-		$('#pubshlishVideo').css('transform', 'none');
-		$('#playVideo').css('transform', 'none');
+		$('video').each((index, video) => {
+			video.setAttribute('transform', 'none');
+		});
 		return;
 	}
 	const value = $('#Mirror').val();
 	if (value === 'onlyPreview') {
 		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
 	} else if (value === 'onlyPlay') {
-		$('#playVideo').css('transform', 'scale(-1, 1)');
+		$('video').each((index, video) => {
+			if (video.id !== 'pubshlishVideo') video.setAttribute('transform', 'scale(-1, 1)');
+		});
 	} else if (value === 'both') {
-		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
-		$('#playVideo').css('transform', 'scale(-1, 1)');
+		$('video').each((index, video) => {
+			video.setAttribute('transform', 'scale(-1, 1)');
+		});
 	}
 }
 
-function playMultipleEvent() {
-	zg.on('playQualityUpdate', (streamId, stats) => {
-		if (streamId === '0004') {
-			$('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`);
-			$('#receiveBitrate').text(parseInt(stats.video.videoBitrate));
-			$('#receiveFPS').text(parseInt(stats.video.videoFPS));
-			$('#receivePacket').text(parseInt(stats.video.videoPacketsLostRate));
-		} else {
-			const spanList = $(`#${streamId} span`);
-			spanList[0].innerText = `${stats.video.frameWidth} * ${stats.video.frameHeight}`;
-			spanList[1].innerText = parseInt(stats.video.videoBitrate);
-			spanList[2].innerText = parseInt(stats.video.videoFPS);
-			spanList[3].innerText = parseInt(stats.video.videoPacketsLostRate);
-		}
-	});
-
-	zg.on('roomStreamUpdate', async (roomID, updateType, streamList, extendedData) => {
-		if (updateType === 'ADD') {
-			for (let i = 0; i < streamList.length; i++) {
-				playMultipleStreamList.push(streamList[i]);
-				palyedObj[streamList[i].streamID] = false;
-				appednHtml(streamList[i].streamID, streamList[i].user);
-				addMultiplePlayingEvent(streamList[i].streamID);
-			}
-		} else if (updateType == 'DELETE') {
-			for (let k = 0; k < playMultipleStreamList.length; k++) {
-				for (let j = 0; j < streamList.length; j++) {
-					if (playMultipleStreamList[k].streamID === streamList[j].streamID) {
-						try {
-							zg.stopPlayingStream(playMultipleStreamList[k].streamID);
-						} catch (error) {
-							console.error(error);
-						}
-						removeHtml(playMultipleStreamList[k].streamID, streamList[k].user);
-						playMultipleStreamList.splice(k--, 1);
-						break;
-					}
-				}
-			}
-		}
-
-		$('#streamList').text(`StreamList (${playMultipleStreamList.length})`);
-	});
-	zg.on('roomUserUpdate', (roomID, updateType, userList) => {
-		if (updateType === 'ADD') {
-			for (let i = 0; i < userList.length; i++) {
-				playMultipleUserList.push(userList[i]);
-				appednHtml(null, userList[i]);
-			}
-		} else {
-			for (let k = 0; k < playMultipleUserList.length; k++) {
-				for (let j = 0; j < userList.length; j++) {
-					if (playMultipleUserList[k].userID === userList[j].userID) {
-						removeHtml(null, playMultipleUserList[k]);
-						playMultipleUserList.splice(k--, 1);
-						break;
-					}
-				}
-			}
-		}
-		$('#userList').text(`UserList (${playMultipleUserList.length})`);
-	});
-}
-
+// When users or streams added
 function appednHtml(streamId, user) {
 	if (streamId) {
+
+		// add new item to streamList
+		$('#streamListUl').append(`
+    <li id="l-${streamId}">
+    <div class="drop-item">
+      <span class="f-b-3 t-nowrap m-r-10">StreamID: ${streamId}</span>
+      <span class="f-b-3 t-nowrap m-r-5">UserID: ${user.userID}</span>
+      <span class="f-b-3 t-nowrap ">Name: ${user.userName}</span>
+    </div>
+    </li>
+    `);
+	}
+
+	if (!streamId && user) {
+		// add new item to PlayList
 		$('#videoList').append(
-			`<div class="preview-playInfo col-6 m-t-10" id="${streamId}">
+			`<div class="preview-playInfo col-6" id="m-${user.userID}">
         <div class="preview-content">
         <div class="preview-action">
           <div class="preview-info">
@@ -500,31 +452,21 @@ function appednHtml(streamId, user) {
                 <input class="check-input" type="checkbox" checked>
               </div>
             </div>
-            <button id='b-${streamId}' class="m-b-5 play-pause-button">Start Playing</button>
+            <button id='b-${user.userID}' class="m-b-5 play-pause-button">Start Playing</button>
           </div>
         </div>
-        <video autoplay muted playsinline></video>
+        <video autoplay playsinline></video>
       </div>
       <div class="font-12 t-nowrap">
-        <span class="m-r-5">${user.userName}</span>
-        StreamID: <span>${streamId}</span>
+			StreamID: <span id="s-${user.userID}"></span>
+        <div>UserName: <span class="m-r-5">${user.userName}</span></div>
       </div>
     </div>`
 		);
-		$('#streamListUl').append(`
-    <li id="l-${streamId}">
-    <div class="drop-item">
-      <span class="f-b-3 t-nowrap m-r-5">StreamID: ${streamId}</span>
-      <span class="f-b-3 t-nowrap m-r-5">UserID: ${user.userID}</span>
-      <span class="f-b-3 t-nowrap ">Name: ${user.userName}</span>
-    </div>
-    </li>
-    `);
-	}
 
-	if (!streamId && user) {
+		// add new item to userList
 		$('#userListUl').append(`
-    <li id="${user.userID}">
+    <li id="u-${user.userID}">
     <div class="drop-item">
       <span class="f-b-5 t-nowrap m-r-5">UserID: ${user.userID}</span>
       <span class="f-b-5 t-nowrap ">Name: ${user.userName}</span>
@@ -534,51 +476,82 @@ function appednHtml(streamId, user) {
 	}
 }
 
+// When users or streams deleted
 function removeHtml(streamId, user) {
 	if (streamId) {
-		$(`#${streamId}`).remove();
-		$(`#l-${streamId}`).remove();
+		document.getElementById(`l-${streamId}`).remove();
 	}
 
 	if (!streamId && user) {
-		$(`${user.userID}`).remove();
+		document.getElementById(`m-${user.userID}`).remove();
+		document.getElementById(`u-${user.userID}`).remove();
 	}
 }
 
-function addMultiplePlayingEvent(streamId) {
-	$(`#b-${streamId}`).on(
+// Bind event by userId
+function addMultiplePlayingEvent(userId) {
+	$(`#b-${userId}`).on(
 		'click',
 		util.throttle(async function() {
 			const selectId = this.id.split('-')[1];
-			const configInput = $(`#${selectId} input`);
+			const configInput = $(`#m-${selectId} input`);
 			this.classList.add('border-primary');
-			if (!palyedObj[streamId]) {
+			if (!palyedObj[userId]) {
 				const config = {
 					video: configInput[0].checked,
 					audio: configInput[1].checked
 				};
+				const streamId = playObj[userId];
+				streamId && $(`#m-${selectId}`).attr('data-id', streamId);
 				const flag = await startPlayingMultipleStream(streamId, config);
 				if (flag) {
 					updateButton(this, 'Start Playing', 'Stop Playing');
-					palyedObj[streamId] = true;
+					palyedObj[userId] = true;
+					$(`#s-${userId}`).text(streamId);
+					configInput.each((idx, item) => {
+						item.disabled = true;
+					});
 				} else {
 					this.classList.remove('border-primary');
 					this.classList.add('border-error');
 					this.innerText = 'Playing Fail';
 				}
 			} else {
-				stopPlayingStream(streamId);
-				updateButton(this, 'Start Playing', 'Stop Playing');
-				const spanList = $(`#${streamId} span`);
-				spanList[0].innerText = '';
-				spanList[1].innerText = '';
-				spanList[2].innerText = '';
-				spanList[3].innerText = '';
-				spanList[4].innerText = '';
-				palyedObj[streamId] = false;
+				configInput.each((idx, item) => {
+					item.disabled = false;
+				});
+				stopPlayingStream(playObj[userId]);
+				stopToChangeUI.call(this, userId);
 			}
 		}, 500)
 	);
+}
+
+function stopToChangeUI(userId) {
+	updateButton(this, 'Start Playing', 'Stop Playing');
+	const spanList = $(`#m-${userId} span`);
+	spanList[0].innerText = '';
+	spanList[1].innerText = '';
+	spanList[2].innerText = '';
+	spanList[3].innerText = '';
+	spanList[4].innerText = '';
+	palyedObj[userId] = false;
+	$(`#s-${userId}`).text('');
+}
+
+function setDisabled(flag) {
+	$('#captureResolution')[0].disabled = flag;
+	$('#FPS')[0].disabled = flag;
+	$('#Bitrate')[0].disabled = flag;
+	$('#Mirror')[0].disabled = flag;
+	$('#CameraDevices')[0].disabled = flag;
+	$('#Camera')[0].disabled = flag;
+	$('#Microphone')[0].disabled = flag;
+}
+
+async function stopTostart(oldId, newId) {
+	await stopPlayingStream(oldId)
+	startPlayingMultipleStream(newId)
 }
 
 // tool end
@@ -595,17 +568,15 @@ async function render() {
 	$('#PublishID').val(streamID);
 	createZegoExpressEngine();
 	await checkSystemRequirements();
-	enumDevices();
+	// enumDevices();
 	playMultipleEvent();
 	initEvent();
 	setLogConfig();
 	try {
+		isLoginRoom = true
 		await loginRoom(roomID, userID, userID);
-		$('#roomStateSuccessSvg').css('display', 'inline-block');
-		$('#roomStateErrorSvg').css('display', 'none');
 	} catch (err) {
-		$('#roomStateSuccessSvg').css('display', 'none');
-		$('#roomStateErrorSvg').css('display', 'inline-block');
+		isLoginRoom = false
 	}
 }
 

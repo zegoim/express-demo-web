@@ -385,6 +385,10 @@ ol li {
   font-size: 20px!important
 }
 
+.color-w {
+  color: #fff;
+}
+
 .b-0 {
   border: none
 }
@@ -6064,7 +6068,7 @@ a.mytooltip {
 
 .sidebar-nav .sidebar-title {
     display: block;
-    padding: 14px 35px 14px 15px;
+    padding: 5px 35px 5px 10px;
     font-weight: 500;
     font-size: 12px;
     /* background-color: #f2f7f8; */
@@ -6085,7 +6089,7 @@ a.mytooltip {
 
 .sidebar-nav ul li a {
   color: #54667a;
-  padding: 14px 35px 14px 15px;
+  padding: 6px 35px 6px 15px;
   display: block;
   font-size: 14px;
   white-space: nowrap
@@ -7987,4 +7991,10 @@ ul.drop li {
     opacity: 1;
     transform: rotateY(0deg) translateY(0px);
   }
+}
+
+.goToDoc{
+  padding: 1%;
+  font-size: 14px;
+  font-weight: 300;
 }

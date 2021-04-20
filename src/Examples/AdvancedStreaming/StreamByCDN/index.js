@@ -12,6 +12,7 @@ let roomID = '0010'
 let streamID = '0010'
 
 let zg = null;
+let isLoginRoom = false;
 let localStream = null;
 let remoteStream = null;
 let published = false;
@@ -30,35 +31,33 @@ function createZegoExpressEngine() {
   window.zg = zg
 }
 
+// Step1 Check system requirements
 async function checkSystemRequirements() {
-  console.log('sdk version is', zg.getVersion());
-  try {
-      const result = await zg.checkSystemRequirements();
+	console.log('sdk version is', zg.getVersion());
+	try {
+		const result = await zg.checkSystemRequirements();
 
-      console.warn('checkSystemRequirements ', result);
-      !result.videoCodec.H264 && $('#videoCodeType option:eq(1)').attr('disabled', 'disabled');
-      !result.videoCodec.VP8 && $('#videoCodeType option:eq(2)').attr('disabled', 'disabled');
+		console.warn('checkSystemRequirements ', result);
 
-      if (!result.webRTC) {
-          console.log('browser is not support webrtc!!');
-          return false;
-      } else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
-        console.log('browser is not support H264 and VP8');
-          return false;
-      } else if (result.videoCodec.H264) {
-          supportScreenSharing = result.screenSharing;
-          if (!supportScreenSharing) console.log('browser is not support screenSharing');
-          previewVideo = $('#previewVideo')[0];
-          // start();
-      } else {
-        console.log('不支持H264，请前往混流转码测试');
-      }
-
-      return true;
-  } catch (err) {
-      console.error('checkSystemRequirements', err);
-      return false;
-  }
+		if (!result.webRTC) {
+			console.error('browser is not support webrtc!!');
+			return false;
+		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
+			console.error('browser is not support H264 and VP8');
+			return false;
+		} else if (!result.camera && !result.microphones) {
+			console.error('camera and microphones not allowed to use');
+			return false;
+		} else if (result.videoCodec.VP8) {
+			if (!result.screenSharing) console.warn('browser is not support screenSharing');
+		} else {
+			console.log('不支持VP8，请前往混流转码测试');
+		}
+		return true;
+	} catch (err) {
+		console.error('checkSystemRequirements', err);
+		return false;
+	}
 }
 
 async function enumDevices() {
@@ -94,6 +93,23 @@ async function enumDevices() {
 }
 
 function initEvent() {
+  zg.on('roomStateUpdate', (roomId, state) => {
+		if(state === 'CONNECTED' && isLoginRoom) {
+			console.log(111);
+			$('#roomStateSuccessSvg').css('display', 'inline-block');
+			$('#roomStateErrorSvg').css('display', 'none');
+		}
+		
+		if (state === 'DISCONNECTED' && !isLoginRoom) {
+			$('#roomStateSuccessSvg').css('display', 'none');
+			$('#roomStateErrorSvg').css('display', 'inline-block');
+		}
+
+		if(state === 'DISCONNECTED' && isLoginRoom) {
+			location.reload()
+		}
+	})
+
   zg.on('publisherStateUpdate', result => {
     if(result.state === "PUBLISHING") {
       $('#pushlishInfo-id').text(result.streamID)
@@ -380,18 +396,18 @@ async function render() {
   $('#UserID').val(userID)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
+  $('#PublishCdnUrl').val(`rtmp://rtmp.wsdemo.zego.im/livestream/zegotest-${appID}-0010`)
+  $('#CdnUrl').val(`https://hdl-wsdemo.zego.im/livestream/zegotest-${appID}-0010.flv`)
   createZegoExpressEngine()
   await checkSystemRequirements()
   enumDevices()
   initEvent()
   setLogConfig()
   try {
+    isLoginRoom = true
     await loginRoom(roomID, userID, userID)
-    $('#roomStateSuccessSvg').css('display', 'inline-block')
-    $('#roomStateErrorSvg').css('display', 'none')
   } catch (err) {
-    $('#roomStateSuccessSvg').css('display', 'none')
-    $('#roomStateErrorSvg').css('display', 'inline-block')
+    isLoginRoom = false
   }
 }
 

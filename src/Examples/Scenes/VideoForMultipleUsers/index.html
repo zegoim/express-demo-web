@@ -5,10 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-lang="VideoForMultipleUsers">多人视频通话</title>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../../../assets/css/style.css">
   <link rel="stylesheet" href="./index.css">
-  <script src="../../../assets/js/ZegoExpressWebRTC-2.4.0.js"></script>
+  <script src="../../../assets/js/ZegoExpressWebRTC.js"></script>
 </head>
 
 <body class="fix-sidebar card-no-border">
@@ -27,6 +28,12 @@
             <span class="sidebar-title" data-lang="Quickstart">快速开始</span>
             <li>
               <a href="../../QuickStart/CommonUsage/index.html" class="waves-effect" data-lang="CommonUsage">实现流程</a>
+            </li>
+            <li>
+              <a href="../../QuickStart/Publishing/index.html" class="waves-effect" data-lang="Publishing">推流</a>
+            </li>
+            <li>
+              <a href="../../QuickStart/Playing/index.html" class="waves-effect" data-lang="Playing">拉流</a>
             </li>
             <span class="sidebar-title" data-lang="Scenes">场景实践</span>
             <li>
@@ -78,7 +85,7 @@
             </li>
             <li>
               <a href="../../AdvancedAudioProcessing/AEC_ANS_AGC/index.html" class="waves-effect"
-                data-lang="AEC_ANS_AGC ">音频3A处理</a>
+                data-lang="AEC_ANS_AGC">音频3A处理</a>
             </li>
             <li>
               <a href="../../AdvancedAudioProcessing/AudioMixing/index.html" class="waves-effect"
@@ -94,6 +101,10 @@
             </li>
             <li>
               <a href="../../Others/ScreenSharing/index.html" class="waves-effect" data-lang="ScreenSharing">屏幕共享</a>
+            </li>
+            <li>
+              <a href="../../Others/MediaTrackReplacement/index.html" class="waves-effect"
+                data-lang="MediaTrackReplacement">音视频轨道替换</a>
             </li>
             <span class="sidebar-title" data-lang="DebugAndConfig">调试与配置</span>
             <li>
@@ -139,7 +150,7 @@
                     <div class="preview-video-action">
                       <div class="flex-c">
                         <div class="select-wrapper">
-                          Mirror
+                          <span data-lang="Mirror">Mirror</span>
                           <select class="form-control form-control-sm m-l-5" id="Mirror">
                             <option value="none">none</option>
                             <option value="onlyPreview">onlyPreview</option>
@@ -148,54 +159,40 @@
                           </select>
                         </div>
                         <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Camera">Camera</label>
+                          <label class="form-check-label m-r-5" for="Camera" data-lang="Camera">Camera</label>
                           <input class="check-input" type="checkbox" id="Camera" checked>
                         </div>
                       </div>
                       <div class="flex-c">
                         <div class="select-wrapper">
-                          Camera
+                          <span data-lang="Camera">Camera</span>
                           <select class="form-control form-control-sm m-l-5" id="CameraDevices">
                           </select>
                         </div>
                         <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Microphone">Microphone</label>
+                          <label class="form-check-label m-r-5" for="Microphone"
+                            data-lang="Microphone">Microphone</label>
                           <input class="check-input" type="checkbox" id="Microphone" checked>
                         </div>
                       </div>
-                      <button id="startPublishing" class="m-b-5 play-pause-button">Start Publishing</button>
+                      <button id="startPublishing" class="m-b-5 play-pause-button" title
+                      ="createStream()/ startPublishingStream()"  >Start Publishing</button>
                     </div>
                   </div>
                   <video id="pubshlishVideo" autoplay muted playsinline></video>
                 </div>
-                <div>
-                  StreamID: <span id="t_0004"></span>
-                </div>
-              </div>
-              <div class="preview-playInfo col-6">
-                <div class="preview-content">
-                  <div class="preview-action">
-                    <div class="preview-info">
-                      <div>Resolution: <span id="playResolution"></span></div>
-                      <div>Video Send Bitrate: <span id="receiveBitrate"></span></div>
-                      <div>Video Send FPS: <span id="receiveFPS"></span></div>
-                      <div>Packet Loss: <span id="receivePacket"></span></div>
-                    </div>
-                    <div class="preview-video-action">
-                      <div class="font-12 publish-check m-b-5 m-t-5">
-                        <div class="check-wrappre m-r-5">
-                          <label class="form-check-label m-r-5" for="Video">Video</label>
-                          <input class="check-input" type="checkbox" id="Video" checked>
-                        </div>
-                        <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Audio">Audio</label>
-                          <input class="check-input" type="checkbox" id="Audio" checked>
-                        </div>
-                      </div>
-                      <button id="startPlaying" class="m-b-5 play-pause-button">Start Playing</button>
-                    </div>
+                <div class="font-12 flex-b">
+                  <div>
+                    StreamID: <span id="publishStreamID-info"></span>
                   </div>
-                  <video id="playVideo" autoplay muted playsinline></video>
+                  <div>
+                    <svg t="1618919355738" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                      xmlns="http://www.w3.org/2000/svg" p-id="2173" width="20" height="20">
+                      <path
+                        d="M512 62.08A449.92 449.92 0 1 0 961.92 512 449.92 449.92 0 0 0 512 62.08z m0 135.04a135.04 135.04 0 1 1-135.04 135.04A134.72 134.72 0 0 1 512 197.12z m0 640a323.84 323.84 0 0 1-269.76-144.96c0-89.6 179.84-138.56 269.76-138.56s268.48 48.96 269.76 138.56A323.84 323.84 0 0 1 512 835.84z"
+                        p-id="2174"></path>
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
@@ -204,18 +201,18 @@
             <div class="action-step">
               <div class="action-content">
                 <div class="action-room font-14 font-bold">
-                  <div class="f-b-5">
+                  <div class="f-b-3">
                     RoomID <input type="text" id="RoomID" disabled />
                   </div>
-                  <div class="f-b-5">
-                    UserId <input type="text" id="UserID" disabled />
+                  <div class="f-b-7">
+                    UserId <input class="custoum_input" type="text" id="UserID" disabled/>
                   </div>
-                  <div class="f-b-5 m-t-10">
-                    UserName <input type="text" id="UserName" disabled />
+                  <div class="f-b-8 m-t-10">
+                    UserName <input class="custoum_input" type="text" id="UserName" disabled/>
                   </div>
                 </div>
                 <div class="font-14 select-wrapper m-b-10 font-bold">
-                  Capture Resolution
+                  <span data-lang="CaptureResolution">Capture Resolution</span>
                   <select class="form-control form-control-sm m-l-5" id="captureResolution">
                     <option value="320*240">320 * 240</option>
                     <option value="640*480">640 * 480</option>
@@ -224,10 +221,11 @@
                 </div>
                 <div class="videoQuality font-bold">
                   <div class="font-14 f-b-5">
-                    FPS <input type="text" class="t-a-r" id="FPS" value="15" /> fps
+                    <span data-lang="FPS">FPS</span> <input type="text" class="t-a-r" id="FPS" value="15" /> fps
                   </div>
                   <div class="font-14 f-b-5">
-                    Bitrate <input type="text" class="t-a-r" id="Bitrate" value="300" /> kbps
+                    <span data-lang="Bitrate">Bitrate</span> <input type="text" class="t-a-r" id="Bitrate"
+                      value="300" /> kbps
                   </div>
                 </div>
                 <div class="dropdown-wrapper">
@@ -247,6 +245,7 @@
           </div>
         </div>
       </div>
+      <div class="goToDoc"><span  data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;<a target="_blank" href="https://doc-zh.zego.im/article/9675" data-lang="HelpDocs"> 帮助文档 </a> </div>
     </div>
     <!-- </div> -->
   </div>

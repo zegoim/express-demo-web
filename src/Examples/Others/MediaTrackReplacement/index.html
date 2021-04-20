@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-lang="AEC_ANS_AGC">音频3A处理</title>
-  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon"/>
+  <title data-lang="MediaTrackReplacement">音视频轨道替换</title>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../../../assets/css/style.css">
   <link rel="stylesheet" href="./index.css">
@@ -42,8 +42,7 @@
             </li>
             <span class="sidebar-title" data-lang="CommonFeatures">常用功能</span>
             <li>
-              <a href="../../CommonFeatures/CommonVideoConfig/index.html" class="waves-effect"
-                data-lang="CommonVideoConfig">常用视频配置</a>
+              <a href="../../CommonFeatures/CommonVideoConfig/index.html" class="waves-effect" data-lang="CommonVideoConfig">常用视频配置</a>
             </li>
             <li>
               <a href="../../CommonFeatures/RoomMessage/index.html" class="waves-effect"
@@ -85,7 +84,8 @@
                 data-lang="SoundLevelAndAudioSpectrum">音频频谱与声浪</a>
             </li>
             <li>
-              <a href="index.html" class="waves-effect" data-lang="AEC_ANS_AGC">音频3A处理</a>
+              <a href="../../AdvancedAudioProcessing/AEC_ANS_AGC/index.html" class="waves-effect"
+                data-lang="AEC_ANS_AGC">音频3A处理</a>
             </li>
             <li>
               <a href="../../AdvancedAudioProcessing/AudioMixing/index.html" class="waves-effect"
@@ -138,10 +138,7 @@
               </div>
             </div>
             <div class="row" id="videoList">
-              <div class="preview-pushlishInfo col-lg-12 col-6">
-                <div class="pushlishInfo-title" data-lang="Preview">
-                  Preview
-                </div>
+              <div class="preview-pushlishInfo col-lg-12 col-6 m-b-15">
                 <div class="preview-content">
                   <div class="preview-action">
                     <div class="preview-info">
@@ -154,72 +151,52 @@
                       <div class="m-t-10 m-b-5">
                         Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
                       </div>
-                      <button id="startPublishing" class="m-b-5 configBtn play-pause-button"  title="createStream() / startPublishingStream()">Start Publishing</button>
+                      <button id="startPublishing" class="m-b-5 configBtn play-pause-button" title="replaceTrack()">Start Publishing</button>
                     </div>
                   </div>
-                  <video id="pubshlishVideo" autoplay muted playsinline></video>
-                </div>
-              </div>
-              <div class="preview-playInfo col-lg-12 col-6 m-t-10">
-                <div class="pushlishInfo-title" data-lang="PlayStream">
-                  Play Stream
-                </div>
-                <div class="preview-content">
-                  <div class="preview-action">
-                    <div class="preview-info">
-                      <div>Resolution: <span id="playResolution"></span></div>
-                      <div>Video Send Bitrate: <span id="receiveBitrate"></span></div>
-                      <div>Video Send FPS: <span id="receiveFPS"></span></div>
-                      <div>Packet Loss: <span id="receivePacket"></span></div>
-                    </div>
-                    <div class="preview-video-action">
-                      <div class="m-t-10 m-b-5">
-                        Playing StreamID <input class="m-l-10" type="text" id="PlayID" />
-                      </div>
-                      <button id="startPlaying" class="m-b-5 configBtn play-pause-button" title="startPlayingStream()">Start Playing</button>
-                    </div>
-                  </div>
-                  <video id="playVideo" autoplay playsinline></video>
+                  <video id="pubshlishVideo" autoplay playsinline></video>
                 </div>
               </div>
             </div>
           </div>
           <div class="col-12 col-lg-6 action-wrapper">
             <div class="action-step">
-              <div class="action-content font-bold font-14">
-                <div data-lang="AEC_ANS_AGC"></div>
-                <div class="publish-check font-medium m-t-10">
-                  <div class="check-wrappre m-r-15">
-                    <label class="form-check-label m-r-5" for="AEC" data-lang="AEC">AEC</label>
-                    <input class="check-input" type="checkbox" id="AEC" checked>
-                  </div>
-                  <div class="check-wrappre m-r-15">
-                    <label class="form-check-label m-r-5" for="AGC" data-lang="AGC">AGC</label>
-                    <input class="check-input" type="checkbox" id="AGC" checked>
-                  </div>
-                  <div class="check-wrappre m-r-15">
-                    <label class="form-check-label m-r-5" for="ANS" data-lang="ANS">ANS</label>
-                    <input class="check-input" type="checkbox" id="ANS" checked>
-                  </div>
+              <div class="action-content">
+                <div class="font-bold m-b-5" data-lang="VideoTrackReplacement">视频轨道替换</div>
+                <div class="switch-field">
+                  <input type="radio" id="radio-one" name="switch-one" value="camera" disabled checked />
+                  <label for="radio-one" data-lang="Camera">摄像头</label>
+                  <input type="radio" id="radio-two" name="switch-one" value="screen" disabled />
+                  <label for="radio-two" data-lang="Screen">屏幕</label>
+                </div>
+                <div class="font-bold m-t-5" data-lang="AudioTrackReplacement">视频轨道替换</div>
+                <audio id="customAudio" crossOrigin="anonymous" loop preload playsinline controls
+                  src="../../../assets/16183688734997.mp3"></audio>
+                <div class="switch-field m-t-5">
+                  <input type="radio" id="Microphone" name="switch-two" value="Microphone" disabled checked />
+                  <label for="Microphone" data-lang="Microphone">摄像头</label>
+                  <input type="radio" id="CustomAudio" name="switch-two" value="CustomAudio" disabled />
+                  <label for="CustomAudio" data-lang="CustomAudioCaptureAndRendering">自定义音频采集</label>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- </div> -->
-      <div class="goToDoc"><span  data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;<a target="_blank" href="https://doc-zh.zego.im/article/9673" data-lang="HelpDocs"> 帮助文档 </a> </div>
+      <!-- <div class="goToDoc"><span  data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;<a target="_blank" href="https://doc-zh.zego.im/article/9675" data-lang="HelpDocs"> 帮助文档 </a> </div> -->
     </div>
+    <!-- </div> -->
+  </div>
 
-    <script src="../../../assets/js/jquery.min.js"></script>
-    <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
-    <script src="../../../assets/js/metisMenu.min.js"></script>
-    <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
-    <script src="../../../assets/js/bootstrap.min.js"></script>
-    <script src="../../../assets/js/vconsole.min.js"></script>
-    <script src="../../../assets/js/custom.js"></script>
-    <script src="../../../KeyCenter.js"></script>
-    <script src="index.js"></script>
+  <script src="../../../assets/js/jquery.min.js"></script>
+  <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
+  <script src="../../../assets/js/metisMenu.min.js"></script>
+  <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
+  <script src="../../../assets/js/bootstrap.min.js"></script>
+  <script src="../../../assets/js/vconsole.min.js"></script>
+  <script src="../../../assets/js/custom.js"></script>
+  <script src="../../../KeyCenter.js"></script>
+  <script src="index.js"></script>
 </body>
 
 </html>

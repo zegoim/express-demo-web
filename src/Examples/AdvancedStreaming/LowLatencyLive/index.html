@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-lang="Quickstart">快速开始</title>
+  <title data-lang="LowLatencyLive">低延迟直播</title>
   <link rel="icon" href="../../../../favicon.ico" type="image/x-icon"/>
   <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../../../assets/css/style.css">
@@ -27,7 +27,7 @@
           <ul id="sidebarnav">
             <span class="sidebar-title" data-lang="Quickstart">快速开始</span>
             <li>
-              <a href="index.html" class="waves-effect" data-lang="CommonUsage">实现流程</a>
+              <a href="../../QuickStart/CommonUsage/index.html" class="waves-effect" data-lang="CommonUsage">实现流程</a>
             </li>
             <li>
               <a href="../../QuickStart/Publishing/index.html" class="waves-effect" data-lang="Publishing">推流</a>
@@ -63,7 +63,7 @@
                 data-lang="StreamByCDN">通过CDN推拉流</a>
             </li>
             <li>
-              <a href="../../AdvancedStreaming/LowLatencyLive/index.html" class="waves-effect"
+              <a href="index.html" class="waves-effect"
                 data-lang="LowLatencyLive">低延迟直播</a>
             </li>
             <span class="sidebar-title" data-lang="AdvancedVideoProcessing">视频进阶</span>
@@ -144,7 +144,7 @@
                   <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id"></span>
                 </div>
                 <div class="preview-content">
-                  <video id="pubshlishVideo" autoplay playsinline muted></video>
+                  <video id="pubshlishVideo" autoplay muted playsinline></video>
                 </div>
               </div>
               <div class="preview-playInfo m-t-10 col-lg-12 col-6">
@@ -163,7 +163,7 @@
                 Step1&emsp;<span class="action-info">Create ZegoExpressEngine</span>
               </div>
               <div class="btn-wrapper">
-                <button id="CreateZegoExpressEngine" type="button" class="btn-outline-info btn cuBtn" title="new ZegoExpressEngine()">
+                <button id="CreateZegoExpressEngine" type="button" class="btn-outline-info btn cuBtn" title="new ZegoExpressEngine()" >
                   <div class="success-svg" id="createSuccessSvg" style="display: none;">
                     <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height=15 width="15"
                       viewBox="0 0 48 48" aria-hidden="true">
@@ -181,7 +181,7 @@
                 Step2&emsp;<span class="action-info">Test Compatiblity</span>
               </div>
               <div class="btn-wrapper">
-                <button id="CheckSystemRequire" type="button" class="btn-outline-info btn cuBtn" title="checkSystemRequirements()">
+                <button id="CheckSystemRequire" type="button" class="btn-outline-info btn cuBtn"  title="checkSystemRequirements()">
                   <div class="success-svg" id="checkSuccessSvg" style="display: none;">
                     <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
                       viewBox="0 0 48 48" aria-hidden="true">
@@ -226,18 +226,8 @@
                     UserName <input type="text" class="w-70" id="UserName" />
                   </div>
                 </div>
-                <!-- <button id="LoginRoom" type="button" class="btn-info btn cuBtn">Login Room</button> -->
-                <button id="LoginRoom" class="play-pause-button" title="loginRoom()">
-                  <div class="success-svg m-r-5" id="loginSuccessSvg" style="display: none;">
-                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
-                      viewBox="0 0 48 48" aria-hidden="true">
-                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
-                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
-                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
-                    </svg>
-                  </div>
-                  Login Room
-                </button>
+                <!-- <button id="LoginRoom" type="button" class="btn-outline-info btn cuBtn">Login Room</button> -->
+                <button id="LoginRoom" class="play-pause-button"  title="loginRoom()">Login Room</button>
               </div>
             </div>
             <div class="action-step">
@@ -259,18 +249,10 @@
                       </div>
                     </div>
                   </div>
-                  <!-- <button id="startPublishing" type="button" class="btn-info btn cuBtn">Start
+                  <!-- <button id="startPublishing" type="button" class="btn-outline-info btn cuBtn">Start
                     Publishing</button> -->
-                  <button id="startPublishing" class="play-pause-button" title="createStream() / startPublishingStream()">
-                    <div class="success-svg m-r-5" id="publishSuccessSvg" style="display: none;">
-                      <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
-                        viewBox="0 0 48 48" aria-hidden="true">
-                        <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
-                        <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
-                          stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
-                      </svg>
-                    </div>Start Publishing</button>
-                  <div class="publish-setting m-t-10 m-b-10">
+                  <button id="startPublishing" class="play-pause-button"  title="createStream() / startPublishingStream()">Start Publishing</button>
+                  <div class="publish-setting m-t-10">
                     <div class="font-12 select-wrapper">
                       <span data-lang="Mirror">Mirror</span>
                       <select class="form-control form-control-sm m-l-5" id="Mirror">
@@ -280,16 +262,11 @@
                         <option value="both">both</option>
                       </select>
                     </div>
-                    <div class="font-12 select-wrapper f-b-7">
-                      <span data-lang="CameraSwitch">Camera Switch</span>
+                    <div class="font-12 select-wrapper">
+                      <span data-lang="Camera">Camera Switch</span>
                       <select class="form-control form-control-sm m-l-5" id="CameraDevices">
                       </select>
                     </div>
-                  </div>
-                  <div class="font-12 select-wrapper">
-                    <span data-lang="MicrophoneSwitch">Microphone Switch</span>
-                    <select class="form-control form-control-sm m-l-5" id="MicrophoneDevices">
-                    </select>
                   </div>
                 </div>
               </div>
@@ -313,28 +290,14 @@
                       </div>
                     </div>
                   </div>
-                  <!-- <button id="startPlaying" type="button" class="btn-info btn cuBtn">Start Playing</button> -->
-                  <button id="startPlaying" class="play-pause-button" title="startPlayingStream()">
-                    <div class="success-svg m-r-5" id="playSuccessSvg" style="display: none;">
-                      <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
-                        viewBox="0 0 48 48" aria-hidden="true">
-                        <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
-                        <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
-                          stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
-                      </svg>
-                    </div>Start Playing</button>
+                  <button id="startPlaying" class="play-pause-button"  title="startPlayingStream()">Start Playing</button>
                 </div>
-              </div>
-            </div>
-            <div class="action-step">
-              <div class="action-content">
-                <button id="reset" type="button" class="btn-danger btn cuBtn">Reset</button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="goToDoc"><span  data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;<a href="https://doc-zh.zego.im/article/7638" data-lang="HelpDocs" target="_blank"> 帮助文档 </a> </div>
+      <div class="goToDoc"><span  data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;<a target="_blank" href="https://doc-zh.zego.im/article/9538" data-lang="HelpDocs"> 帮助文档 </a> </div>
     </div>
     <!-- </div> -->
   </div>

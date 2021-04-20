@@ -1,15 +1,15 @@
 // require('../../../../jquery')
-// let appID;   // from  /src/KeyCenter.js
-// let server;  // from  /src/KeyCenter.js
-// let tokenUrl;  // from  /src/KeyCenter.js
+// let appID = 1739272706;   // from  /src/KeyCenter.js
+// let server = 'wss://webliveroom-test.zego.im/ws';  // from  /src/KeyCenter.js
+// let tokenUrl = 'https://wsliveroom-alpha.zego.im:8282/token';  // from  /src/KeyCenter.js
 
 // ==============================================================
 // This part of the code defines the default values and global values
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0033';
-let streamID = '0033';
+let roomID = '0011';
+let streamID = '0011';
 
 let zg = null;
 let isChecked = false;
@@ -24,11 +24,6 @@ let played = false;
 // ==============================================================
 // This part of the code uses the SDK
 // ==============================================================
-
-function createZegoExpressEngine() {
-	zg = new ZegoExpressEngine(appID, server);
-	window.zg = zg;
-}
 
 // Step1 Check system requirements
 async function checkSystemRequirements() {
@@ -87,10 +82,99 @@ async function enumDevices() {
 	audioInputList.push('<option value="0">禁止</option>');
 	videoInputList.push('<option value="0">禁止</option>');
 
-	$('#MirrorDevices').html(audioInputList.join(''));
+	// $('#MirrorDevices').html(audioInputList.join(''));
 	$('#CameraDevices').html(videoInputList.join(''));
 }
 
+function setLogConfig() {
+	let config = localStorage.getItem('logConfig');
+	const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false;
+	if (config) {
+		config = JSON.parse(config);
+		zg.setLogConfig({
+			logLevel: config.logLevel,
+			remoteLogLevel: config.remoteLogLevel,
+			logURL: ''
+		});
+	}
+	zg.setDebugVerbose(DebugVerbose);
+}
+
+function initEvent() {
+	zg.on('roomStateUpdate', (roomId, state) => {
+		if(state === 'CONNECTED' && isLoginRoom) {
+			$('#roomStateSuccessSvg').css('display', 'inline-block');
+			$('#roomStateErrorSvg').css('display', 'none');
+		}
+		
+		if (state === 'DISCONNECTED' && !isLoginRoom) {
+			$('#roomStateSuccessSvg').css('display', 'none');
+			$('#roomStateErrorSvg').css('display', 'inline-block');
+		}
+
+		if(state === 'DISCONNECTED' && isLoginRoom) {
+			location.reload()
+		}
+	})
+
+	zg.on('publisherStateUpdate', (result) => {
+		if (result.state === 'PUBLISHING') {
+			$('#pushlishInfo-id').text(result.streamID);
+		} else if (result.state === 'NO_PUBLISH') {
+			$('#pushlishInfo-id').text('');
+		}
+	});
+
+	zg.on('playerStateUpdate', (result) => {
+		if (result.state === 'PLAYING') {
+			$('#playInfo-id').text(result.streamID);
+		} else if (result.state === 'NO_PLAY') {
+			$('#playInfo-id').text('');
+		}
+	});
+}
+
+function clearStream(flag) {
+	if (flag === 'room') {
+		localStream && zg.destroyStream(localStream);
+		$('#pubshlishVideo')[0].srcObject = null;
+		localStream = null;
+		published = false;
+		remoteStream && zg.destroyStream(remoteStream);
+		$('#playVideo')[0].srcObject = null;
+		remoteStream = null;
+		played = false;
+	}
+
+	if (flag === 'publish') {
+		localStream && zg.destroyStream(localStream);
+		$('#pubshlishVideo')[0].srcObject = null;
+		localStream = null;
+		published = false;
+		if ($('#PublishID').val() === $('#PlayID').val()) {
+			remoteStream && zg.destroyStream(remoteStream);
+			$('#playVideo')[0].srcObject = null;
+			remoteStream = null;
+			played = false;
+		}
+	}
+
+	if (flag === 'play') {
+		remoteStream && zg.destroyStream(remoteStream);
+		$('#playVideo')[0].srcObject = null;
+		remoteStream = null;
+		played = false;
+	}
+}
+
+// Step1 Create ZegoExpressEngine
+function createZegoExpressEngine() {
+	zg = new ZegoExpressEngine(appID, server);
+	window.zg = zg;
+	setLogConfig();
+}
+
+// Step2 Login room
 function loginRoom(roomId, userId, userName) {
 	return new Promise((resolve, reject) => {
 		$.get(
@@ -114,89 +198,19 @@ function loginRoom(roomId, userId, userName) {
 	});
 }
 
-function initEvent() {
-	zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED' && isLoginRoom) {
-			console.log(111);
-			$('#roomStateSuccessSvg').css('display', 'inline-block');
-			$('#roomStateErrorSvg').css('display', 'none');
-		}
-		
-		if (state === 'DISCONNECTED' && !isLoginRoom) {
-			$('#roomStateSuccessSvg').css('display', 'none');
-			$('#roomStateErrorSvg').css('display', 'inline-block');
-		}
-
-		if(state === 'DISCONNECTED' && isLoginRoom) {
-			location.reload()
-		}
-	})
-
-	zg.on('publisherStateUpdate', (result) => {
-		console.warn('publisherStateUpdate', result);
-		if (result.state === 'PUBLISHING') {
-			$('#pushlishInfo-id').text(result.streamID);
-		} else if (result.state === 'NO_PUBLISH') {
-			$('#pushlishInfo-id').text('');
-		}
-	});
-
-	zg.on('playerStateUpdate', (result) => {
-		console.warn('playerStateUpdate', result);
-		if (result.state === 'PLAYING') {
-			$('#playInfo-id').text(result.streamID);
-		} else if (result.state === 'NO_PLAY') {
-			$('#playInfo-id').text('');
-		}
-	});
-
-	zg.on('publishQualityUpdate', (streamId, stats) => {
-		console.warn('publishQualityUpdate', streamId, stats);
-	});
-
-	zg.on('playQualityUpdate', (streamId, stats) => {
-		console.warn('playQualityUpdate', streamId, stats);
-	});
-	zg.on('screenSharingEnded', (stream) => {
-		console.warn('screen sharing end');
-	});
+// Step2 Logout room
+function logoutRoom(roomId) {
+	if (localStream) {
+		stopPublishingStream($('#pushlishInfo-id').text());
+	}
+	if (remoteStream) {
+		stopPlayingStream($('#playInfo-id').text());
+	}
+	zg.logoutRoom(roomId);
+	clearStream('room');
 }
 
-function clearStream(flag) {
-	if (flag === 'publish') {
-		localStream && zg.destroyStream(localStream);
-		$('#pubshlishVideo')[0].srcObject = null;
-		localStream = null;
-		published = false;
-		if ($('#PublishID').val() === $('#PlayID').val()) {
-			remoteStream && zg.destroyStream(remoteStream);
-			$('#playVideo')[0].srcObject = null;
-			remoteStream = null;
-			played = false;
-		}
-	}
-
-	if (flag === 'play') {
-		remoteStream && zg.destroyStream(remoteStream);
-		$('#playVideo')[0].srcObject = null;
-		remoteStream = null;
-		played = false;
-	}
-}
-
-function setLogConfig() {
-	let config = localStorage.getItem('logConfig');
-	const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false;
-	if (config) {
-		config = JSON.parse(config);
-		zg.setLogConfig({
-			logLevel: config.logLevel,
-			remoteLogLevel: config.remoteLogLevel,
-			logURL: ''
-		});
-	}
-	zg.setDebugVerbose(DebugVerbose);
-}
+// Step3 Start Publishing Stream
 
 async function startPublishingStream(streamId, config) {
 	try {
@@ -209,14 +223,16 @@ async function startPublishingStream(streamId, config) {
 	}
 }
 
+//Step3 Stop Publishing Stream
 async function stopPublishingStream(streamId) {
 	zg.stopPublishingStream(streamId);
-	if (remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
+	if (remoteStream && streamId === $('#PlayID').val()) {
 		stopPlayingStream(streamId);
 	}
 	clearStream('publish');
 }
 
+// Step4 Start Play Stream
 async function startPlayingStream(streamId, options = {}) {
 	try {
 		remoteStream = await zg.startPlayingStream(streamId, options);
@@ -227,6 +243,7 @@ async function startPlayingStream(streamId, options = {}) {
 	}
 }
 
+// Step4 Stop Play Stream
 async function stopPlayingStream(streamId) {
 	zg.stopPlayingStream(streamId);
 	clearStream('play');
@@ -238,30 +255,112 @@ async function stopPlayingStream(streamId) {
 // This part of the code binds the button click event
 // ==============================================================
 
+$('#CreateZegoExpressEngine').on('click', function() {
+	createZegoExpressEngine();
+	// this.setAttribute('class', 'btn-info btn cuBtn')
+	this.setAttribute('disabled', 'disabled');
+	$('#createSuccessSvg').css('display', 'inline-block');
+	initEvent();
+});
+
+$('#CheckSystemRequire').on('click', async function() {
+	if (!zg) return alert('you should create zegoExpressEngine');
+	const result = await checkSystemRequirements();
+	if (result) {
+		this.setAttribute('disabled', 'disabled');
+		$('#checkSuccessSvg').css('display', 'inline-block');
+		enumDevices();
+	} else {
+		this.setAttribute('class', 'btn-outline-danger btn cuBtn');
+		$('#checkErrorSvg').css('display', 'inline-block');
+	}
+	isChecked = true;
+});
+
+$('#LoginRoom').on(
+	'click',
+	util.throttle(async function() {
+		if (!zg) return alert('should create zegoExpressEngine');
+		if (!isChecked) return alert('should test compatiblity');
+
+		const userName = $('#UserName').val();
+		const id = $('#RoomID').val();
+
+		if (!userName) return alert('UserName is Empty');
+		if (!id) return alert('RoomID is Empty');
+		this.classList.add('border-primary');
+		if (!isLoginRoom) {
+			try {
+				isLoginRoom = true;
+				await loginRoom(id, userID, userName);
+				updateButton(this, 'Login Room', 'Logout Room');
+				$('#UserName')[0].disabled = true;
+				$('#RoomID')[0].disabled = true;
+			} catch (err) {
+				isLoginRoom = false;
+				this.classList.remove('border-primary');
+				this.classList.add('border-error');
+				this.innerText = 'Login Fail Try Again';
+			}
+		} else {
+			if (localStream) {
+				$('#PublishID')[0].disabled = false;
+				updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
+			}
+			if (remoteStream) {
+				$('#PlayID')[0].disabled = false;
+				updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing');
+			}
+			isLoginRoom = false;
+			logoutRoom(id);
+			updateButton(this, 'Login Room', 'Logout Room');
+			$('#UserName')[0].disabled = false;
+			$('#RoomID')[0].disabled = false;
+		}
+	}, 500)
+);
+
 $('#startPublishing').on(
 	'click',
 	util.throttle(async function() {
+		if (!zg) return alert('should create zegoExpressEngine');
+		if (!isChecked) return alert('should test compatiblity');
+		if (!isLoginRoom) return alert('should login room');
+
 		const id = $('#PublishID').val();
-		if (!id) return alert('PublishID is empty');
+		if (!id) return alert('StreamID is Empty');
+		this.classList.add('border-primary');
 		if (!published) {
 			const flag = await startPublishingStream(id, getCreateStreamConfig());
 			if (flag) {
-				updateButton(this, 'Start Screen Capture', 'Stop Screen Capture');
+				updateButton(this, 'Start Publishing', 'Stop Publishing');
 				published = true;
 				$('#PublishID')[0].disabled = true;
+				$('#Camera')[0].disabled = true;
+				$('#Microphone')[0].disabled = true;
+				$('#Mirror')[0].disabled = true;
+				$('#CameraDevices')[0].disabled = true;
 				changeVideo();
+			} else {
+				this.classList.remove('border-primary');
+				this.classList.add('border-error');
+				this.innerText = 'Publishing Fail Try Again';
+				changeVideo(true);
 			}
 		} else {
 			if (remoteStream && id === $('#PlayID').val()) {
 				$('#PlayID')[0].disabled = false;
 				updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing');
-				reSetVideoInfo();
 			}
-			stopPublishingStream(id);
-			updateButton(this, 'Start Screen Capture', 'Stop Screen Capture');
+			stopPublishingStream($('#pushlishInfo-id').text());
+			updateButton(this, 'Start Publishing', 'Stop Publishing');
 			published = false;
 			$('#PublishID')[0].disabled = false;
-			reSetVideoInfo('publish');
+			$('#Camera')[0].disabled = false;
+			$('#Microphone')[0].disabled = false;
+			$('#Mirror')[0].disabled = false;
+			$('#CameraDevices')[0].disabled = false;
+			changeVideo(true);
 		}
 	}, 500)
 );
@@ -269,28 +368,38 @@ $('#startPublishing').on(
 $('#startPlaying').on(
 	'click',
 	util.throttle(async function() {
+		if (!zg) return alert('should create zegoExpressEngine');
+		if (!isChecked) return alert('should test compatiblity');
+		if (!isLoginRoom) return alert('should login room');
+
 		const id = $('#PlayID').val();
-		if (!id) return alert('PlayID is empty');
+		if (!id) return alert('StreamID is Empty');
 		this.classList.add('border-primary');
 		if (!played) {
-			const flag = await startPlayingStream(id);
+			const config = {
+				video: $('#Video')[0].checked,
+				audio: $('#Audio')[0].checked,
+				resourceMode: 2
+			};
+			const flag = await startPlayingStream(id, config);
 			if (flag) {
 				updateButton(this, 'Start Playing', 'Stop Playing');
 				played = true;
 				$('#PlayID')[0].disabled = true;
-				changeVideo();
+				$('#Video')[0].disabled = true;
+				$('#Audio')[0].disabled = true;
 			} else {
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
-				this.innerText = 'Playing Fail';
-				changeVideo(true);
+				this.innerText = 'Playing Fail Try Again';
 			}
 		} else {
-			stopPlayingStream(id);
+			stopPlayingStream($('#playInfo-id').text());
 			updateButton(this, 'Start Playing', 'Stop Playing');
 			played = false;
 			$('#PlayID')[0].disabled = false;
-			reSetVideoInfo('play');
+			$('#Video')[0].disabled = false;
+			$('#Audio')[0].disabled = false;
 		}
 	}, 500)
 );
@@ -300,18 +409,6 @@ $('#startPlaying').on(
 // ==============================================================
 // This part of the code bias tool
 // ==============================================================
-
-function getCreateStreamConfig() {
-	const config = {
-		screen: {
-			audio: true,
-			bitrate: 2000,
-                                    frameRate: 15,
-                                    startBitrate: 800,
-		}
-	};
-	return config;
-}
 
 function updateButton(button, preText, afterText) {
 	if (button.classList.contains('playing')) {
@@ -332,6 +429,19 @@ function updateButton(button, preText, afterText) {
 	}
 }
 
+function getCreateStreamConfig() {
+	const config = {
+		camera: {
+			audioInput: $('#MirrorDevices').val(),
+			videoInput: $('#CameraDevices').val(),
+			video: $('#Camera')[0].checked,
+			audio: $('#Microphone')[0].checked,
+			videoQuality: 3
+		}
+	};
+	return config;
+}
+
 function changeVideo(flag) {
 	if (flag) {
 		$('#pubshlishVideo').css('transform', 'none');
@@ -349,45 +459,21 @@ function changeVideo(flag) {
 	}
 }
 
-function reSetVideoInfo(flag) {
-	if (flag === 'publish' || !flag) {
-		$('#publishResolution').text('');
-		$('#sendBitrate').text('');
-		$('#sendFPS').text('');
-		$('#sendPacket').text('');
-	}
-	if (flag === 'play' || !flag) {
-		$('#playResolution').text('');
-		$('#receiveBitrate').text('');
-		$('#receiveFPS').text('');
-		$('#receivePacket').text('');
-	}
-}
-
 // tool end
 
 // ==============================================================
 // This part of the code Initialization web page
 // ==============================================================
 
-async function render() {
+function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
 	$('#UserName').val(userID);
-	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
-	createZegoExpressEngine();
-	await checkSystemRequirements();
-	enumDevices();
-	initEvent();
-	setLogConfig();
-	try {
-		isLoginRoom = true
-		await loginRoom(roomID, userID, userID);
-	} catch (err) {
-		isLoginRoom = false
-	}
+	$('#Camera')[0].checked = true;
+	$('#Microphone')[0].checked = true;
+	$('#Video')[0].checked = true;
 }
 
 render();

@@ -10,8 +10,10 @@
 let userID = Util.getBrow() + '_' + new Date().getTime();
 let roomID = '0009'
 let streamID = '0009'
+let secondStreamID = '00091'
 
 let zg = null;
+let isLoginRoom = false;
 let localStream = null;
 let localSecondStream = null;
 let remoteStream = null;
@@ -32,35 +34,33 @@ function createZegoExpressEngine() {
   window.zg = zg
 }
 
+// Step1 Check system requirements
 async function checkSystemRequirements() {
-  console.log('sdk version is', zg.getVersion());
-  try {
-      const result = await zg.checkSystemRequirements();
+	console.log('sdk version is', zg.getVersion());
+	try {
+		const result = await zg.checkSystemRequirements();
 
-      console.warn('checkSystemRequirements ', result);
-      !result.videoCodec.H264 && $('#videoCodeType option:eq(1)').attr('disabled', 'disabled');
-      !result.videoCodec.VP8 && $('#videoCodeType option:eq(2)').attr('disabled', 'disabled');
+		console.warn('checkSystemRequirements ', result);
 
-      if (!result.webRTC) {
-          console.log('browser is not support webrtc!!');
-          return false;
-      } else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
-        console.log('browser is not support H264 and VP8');
-          return false;
-      } else if (result.videoCodec.H264) {
-          supportScreenSharing = result.screenSharing;
-          if (!supportScreenSharing) console.log('browser is not support screenSharing');
-          previewVideo = $('#previewVideo')[0];
-          // start();
-      } else {
-        console.log('不支持H264，请前往混流转码测试');
-      }
-
-      return true;
-  } catch (err) {
-      console.error('checkSystemRequirements', err);
-      return false;
-  }
+		if (!result.webRTC) {
+			console.error('browser is not support webrtc!!');
+			return false;
+		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
+			console.error('browser is not support H264 and VP8');
+			return false;
+		} else if (!result.camera && !result.microphones) {
+			console.error('camera and microphones not allowed to use');
+			return false;
+		} else if (result.videoCodec.VP8) {
+			if (!result.screenSharing) console.warn('browser is not support screenSharing');
+		} else {
+			console.log('不支持VP8，请前往混流转码测试');
+		}
+		return true;
+	} catch (err) {
+		console.error('checkSystemRequirements', err);
+		return false;
+	}
 }
 
 async function enumDevices() {
@@ -119,6 +119,22 @@ function loginRoom(roomId, userId, userName) {
 }
 
 function initEvent() {
+  zg.on('roomStateUpdate', (roomId, state) => {
+		if(state === 'CONNECTED' && isLoginRoom) {
+			console.log(111);
+			$('#roomStateSuccessSvg').css('display', 'inline-block');
+			$('#roomStateErrorSvg').css('display', 'none');
+		}
+		
+		if (state === 'DISCONNECTED' && !isLoginRoom) {
+			$('#roomStateSuccessSvg').css('display', 'none');
+			$('#roomStateErrorSvg').css('display', 'inline-block');
+		}
+
+		if(state === 'DISCONNECTED' && isLoginRoom) {
+			location.reload()
+		}
+	})
   zg.on('publisherStateUpdate', result => {
     console.warn('publisherStateUpdate', result);
     if(result.state === "PUBLISHING") {
@@ -153,12 +169,6 @@ function clearStream(flag) {
     $('#pubshlishVideo')[0].srcObject = null;
     localStream = null;
     published = false
-    if($('#PublishID').val() === $('#PlayID').val()) {
-      remoteStream && zg.destroyStream(remoteStream);
-      $('#playVideo')[0].srcObject = null;
-      remoteStream = null;
-      played = false
-    }
   }
 
   if(flag === 'play') {
@@ -173,12 +183,6 @@ function clearStream(flag) {
     $('#pubshlishSecondVideo')[0].srcObject = null;
     localSecondStream = null;
     publishedSecond = false
-    if($('#PublishSecondID').val() === $('#PlaySecondID').val()) {
-      remoteSecondStream && zg.destroyStream(remoteSecondStream);
-      $('#playSecondVideo')[0].srcObject = null;
-      remoteSecondStream = null;
-      playedSecond = false;
-    }
   }
 
   if(flag === 'playSeconed') {
@@ -206,7 +210,7 @@ function setLogConfig() {
 async function startPublishingStream (streamId, config) {
   try {
     localStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localStream);
+    zg.startPublishingStream(streamId, localStream, { videoCodec: "VP8" });
     $('#pubshlishVideo')[0].srcObject = localStream;
     return true
   } catch(err) {
@@ -218,7 +222,7 @@ async function startPublishingStream (streamId, config) {
 async function startPublishingSecondStream (streamId, config) {
   try {
     localSecondStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localSecondStream);
+    zg.startPublishingStream(streamId, localSecondStream, { videoCodec: "VP8" });
     $('#pubshlishSecondVideo')[0].srcObject = localSecondStream;
     return true
   } catch(err) {
@@ -229,15 +233,6 @@ async function startPublishingSecondStream (streamId, config) {
 
 async function stopPublishingStream(streamId, clearWay) {
   zg.stopPublishingStream(streamId)
-  if(clearWay === 'publish') {
-    if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
-      stopPlayingStream(streamId)
-    }
-  } else {
-    if(remoteSecondStream && $('#PublishSecondID').val() === $('#PlaySecondID').val()) {
-      stopPlayingStream(streamId)
-    }
-  }
   clearStream(clearWay)
 }
 
@@ -291,11 +286,6 @@ $('#startPublishing').on('click', util.throttle( async function () {
       }
 
   } else {
-      if(remoteStream && id === $('#PlayID').val()) {
-      $('#PlayID')[0].disabled = false
-        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
-        reSetVideoInfo()
-      }
       stopPublishingStream(id, 'publish');
       updateButton(this, 'Start Publishing', 'Stop Publishing')
       published = false
@@ -307,7 +297,6 @@ $('#startPublishing').on('click', util.throttle( async function () {
 $('#startPlaying').on('click', util.throttle( async function () {
   const id = $('#PlayID').val();
   if(!id) return alert('PublishID is empty')
-  if(id === $('#PublishSecondID').val()) return alert('Don\'t use Screen Channel')
   this.classList.add('border-primary')
   if(!played) {
       const flag =  await startPlayingStream(id);
@@ -334,26 +323,21 @@ $('#startSecondPublishing').on('click', util.throttle( async function () {
   const id = $('#PublishSecondID').val();
   if(!id) return alert('PublishID is empty')
   if(id === $('#PublishID').val() && published) return alert('PublishID already exists')
-  this.classList.add('border-primary')
   if(!publishedSecond) {
       const flag =  await startPublishingSecondStream(id, {
-        screen: true
+        screen: {
+					audio: true,
+          bitrate: 1500,
+          frameRate: 30
+				}
       });
       if(flag) {
         updateButton(this, 'Start Publishing', 'Stop Publishing');
         publishedSecond = true
         $('#PublishSecondID')[0].disabled = true
-      } else {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Publishing Fail'
       }
 
   } else {
-      if(remoteSecondStream && id === $('#PlaySecondID').val()) {
-      $('#PlaySecondID')[0].disabled = false
-        updateButton($('#startSecondPlaying')[0], 'Start Playing', 'Stop Playing')
-      }
       stopPublishingStream(id, 'publishSecond');
       updateButton(this, 'Start Publishing', 'Stop Publishing')
       publishedSecond = false
@@ -364,7 +348,6 @@ $('#startSecondPublishing').on('click', util.throttle( async function () {
 $('#startSecondPlaying').on('click', util.throttle( async function () {
   const id = $('#PlaySecondID').val();
   if(!id) return alert('PublishID is empty')
-  if(id === $('#PublishID').val()) return alert('Don\'t use Camera Channel')
   this.classList.add('border-primary')
   if(!playedSecond) {
       const flag =  await startPlayingSecondStream(id);
@@ -442,18 +425,18 @@ async function render() {
   $('#UserID').val(userID)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
+  $('#PublishSecondID').val(secondStreamID)
+  $('#PlaySecondID').val(secondStreamID)
   createZegoExpressEngine()
   await checkSystemRequirements()
   enumDevices()
   initEvent()
   setLogConfig()
   try {
+    isLoginRoom = true;
     await loginRoom(roomID, userID, userID)
-    $('#roomStateSuccessSvg').css('display', 'inline-block')
-    $('#roomStateErrorSvg').css('display', 'none')
   } catch (err) {
-    $('#roomStateSuccessSvg').css('display', 'none')
-    $('#roomStateErrorSvg').css('display', 'inline-block')
+    isLoginRoom = false;
   }
 }
 

@@ -5,10 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-lang="SetVideoProperties">设置视频编码属性</title>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon"/>
   <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../../../assets/css/style.css">
   <link rel="stylesheet" href="./index.css">
-  <script src="../../../assets/js/ZegoExpressWebRTC-2.4.0.js"></script>
+  <script src="../../../assets/js/ZegoExpressWebRTC.js"></script>
 </head>
 
 <body class="fix-sidebar card-no-border">
@@ -27,6 +28,12 @@
             <span class="sidebar-title" data-lang="Quickstart">快速开始</span>
             <li>
               <a href="../../QuickStart/CommonUsage/index.html" class="waves-effect" data-lang="CommonUsage">实现流程</a>
+            </li>
+            <li>
+              <a href="../../QuickStart/Publishing/index.html" class="waves-effect" data-lang="Publishing">推流</a>
+            </li>
+            <li>
+              <a href="../../QuickStart/Playing/index.html" class="waves-effect" data-lang="Playing">拉流</a>
             </li>
             <span class="sidebar-title" data-lang="Scenes">场景实践</span>
             <li>
@@ -78,7 +85,7 @@
             </li>
             <li>
               <a href="../../AdvancedAudioProcessing/AEC_ANS_AGC/index.html" class="waves-effect"
-                data-lang="AEC_ANS_AGC ">音频3A处理</a>
+                data-lang="AEC_ANS_AGC">音频3A处理</a>
             </li>
             <li>
               <a href="../../AdvancedAudioProcessing/AudioMixing/index.html" class="waves-effect"
@@ -94,6 +101,10 @@
             </li>
             <li>
               <a href="../../Others/ScreenSharing/index.html" class="waves-effect" data-lang="ScreenSharing">屏幕共享</a>
+            </li>
+            <li>
+              <a href="../../Others/MediaTrackReplacement/index.html" class="waves-effect"
+                data-lang="MediaTrackReplacement">音视频轨道替换</a>
             </li>
             <span class="sidebar-title" data-lang="DebugAndConfig">调试与配置</span>
             <li>
@@ -127,7 +138,7 @@
               </div>
             </div>
             <div class="row" id="videoList">
-              <div class="preview-pushlishInfo col-lg-12 col-6">
+              <div class="preview-pushlishInfo col-lg-12 col-6 m-b-15">
                 <div class="preview-content">
                   <div class="preview-action">
                     <div class="preview-info">
@@ -141,13 +152,10 @@
                       <div class="m-t-10 m-b-5">
                         Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
                       </div>
-                      <button id="startPublishing" class="m-b-5 configBtn play-pause-button">Start Publishing</button>
+                      <button id="startPublishing" class="m-b-5 configBtn play-pause-button"  title="createStream() / startPublishingStream()">Start Publishing</button>
                     </div>
                   </div>
                   <video id="pubshlishVideo" autoplay muted playsinline></video>
-                </div>
-                <div>
-                  StreamID: <span id="t_0004"></span>
                 </div>
               </div>
               <div class="preview-playInfo col-lg-12 col-6">
@@ -164,10 +172,10 @@
                       <div class="m-t-10 m-b-5">
                         Playing StreamID <input class="m-l-10" type="text" id="PlayID" />
                       </div>
-                      <button id="startPlaying" class="m-b-5 configBtn play-pause-button">Start Playing</button>
+                      <button id="startPlaying" class="m-b-5 configBtn play-pause-button"  title="startPlayingStream()">Start Playing</button>
                     </div>
                   </div>
-                  <video id="playVideo" autoplay muted playsinline></video>
+                  <video id="playVideo" autoplay playsinline></video>
                 </div>
               </div>
             </div>
@@ -190,6 +198,7 @@
           </div>
         </div>
       </div>
+      <!-- <div class="goToDoc"><span  data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;<a target="_blank" href="https://doc-zh.zego.im/article/9675" data-lang="HelpDocs"> 帮助文档 </a> </div> -->
     </div>
     <!-- </div> -->
   </div>

@@ -137,6 +137,9 @@ function initEvent() {
 	zg.on('playQualityUpdate', (streamId, stats) => {
 		console.warn('playQualityUpdate', streamId, stats);
 	});
+	zg.on('screenSharingEnded', (stream) => {
+		console.warn('screen sharing end');
+	});
 }
 
 function clearStream(flag) {
@@ -309,6 +312,7 @@ function updateButton(button, preText, afterText) {
 		button.innerText = afterText;
 	}
 }
+
 function changeVideo(flag) {
 	if (flag) {
 		$('#pubshlishVideo').css('transform', 'none');

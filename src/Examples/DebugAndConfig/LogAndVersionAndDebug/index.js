@@ -28,7 +28,16 @@ $('#SetLogConfig').on('click', function() {
 	$('#successSvg').css('display', 'inline-block');
 });
 
+$('#logLevel').on('change', function() {
+	$('#successSvg').css('display', 'none');
+})
+
+$('#remoteLogLevel').on('change', function() {
+	$('#successSvg').css('display', 'none');
+})
+
 $('#debug-check').on('change', function() {
+	$('#successSvg').css('display', 'none');
 	setDebugVerbose(this.checked);
 	localStorage.setItem('DebugVerbose', this.checked);
 });

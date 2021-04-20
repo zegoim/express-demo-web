@@ -272,6 +272,7 @@ $('#reset').on('click', async function() {
 // This part of the code bias tool
 // ==============================================================
 
+// get some stream config
 function getCreateStreamConfig() {
 	const config = {
 		camera: {
@@ -284,6 +285,7 @@ function getCreateStreamConfig() {
 	return config;
 }
 
+// Change video direction
 function changeVideo(flag) {
 	if (flag) {
 		$('#pubshlishVideo').css('transform', 'none');

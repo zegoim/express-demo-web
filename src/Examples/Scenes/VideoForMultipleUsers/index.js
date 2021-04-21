@@ -19,6 +19,7 @@ let published = false;
 let playMultipleStreamList = [];
 let palyedObj = {};
 let playMultipleUserList = [];
+let playObj = {};
 
 // part end
 
@@ -123,7 +124,7 @@ function playMultipleEvent() {
 			$('#receiveFPS').text(parseInt(stats.video.videoFPS));
 			$('#receivePacket').text(parseInt(stats.video.videoPacketsLostRate));
 		} else {
-			const spanList = $(`#${streamId} span`);
+			const spanList = $(`[data-id=${streamId}] span`);
 			spanList[0].innerText = `${stats.video.frameWidth} * ${stats.video.frameHeight}`;
 			spanList[1].innerText = parseInt(stats.video.videoBitrate);
 			spanList[2].innerText = parseInt(stats.video.videoFPS);
@@ -135,20 +136,25 @@ function playMultipleEvent() {
 		if (updateType === 'ADD') {
 			for (let i = 0; i < streamList.length; i++) {
 				playMultipleStreamList.push(streamList[i]);
-				palyedObj[streamList[i].streamID] = false;
 				appednHtml(streamList[i].streamID, streamList[i].user);
-				addMultiplePlayingEvent(streamList[i].streamID);
+				if (playObj[streamList[i].user.userID]) {
+					$(`#m-${streamList[i].user.userID}`).attr('data-id', streamList[i].streamID);
+					stopTostart(playObj[streamList[i].user.userID], streamList[i].streamID);
+					$(`#s-${streamList[i].user.userID}`).text(streamList[i].streamID);
+				}
+				playObj[streamList[i].user.userID] = streamList[i].streamID;
 			}
 		} else if (updateType == 'DELETE') {
 			for (let k = 0; k < playMultipleStreamList.length; k++) {
 				for (let j = 0; j < streamList.length; j++) {
 					if (playMultipleStreamList[k].streamID === streamList[j].streamID) {
-						try {
-							zg.stopPlayingStream(playMultipleStreamList[k].streamID);
-						} catch (error) {
-							console.error(error);
+						stopPlayingStream(playMultipleStreamList[k].streamID);
+						removeHtml(playMultipleStreamList[k].streamID);
+						const node = $(`[data-id=${streamList[j].streamID}]`)[0];
+						if (node) {
+							const id = node.id.split('-')[1];
+							stopChangeUI.call($(`#b-${id}`)[0], id);
 						}
-						removeHtml(playMultipleStreamList[k].streamID, streamList[j].user);
 						playMultipleStreamList.splice(k--, 1);
 						break;
 					}
@@ -158,11 +164,14 @@ function playMultipleEvent() {
 
 		$('#streamList').text(`StreamList (${playMultipleStreamList.length})`);
 	});
+
 	zg.on('roomUserUpdate', (roomID, updateType, userList) => {
 		if (updateType === 'ADD') {
 			for (let i = 0; i < userList.length; i++) {
 				playMultipleUserList.push(userList[i]);
+				palyedObj[userList[i].userID] = false;
 				appednHtml(null, userList[i]);
+				addMultiplePlayingEvent(userList[i].userID);
 			}
 		} else if (updateType == 'DELETE') {
 			for (let k = 0; k < playMultipleUserList.length; k++) {
@@ -260,7 +269,7 @@ async function stopPublishingStream(streamId) {
 async function startPlayingMultipleStream(streamId, options = {}) {
 	try {
 		const stream = await zg.startPlayingStream(streamId, options);
-		$(`#${streamId} video`)[0].srcObject = stream;
+		$(`[data-id=${streamId}] video`)[0].srcObject = stream;
 		return true;
 	} catch (err) {
 		return false;
@@ -269,7 +278,10 @@ async function startPlayingMultipleStream(streamId, options = {}) {
 
 async function stopPlayingStream(streamId) {
 	zg.stopPlayingStream(streamId);
-	clearStream('play');
+	const video = $(`[data-id=${streamId}] video`)[0];
+	if (video) {
+		video.srcObject = null;
+	}
 }
 
 // uses SDK end
@@ -288,18 +300,20 @@ $('#startPublishing').on(
 				updateButton(this, 'Start Publishing', 'Stop Publishing');
 				published = true;
 				changeVideo();
+				setDisabled(true);
 			} else {
 				changeVideo(true);
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Publishing Fail';
 			}
-			$('#publishStreamID-info').text(streamID)
+			$('#publishStreamID-info').text(streamID);
 		} else {
 			stopPublishingStream(streamID);
 			updateButton(this, 'Start Publishing', 'Stop Publishing');
 			published = false;
-			$('#publishStreamID-info').text('')
+			$('#publishStreamID-info').text('');
+			setDisabled(false);
 		}
 	}, 500)
 );
@@ -350,8 +364,8 @@ function updateButton(button, preText, afterText) {
 function changeVideo(flag) {
 	if (flag) {
 		$('video').each((index, video) => {
-			video.setAttribute('transform', 'none')
-		})
+			video.setAttribute('transform', 'none');
+		});
 		return;
 	}
 	const value = $('#Mirror').val();
@@ -359,20 +373,31 @@ function changeVideo(flag) {
 		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
 	} else if (value === 'onlyPlay') {
 		$('video').each((index, video) => {
-			if(video.id !== 'pubshlishVideo')
-			video.setAttribute('transform', 'scale(-1, 1)')
-		})
+			if (video.id !== 'pubshlishVideo') video.setAttribute('transform', 'scale(-1, 1)');
+		});
 	} else if (value === 'both') {
 		$('video').each((index, video) => {
-			video.setAttribute('transform', 'scale(-1, 1)')
-		})
+			video.setAttribute('transform', 'scale(-1, 1)');
+		});
 	}
 }
 
 function appednHtml(streamId, user) {
 	if (streamId) {
+		$('#streamListUl').append(`
+    <li id="l-${streamId}">
+    <div class="drop-item">
+      <span class="f-b-3 t-nowrap m-r-10">StreamID: ${streamId}</span>
+      <span class="f-b-3 t-nowrap m-r-5">UserID: ${user.userID}</span>
+      <span class="f-b-3 t-nowrap ">Name: ${user.userName}</span>
+    </div>
+    </li>
+    `);
+	}
+
+	if (!streamId && user) {
 		$('#videoList').append(
-			`<div class="preview-playInfo col-6" id="${streamId}">
+			`<div class="preview-playInfo col-6" id="m-${user.userID}">
         <div class="preview-content">
         <div class="preview-action">
           <div class="preview-info">
@@ -392,29 +417,17 @@ function appednHtml(streamId, user) {
                 <input class="check-input" type="checkbox" checked>
               </div>
             </div>
-            <button id='b-${streamId}' class="m-b-5 play-pause-button">Start Playing</button>
+            <button id='b-${user.userID}' class="m-b-5 play-pause-button">Start Playing</button>
           </div>
         </div>
         <video autoplay muted playsinline></video>
       </div>
       <div class="font-12 t-nowrap">
-			StreamID: <span>${streamId}</span>
+			StreamID: <span id="s-${user.userID}"></span>
         <div>UserName: <span class="m-r-5">${user.userName}</span></div>
       </div>
     </div>`
 		);
-		$('#streamListUl').append(`
-    <li id="l-${streamId}">
-    <div class="drop-item">
-      <span class="f-b-3 t-nowrap m-r-10">StreamID: ${streamId}</span>
-      <span class="f-b-3 t-nowrap m-r-5">UserID: ${user.userID}</span>
-      <span class="f-b-3 t-nowrap ">Name: ${user.userName}</span>
-    </div>
-    </li>
-    `);
-	}
-
-	if (!streamId && user) {
 		$('#userListUl').append(`
     <li id="u-${user.userID}">
     <div class="drop-item">
@@ -428,49 +441,78 @@ function appednHtml(streamId, user) {
 
 function removeHtml(streamId, user) {
 	if (streamId) {
-		document.getElementById(`${streamId}`).remove();
 		document.getElementById(`l-${streamId}`).remove();
 	}
 
 	if (!streamId && user) {
+		document.getElementById(`m-${user.userID}`).remove();
 		document.getElementById(`u-${user.userID}`).remove();
 	}
 }
 
-function addMultiplePlayingEvent(streamId) {
-	$(`#b-${streamId}`).on(
+function addMultiplePlayingEvent(userId) {
+	$(`#b-${userId}`).on(
 		'click',
 		util.throttle(async function() {
 			const selectId = this.id.split('-')[1];
-			const configInput = $(`#${selectId} input`);
+			const configInput = $(`#m-${selectId} input`);
 			this.classList.add('border-primary');
-			if (!palyedObj[streamId]) {
+			if (!palyedObj[userId]) {
 				const config = {
 					video: configInput[0].checked,
 					audio: configInput[1].checked
 				};
+				const streamId = playObj[userId];
+				streamId && $(`#m-${selectId}`).attr('data-id', streamId);
 				const flag = await startPlayingMultipleStream(streamId, config);
 				if (flag) {
 					updateButton(this, 'Start Playing', 'Stop Playing');
-					palyedObj[streamId] = true;
+					palyedObj[userId] = true;
+					$(`#s-${userId}`).text(streamId);
+					configInput.each((idx, item) => {
+						item.disabled = true;
+					});
 				} else {
 					this.classList.remove('border-primary');
 					this.classList.add('border-error');
 					this.innerText = 'Playing Fail';
 				}
 			} else {
-				stopPlayingStream(streamId);
-				updateButton(this, 'Start Playing', 'Stop Playing');
-				const spanList = $(`#${streamId} span`);
-				spanList[0].innerText = '';
-				spanList[1].innerText = '';
-				spanList[2].innerText = '';
-				spanList[3].innerText = '';
-				spanList[4].innerText = '';
-				palyedObj[streamId] = false;
+				configInput.each((idx, item) => {
+					item.disabled = false;
+				});
+				stopPlayingStream(playObj[userId]);
+				stopChangeUI.call(this, userId);
 			}
 		}, 500)
 	);
+}
+
+function stopChangeUI(userId) {
+	updateButton(this, 'Start Playing', 'Stop Playing');
+	const spanList = $(`#m-${userId} span`);
+	spanList[0].innerText = '';
+	spanList[1].innerText = '';
+	spanList[2].innerText = '';
+	spanList[3].innerText = '';
+	spanList[4].innerText = '';
+	palyedObj[userId] = false;
+	$(`#s-${userId}`).text('');
+}
+
+function setDisabled(flag) {
+	$('#captureResolution')[0].disabled = flag;
+	$('#FPS')[0].disabled = flag;
+	$('#Bitrate')[0].disabled = flag;
+	$('#Mirror')[0].disabled = flag;
+	$('#CameraDevices')[0].disabled = flag;
+	$('#Camera')[0].disabled = flag;
+	$('#Microphone')[0].disabled = flag;
+}
+
+async function stopTostart(oldId, newId) {
+	await stopPlayingStream(oldId)
+	startPlayingMultipleStream(newId)
 }
 
 // tool end

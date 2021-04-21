@@ -90,20 +90,24 @@ function initEvent() {
   zg.on('IMRecvBroadcastMessage', (roomID, messageInfo) => {
     for(let i = 0; i < messageInfo.length; i++) {
       updateLogger(`[BroadcastMessage] ${messageInfo[i].fromUser.userName}: ${messageInfo[i].message}`)
+      $('#BroadcastMessageReceived').text(messageInfo[i].message)
     }
   })
   zg.on('IMRecvBarrageMessage', (roomID, chatData) => {
     for(let i = 0; i < chatData.length; i++) {
-      updateLogger(`[BroadcastMessage] ${chatData[i].fromUser.userName}: ${chatData[i].message}`)
+      updateLogger(`[BarrageMessage] ${chatData[i].fromUser.userName}: ${chatData[i].message}`)
+      $('#BarrageMessageReceived').text(chatData[i].message)
     }
   })
   zg.on('IMRecvCustomCommand', (roomID, fromUser, command) => {
     updateLogger(`[CustomCommand] ${fromUser.userName}: ${command}`)
+    $('#CustomCommandReceived').text(command)
   })
   zg.on('roomExtraInfoUpdate', (roomID, roomExtraInfoList) => {
     for(let i = 0 ; i< roomExtraInfoList.length; i++) {
       updateLogger(`[roomExtraInfo] ${roomExtraInfoList[i].updateUser.userName} 
       set key: ${roomExtraInfoList[i].key } value: ${roomExtraInfoList[i].value}`)
+      $('#RoomExtraInfo').text(roomExtraInfoList[i].value)
     }
   })
 
@@ -403,6 +407,8 @@ function updateLogger(text) {
   $('#logger').append(`
     <div>${text}</div>
   `)
+  const scrollHeight = $('#logger').prop("scrollHeight");
+  $('#logger').scrollTop(scrollHeight,200);
 }
 
 function changeVideo(flag) {

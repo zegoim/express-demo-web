@@ -230,8 +230,9 @@ $('#startPublishing').on(
 			if (flag) {
 				updateButton(this, 'Start Publishing', 'Stop Publishing');
 				published = true;
-				$('#PublishID')[0].disabled = true;
+				setDisabled(true, 'publish');
 				changeVideo();
+				$('#PublishID').addClass('color-w')
 			} else {
 				changeVideo(true);
 				this.classList.remove('border-primary');
@@ -243,12 +244,14 @@ $('#startPublishing').on(
 				$('#PlayID')[0].disabled = false;
 				updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing');
 				reSetVideoInfo();
+				$('#PlayID').removeClass('color-w')
 			}
 			stopPublishingStream(id);
 			updateButton(this, 'Start Publishing', 'Stop Publishing');
 			published = false;
-			$('#PublishID')[0].disabled = false;
+			setDisabled(false, 'publish');
 			reSetVideoInfo('publish');
+			$('#PublishID').removeClass('color-w')
 		}
 	}, 500)
 );
@@ -264,8 +267,9 @@ $('#startPlaying').on(
 			if (flag) {
 				updateButton(this, 'Start Playing', 'Stop Playing');
 				played = true;
-				$('#PlayID')[0].disabled = true;
+				setDisabled(true, 'play');
 				changeVideo();
+				$('#PlayID').addClass('color-w')
 			} else {
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
@@ -276,8 +280,9 @@ $('#startPlaying').on(
 			stopPlayingStream(id);
 			updateButton(this, 'Start Playing', 'Stop Playing');
 			played = false;
-			$('#PlayID')[0].disabled = false;
+			setDisabled(false, 'play');
 			reSetVideoInfo('play');
+			$('#PlayID').removeClass('color-w')
 		}
 	}, 500)
 );
@@ -349,6 +354,18 @@ function reSetVideoInfo(flag) {
 		$('#receiveBitrate').text('');
 		$('#receiveFPS').text('');
 		$('#receivePacket').text('');
+	}
+}
+
+function setDisabled(flag, type) {
+	if(type === 'publish') {
+		$('#PublishID')[0].disabled = flag;
+		$('#captureResolution')[0].disabled = flag;
+		$('#FPS')[0].disabled = flag;
+		$('#Bitrate')[0].disabled = flag;
+		$('#Mirror')[0].disabled = flag;
+	} else {
+		$('#PlayID')[0].disabled = flag;
 	}
 }
 

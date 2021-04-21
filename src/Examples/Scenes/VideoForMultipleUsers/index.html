@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-lang="VideoForMultipleUsers">多人视频通话</title>
-  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon"/>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../../../assets/css/style.css">
   <link rel="stylesheet" href="./index.css">
@@ -160,7 +160,8 @@
                           </select>
                         </div>
                         <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Microphone" data-lang="Microphone">Microphone</label>
+                          <label class="form-check-label m-r-5" for="Microphone"
+                            data-lang="Microphone">Microphone</label>
                           <input class="check-input" type="checkbox" id="Microphone" checked>
                         </div>
                       </div>
@@ -169,34 +170,18 @@
                   </div>
                   <video id="pubshlishVideo" autoplay muted playsinline></video>
                 </div>
-                <div class="font-12">
-                  StreamID: <span id="publishStreamID-info"></span>
-                </div>
-              </div>
-              <div class="preview-playInfo col-6">
-                <div class="preview-content">
-                  <div class="preview-action">
-                    <div class="preview-info">
-                      <div>Resolution: <span id="playResolution"></span></div>
-                      <div>Video Send Bitrate: <span id="receiveBitrate"></span></div>
-                      <div>Video Send FPS: <span id="receiveFPS"></span></div>
-                      <div>Packet Loss: <span id="receivePacket"></span></div>
-                    </div>
-                    <div class="preview-video-action">
-                      <div class="font-12 publish-check m-b-5 m-t-5">
-                        <div class="check-wrappre m-r-5">
-                          <label class="form-check-label m-r-5" for="Video" data-lang="Video">Video</label>
-                          <input class="check-input" type="checkbox" id="Video" checked>
-                        </div>
-                        <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Audio" data-lang="Audio">Audio</label>
-                          <input class="check-input" type="checkbox" id="Audio" checked>
-                        </div>
-                      </div>
-                      <button id="startPlaying" class="m-b-5 play-pause-button">Start Playing</button>
-                    </div>
+                <div class="font-12 flex-b">
+                  <div>
+                    StreamID: <span id="publishStreamID-info"></span>
                   </div>
-                  <video id="playVideo" autoplay playsinline></video>
+                  <div>
+                    <svg t="1618919355738" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                      xmlns="http://www.w3.org/2000/svg" p-id="2173" width="20" height="20">
+                      <path
+                        d="M512 62.08A449.92 449.92 0 1 0 961.92 512 449.92 449.92 0 0 0 512 62.08z m0 135.04a135.04 135.04 0 1 1-135.04 135.04A134.72 134.72 0 0 1 512 197.12z m0 640a323.84 323.84 0 0 1-269.76-144.96c0-89.6 179.84-138.56 269.76-138.56s268.48 48.96 269.76 138.56A323.84 323.84 0 0 1 512 835.84z"
+                        p-id="2174"></path>
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
@@ -205,14 +190,14 @@
             <div class="action-step">
               <div class="action-content">
                 <div class="action-room font-14 font-bold">
-                  <div class="f-b-5">
+                  <div class="f-b-3">
                     RoomID <input type="text" id="RoomID" disabled />
                   </div>
                   <div class="f-b-5">
-                    UserId <input type="text" id="UserID" disabled />
+                    UserId <input class="custoum_input" type="text" id="UserID" disabled/>
                   </div>
-                  <div class="f-b-5 m-t-10">
-                    UserName <input type="text" id="UserName" disabled />
+                  <div class="f-b-8 m-t-10">
+                    UserName <input class="custoum_input" type="text" id="UserName" disabled/>
                   </div>
                 </div>
                 <div class="font-14 select-wrapper m-b-10 font-bold">
@@ -228,7 +213,8 @@
                     <span data-lang="FPS">FPS</span> <input type="text" class="t-a-r" id="FPS" value="15" /> fps
                   </div>
                   <div class="font-14 f-b-5">
-                    <span data-lang="FPS">Bitrate</span> <input type="text" class="t-a-r" id="Bitrate" value="300" /> kbps
+                    <span data-lang="Bitrate">Bitrate</span> <input type="text" class="t-a-r" id="Bitrate"
+                      value="300" /> kbps
                   </div>
                 </div>
                 <div class="dropdown-wrapper">

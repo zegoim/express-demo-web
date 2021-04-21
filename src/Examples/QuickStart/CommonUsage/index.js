@@ -14,6 +14,7 @@ let streamID = '0001';
 let zg = null;
 let localStream = null;
 let remoteStream = null;
+let isLogin = false;
 
 // part end
 
@@ -54,7 +55,6 @@ async function enumDevices() {
 }
 
 function initEvent() {
-
 	zg.on('publisherStateUpdate', (result) => {
 		if (result.state === 'PUBLISHING') {
 			$('#pushlishInfo-id').text(result.streamID);
@@ -206,11 +206,17 @@ $('#CheckSystemRequire').on('click', async function() {
 $('#LoginRoom').on('click', async function() {
 	const userName = $('#UserName').val();
 	const id = $('#RoomID').val();
-	await loginRoom(id, userID, userName);
+	try {
+		await loginRoom(id, userID, userName);
+		$('#loginSuccessSvg').css('display', 'inline-block');
+	} catch (err) {
+		console.log(err);
+	}
+	isLogin = true
 	$('#UserName')[0].disabled = true;
 	$('#RoomID')[0].disabled = true;
-	$('#roomStateErrorSvg').css('display', 'none')
-	$('#roomStateSuccessSvg').css('display', 'inline-block')
+	$('#roomStateErrorSvg').css('display', 'none');
+	$('#roomStateSuccessSvg').css('display', 'inline-block');
 });
 
 $('#startPublishing').on('click', async function() {
@@ -223,6 +229,7 @@ $('#startPublishing').on('click', async function() {
 		$('#Microphone')[0].disabled = true;
 		$('#Mirror')[0].disabled = true;
 		$('#CameraDevices')[0].disabled = true;
+		$('#publishSuccessSvg').css('display', 'inline-block');
 		changeVideo();
 	}
 });
@@ -238,15 +245,17 @@ $('#startPlaying').on('click', async function() {
 		$('#PlayID')[0].disabled = true;
 		$('#Video')[0].disabled = true;
 		$('#Audio')[0].disabled = true;
+		$('#playSuccessSvg').css('display', 'inline-block');
 	}
 });
 
 $('#reset').on('click', async function() {
-	await stopPublishingStream($('#PublishID').val())
-	await stopPlayingStream($('#PlayID').val())
-	logoutRoom($('#RoomID').val())
-	clearStream()
-	zg = null
+	await stopPublishingStream($('#PublishID').val());
+	await stopPlayingStream($('#PlayID').val());
+	isLogin && logoutRoom($('#RoomID').val());
+	clearStream();
+	zg = null;
+	isLogin = false;
 	$('#PlayID')[0].disabled = false;
 	$('#Video')[0].disabled = false;
 	$('#Audio')[0].disabled = false;
@@ -259,12 +268,15 @@ $('#reset').on('click', async function() {
 	$('#RoomID')[0].disabled = false;
 	$('#createSuccessSvg').css('display', 'none');
 	$('#checkSuccessSvg').css('display', 'none');
+	$('#loginSuccessSvg').css('display', 'none');
+	$('#publishSuccessSvg').css('display', 'none');
+	$('#playSuccessSvg').css('display', 'none');
 	$('#checkErrorSvg').css('display', 'none');
-	('#CreateZegoExpressEngine')[0].disabled = true;
-	('#CheckSystemRequire')[0].disabled = true;
-	$('#roomStateErrorSvg').css('display', 'inline-block')
-	$('#roomStateSuccessSvg').css('display', 'none')
-})
+	'#CreateZegoExpressEngine'[0].disabled = true;
+	'#CheckSystemRequire'[0].disabled = true;
+	$('#roomStateErrorSvg').css('display', 'inline-block');
+	$('#roomStateSuccessSvg').css('display', 'none');
+});
 
 // bind event end
 

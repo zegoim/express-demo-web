@@ -7,7 +7,7 @@
 // This part of the code defines the default values and global values
 // ==============================================================
 
-let userID = util.getBrow() + '_' + new Date().getTime();
+let userID = util.queryObj['userID'] || util.getBrow() + '_' + new Date().getTime();
 let roomID = '0004';
 let streamID = parseInt(Math.random() * 999999) + '';
 
@@ -15,9 +15,7 @@ let zg = null;
 let isChecked = false;
 let isLoginRoom = false;
 let localStream = null;
-let remoteStream = null;
 let published = false;
-let played = false;
 let playMultipleStreamList = [];
 let palyedObj = {};
 let playMultipleUserList = [];
@@ -150,7 +148,7 @@ function playMultipleEvent() {
 						} catch (error) {
 							console.error(error);
 						}
-						removeHtml(playMultipleStreamList[k].streamID, streamList[k].user);
+						removeHtml(playMultipleStreamList[k].streamID, streamList[j].user);
 						playMultipleStreamList.splice(k--, 1);
 						break;
 					}
@@ -166,7 +164,7 @@ function playMultipleEvent() {
 				playMultipleUserList.push(userList[i]);
 				appednHtml(null, userList[i]);
 			}
-		} else {
+		} else if (updateType == 'DELETE') {
 			for (let k = 0; k < playMultipleUserList.length; k++) {
 				for (let j = 0; j < userList.length; j++) {
 					if (playMultipleUserList[k].userID === userList[j].userID) {
@@ -187,17 +185,6 @@ function clearStream(flag) {
 		$('#pubshlishVideo')[0].srcObject = null;
 		localStream = null;
 		published = false;
-		remoteStream && zg.destroyStream(remoteStream);
-		$('#playVideo')[0].srcObject = null;
-		remoteStream = null;
-		played = false;
-	}
-
-	if (flag === 'play') {
-		remoteStream && zg.destroyStream(remoteStream);
-		$('#playVideo')[0].srcObject = null;
-		remoteStream = null;
-		played = false;
 	}
 }
 
@@ -267,20 +254,7 @@ async function startPublishingStream(streamId, config) {
 
 async function stopPublishingStream(streamId) {
 	zg.stopPublishingStream(streamId);
-	if (remoteStream) {
-		stopPlayingStream(streamId);
-	}
 	clearStream('publish');
-}
-
-async function startPlayingStream(streamId, options = {}) {
-	try {
-		remoteStream = await zg.startPlayingStream(streamId, options);
-		$('#playVideo')[0].srcObject = remoteStream;
-		return true;
-	} catch (err) {
-		return false;
-	}
 }
 
 async function startPlayingMultipleStream(streamId, options = {}) {
@@ -322,41 +296,10 @@ $('#startPublishing').on(
 			}
 			$('#publishStreamID-info').text(streamID)
 		} else {
-			if (remoteStream) {
-				updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing');
-			}
 			stopPublishingStream(streamID);
 			updateButton(this, 'Start Publishing', 'Stop Publishing');
 			published = false;
 			$('#publishStreamID-info').text('')
-		}
-	}, 500)
-);
-
-$('#startPlaying').on(
-	'click',
-	util.throttle(async function() {
-		this.classList.add('border-primary');
-		if (!played) {
-			const config = {
-				video: $('#Video')[0].checked,
-				audio: $('#Audio')[0].checked
-			};
-			const flag = await startPlayingStream(streamID, config);
-			if (flag) {
-				updateButton(this, 'Start Playing', 'Stop Playing');
-				played = true;
-				changeVideo();
-			} else {
-				this.classList.remove('border-primary');
-				this.classList.add('border-error');
-				this.innerText = 'Playing Fail';
-				changeVideo(true);
-			}
-		} else {
-			stopPlayingStream(streamID);
-			updateButton(this, 'Start Playing', 'Stop Playing');
-			played = false;
 		}
 	}, 500)
 );
@@ -429,7 +372,7 @@ function changeVideo(flag) {
 function appednHtml(streamId, user) {
 	if (streamId) {
 		$('#videoList').append(
-			`<div class="preview-playInfo col-6 m-t-10" id="${streamId}">
+			`<div class="preview-playInfo col-6" id="${streamId}">
         <div class="preview-content">
         <div class="preview-action">
           <div class="preview-info">
@@ -473,7 +416,7 @@ function appednHtml(streamId, user) {
 
 	if (!streamId && user) {
 		$('#userListUl').append(`
-    <li id="${user.userID}">
+    <li id="u-${user.userID}">
     <div class="drop-item">
       <span class="f-b-5 t-nowrap m-r-5">UserID: ${user.userID}</span>
       <span class="f-b-5 t-nowrap ">Name: ${user.userName}</span>
@@ -485,12 +428,12 @@ function appednHtml(streamId, user) {
 
 function removeHtml(streamId, user) {
 	if (streamId) {
-		$(`#${streamId}`).remove();
-		$(`#l-${streamId}`).remove();
+		document.getElementById(`${streamId}`).remove();
+		document.getElementById(`l-${streamId}`).remove();
 	}
 
 	if (!streamId && user) {
-		$(`#${user.userID}`).remove();
+		document.getElementById(`u-${user.userID}`).remove();
 	}
 }
 

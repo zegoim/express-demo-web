@@ -50,6 +50,15 @@
   padding-right: 5px;
 }
 
+.preview-pushlishInfo, .preview-playInfo {
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.custoum_input {
+  width: 70%;
+}
+
 .preview-roomInfo {
   font-weight: 500;
 }
@@ -119,6 +128,9 @@
   justify-content: space-between;
   flex-wrap: wrap;
   padding-bottom: 10px;
+}
+.f-b-8 {
+  flex-basis: 80%;
 }
 .f-b-5 {
   flex-basis: 50%;
@@ -215,4 +227,9 @@ option {
   margin: 5px 0;
   display: flex;
   align-items: center;
+}
+
+.flex-b {
+  display: flex;
+  justify-content: space-between;
 }

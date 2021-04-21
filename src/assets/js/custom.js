@@ -199,4 +199,18 @@ util.throttle = (fn, delay = 300) => {
   
 }
 
-window.Util = util;
+util.queryObj = (function parseQueryString(url) {
+	var params = {};
+	var arr = url.split("?");
+	if (arr.length <= 1) {
+		 return params;
+	}
+	arr = arr[1].split("&");
+	for(var i = 0, l = arr.length; i < l; i++) {
+		 var a = arr[i].split("=");
+		 params[a[0]] = a[1];
+	}
+	return params;
+})(location.href)
+
+window.util = util;

@@ -89,6 +89,19 @@ input {
   color: #495057;
 }
 
+.f-b-3 {
+  flex-basis: 30%;
+}
+.f-b-7 {
+  flex-basis: 70%;
+}
+.t-a-r {
+  text-align: right;
+}
+.w-70 {
+  width: 70%;
+}
+
 .publish-setting {
   display: flex;
   /* justify-content: space-between; */

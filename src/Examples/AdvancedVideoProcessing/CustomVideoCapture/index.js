@@ -17,7 +17,6 @@ let isLoginRoom = false;
 let localStream = null;
 let remoteStream = null;
 let published = false;
-let isPlay = false;
 // part end
 
 // ============================================================== 
@@ -193,23 +192,7 @@ async function stopPublishingStream(streamId) {
 // This part of the code binds the button click event
 // ==============================================================  
 
-$('#startPlay').on('click', util.throttle( async function () {
-  const url = $('#CustomVideo').val()
-  if(!url) return alert('url is empty')
-
-  $('#customLocalVideo')[0].src = url
-  const flag = await checkVideo()
-  if(flag) {
-    isPlay = true
-  } else {
-    isPlay = false
-    $('#CustomVideo').val('')
-    alert('Playback failed')
-  }
-}, 500))
-
 $('#startPublishing').on('click', util.throttle( async function () {
-  if(!isPlay) return alert('must start play')
   const id = $('#PublishID').val();
   if(!id) return alert('PublishID is empty')
   this.classList.add('border-primary')

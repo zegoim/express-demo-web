@@ -223,7 +223,6 @@ $('#startPublishing').on(
 	util.throttle(async function() {
 		const id = $('#PublishID').val();
 		if (!id) return alert('PublishID is empty');
-		this.classList.add('border-primary');
 		if (!published) {
 			const flag = await startPublishingStream(id, getCreateStreamConfig());
 			if (flag) {
@@ -231,11 +230,6 @@ $('#startPublishing').on(
 				published = true;
 				$('#PublishID')[0].disabled = true;
 				changeVideo();
-			} else {
-				changeVideo(true);
-				this.classList.remove('border-primary');
-				this.classList.add('border-error');
-				this.innerText = 'Publishing Fail';
 			}
 		} else {
 			if (remoteStream && id === $('#PlayID').val()) {

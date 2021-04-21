@@ -316,6 +316,10 @@ $('#startPublishing').on(
 				updateButton(this, 'Start Publishing', 'Stop Publishing');
 				published = true;
 				$('#PublishID')[0].disabled = true;
+				$('#Camera')[0].disabled = true;
+				$('#Microphone')[0].disabled = true;
+				$('#Mirror')[0].disabled = true;
+				$('#CameraDevices')[0].disabled = true;
 				changeVideo();
 			} else {
 				this.classList.remove('border-primary');
@@ -332,6 +336,10 @@ $('#startPublishing').on(
 			updateButton(this, 'Start Publishing', 'Stop Publishing');
 			published = false;
 			$('#PublishID')[0].disabled = false;
+			$('#Camera')[0].disabled = false;
+			$('#Microphone')[0].disabled = false;
+			$('#Mirror')[0].disabled = false;
+			$('#CameraDevices')[0].disabled = false;
 			changeVideo(true);
 		}
 	}, 500)
@@ -357,6 +365,8 @@ $('#startPlaying').on(
 				updateButton(this, 'Start Playing', 'Stop Playing');
 				played = true;
 				$('#PlayID')[0].disabled = true;
+				$('#Video')[0].disabled = true;
+				$('#Audio')[0].disabled = true;
 			} else {
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
@@ -367,6 +377,8 @@ $('#startPlaying').on(
 			updateButton(this, 'Start Playing', 'Stop Playing');
 			played = false;
 			$('#PlayID')[0].disabled = false;
+			$('#Video')[0].disabled = false;
+			$('#Audio')[0].disabled = false;
 		}
 	}, 500)
 );

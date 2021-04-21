@@ -124,10 +124,16 @@
   flex-basis: 50%;
 }
 .f-b-3 {
-  flex-basis: 33.3%;
+  flex-basis: 30%;
+}
+.f-b-7 {
+  flex-basis: 70%;
 }
 .t-a-r {
   text-align: right;
+}
+.w-70 {
+  width: 70%;
 }
 .drop-item {
   display: flex;
@@ -153,7 +159,7 @@
 }
 
 input {
-  width: 40% ;
+  width: 40%;
   height: 21px ;
   border: 1px solid #ced4da;
   border-radius: .25rem;

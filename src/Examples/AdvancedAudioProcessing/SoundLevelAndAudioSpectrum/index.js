@@ -176,7 +176,7 @@ function stopSoundLevelDelegate() {
 
 $('#SoundLevelMonitor').on('change', function({ target }) {
 	if (target.checked) {
-		startSoundLevelDelegate(500)
+		startSoundLevelDelegate(100)
 	} else {
     stopSoundLevelDelegate()
 		$('#SoundLevelProgressbar').progressbar(0)

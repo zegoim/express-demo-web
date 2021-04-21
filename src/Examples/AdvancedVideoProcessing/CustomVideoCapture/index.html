@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-lang="CustomVideoCapture">自定义视频采集</title>
-  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon"/>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../../../assets/css/style.css">
   <link rel="stylesheet" href="./index.css">
@@ -109,7 +109,7 @@
     <div class="page-wrapper">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-12 col-lg-6 preview-wrapper">
+          <div class="col-12 preview-wrapper">
             <div class="preview-roomInfo">
               RoomID:&nbsp;<div id="roomInfo-id" class="m-r-10"></div>
               RoomState:&nbsp;<div id="roomInfo-state">
@@ -128,9 +128,18 @@
               </div>
             </div>
             <div class="row" id="videoList">
-              <div class="preview-pushlishInfo col-12">
+              <div class="preview-pushlishInfo col-12 col-lg-6">
                 <div class="pushlishInfo-title">
                   Custom Stream&emsp;
+                </div>
+                <div class="preview-content">
+                  <video id="customLocalVideo" crossorigin="anonymous" autoplay playsinline muted controls
+                    src="https://zego-public.oss-cn-shanghai.aliyuncs.com/sdk-doc/assets/big_buck_bunny.mp4"></video>
+                </div>
+              </div>
+              <div class="preview-playInfo col-12 col-lg-6">
+                <div class="pushlishInfo-title">
+                  Preview&emsp;PublishStreamID: <span id="pushlishInfo-id"></span>
                 </div>
                 <div class="preview-content">
                   <div class="preview-action">
@@ -141,25 +150,7 @@
                       <button id="startPublishing" class="m-b-5 configBtn play-pause-button">Start Publishing</button>
                     </div>
                   </div>
-                  <video id="customLocalVideo" crossorigin="anonymous" autoplay playsinline></video>
-                </div>
-              </div>
-              <div class="preview-playInfo col-12">
-                <div class="pushlishInfo-title">
-                  Preview&emsp;PublishStreamID: <span id="pushlishInfo-id"></span>
-                </div>
-                <div class="preview-content">
                   <video id="pubshlishVideo" autoplay muted playsinline></video>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-lg-6 action-wrapper">
-            <div class="action-step">
-              <div class="action-content font-14 font-bold">
-                <div class="m-t-10 m-b-10">
-                  Media URL <input id="CustomVideo" type="text" class="m-l-5 font-12" placeholder="https://xxx.com/vidoe.mp4">
-                  <button id="startPlay" type="button" class="btn-info btn cuBtn">Stat play</button>
                 </div>
               </div>
             </div>

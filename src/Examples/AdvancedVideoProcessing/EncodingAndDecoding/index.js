@@ -234,6 +234,7 @@ $('#startPublishing').on('click', util.throttle( async function () {
         updateButton(this, 'Start Publishing', 'Stop Publishing');
         published = true
         $('#Codec')[0].disabled = true
+        $('#PublishID')[0].disabled = true
       } else {
         this.classList.remove('border-primary');
         this.classList.add('border-error')

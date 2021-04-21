@@ -233,6 +233,9 @@ $('#startPublishing').on('click', util.throttle( async function () {
         updateButton(this, 'Start Publishing', 'Stop Publishing');
         published = true
         $('#PublishID')[0].disabled = true
+        $('#HeadphoneMonitor')[0].disabled = true
+        $('#Channel')[0].disabled = true
+        
         setHeadphoneMonitor($('#HeadphoneMonitor')[0].checked)
       } else {
         this.classList.remove('border-primary');
@@ -250,6 +253,8 @@ $('#startPublishing').on('click', util.throttle( async function () {
       updateButton(this, 'Start Publishing', 'Stop Publishing')
       published = false
       $('#PublishID')[0].disabled = false
+      $('#HeadphoneMonitor')[0].disabled = false
+      $('#Channel')[0].disabled = false
       setHeadphoneMonitor(false)
       reSetVideoInfo('publish')
   }

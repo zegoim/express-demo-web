@@ -105,7 +105,6 @@ function clearStream() {
   remoteStream = null;
   localStream = null;
   $('#pubshlishVideo')[0].srcObject = null;
-  $('#playVideo')[0].srcObject = null;
   isStart = false
 }
 
@@ -232,27 +231,16 @@ $('#start').on('click', util.throttle( async function () {
       $('#PublishID')[0].disabled = true
       $('#AudioMixing')[0].disabled = false
 
-      // Step3 PlayingStream
-      // const flagPlay =  await startPlayingStream(PlayID);
-      // if(!flagPlay) {
-      //   this.classList.remove('border-primary');
-      //   this.classList.add('border-error')
-      //   this.innerText = 'Start Fail'
-      // }
-
       updateButton(this, 'Start', 'Stop');
       isStart = true
-      // $('#PlayID')[0].disabled = true
       $('#customAudio')[0].play()
   } else {
-      stopPlayingStream(PlayID)
       stopPublishingStream(PublishId);
       logoutRoom(roomID)
       updateButton(this, 'Start', 'Stop')
       isStart = false
       $('#RoomID')[0].disabled = false
       $('#PublishID')[0].disabled = false
-      $('#PlayID')[0].disabled = false
       $('#AudioMixing')[0].disabled = true
       $('#roomStateSuccessSvg').css('display', 'none')
       $('#roomStateErrorSvg').css('display', 'inline-block')

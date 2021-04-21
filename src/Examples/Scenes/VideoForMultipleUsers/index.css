@@ -135,8 +135,11 @@
 .f-b-5 {
   flex-basis: 50%;
 }
+.f-b-7 {
+  flex-basis: 70%;
+}
 .f-b-3 {
-  flex-basis: 33.3%;
+  flex-basis: 30%;
 }
 .t-a-r {
   text-align: right;

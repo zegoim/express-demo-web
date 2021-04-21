@@ -55,6 +55,12 @@ async function enumDevices() {
 }
 
 function initEvent() {
+	zg.on('roomStateUpdate', (roomId, state) => {
+		if(state === 'DISCONNECTED') {
+			location.reload()
+		}
+	})
+
 	zg.on('publisherStateUpdate', (result) => {
 		if (result.state === 'PUBLISHING') {
 			$('#pushlishInfo-id').text(result.streamID);

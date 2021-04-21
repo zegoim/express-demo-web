@@ -213,4 +213,4 @@ util.queryObj = (function parseQueryString(url) {
 	return params;
 })(location.href)
 
-window.util = util;
+window.Util = util;

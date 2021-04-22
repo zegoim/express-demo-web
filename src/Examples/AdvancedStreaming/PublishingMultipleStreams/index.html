@@ -126,9 +126,10 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-12 col-lg-6 preview-wrapper">
+          <div class="col-12 preview-wrapper m-t-10">
+            <div class="font-bold">Step1</div>
             <div class="row" id="videoList">
-              <div class="preview-pushlishInfo col-lg-12 col-6 m-b-10">
+              <div class="preview-pushlishInfo col-6 m-b-10">
                 <div class="preview-content">
                   <div class="preview-action">
                     <div class="preview-info">
@@ -144,27 +145,7 @@
                   <video id="pubshlishVideo" autoplay muted playsinline></video>
                 </div>
               </div>
-              <div class="preview-playInfo col-lg-12 col-6 m-b-10">
-                <div class="preview-content">
-                  <div class="preview-action">
-                    <div class="preview-info">
-                      <span data-lang="PlayFirstStream">Play First Stream</span>
-                    </div>
-                    <div class="preview-video-action">
-                      <div class="m-t-10 m-b-5">
-                        Playing StreamID <input class="m-l-10" type="text" id="PlayID" />
-                      </div>
-                      <button id="startPlaying" class="m-b-5 configBtn play-pause-button">Start Playing</button>
-                    </div>
-                  </div>
-                  <video id="playVideo" autoplay playsinline></video>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-lg-6 preview-wrapper">
-            <div class="row" id="videoList">
-              <div class="preview-pushlishInfo col-lg-12 col-6 m-b-10">
+              <div class="preview-pushlishInfo col-6 m-b-10">
                 <div class="preview-content">
                   <div class="preview-action">
                     <div class="preview-info">
@@ -181,7 +162,28 @@
                   <video id="pubshlishSecondVideo" autoplay muted playsinline></video>
                 </div>
               </div>
-              <div class="preview-playInfo col-lg-12 col-6">
+            </div>
+          </div>
+          <div class="col-12 preview-wrapper m-t-10">
+            <div class="font-bold">Step2</div>
+            <div class="row" id="videoList">
+              <div class="preview-playInfo col-6 m-b-10">
+                <div class="preview-content">
+                  <div class="preview-action">
+                    <div class="preview-info">
+                      <span data-lang="PlayFirstStream">Play First Stream</span>
+                    </div>
+                    <div class="preview-video-action">
+                      <div class="m-t-10 m-b-5">
+                        Playing StreamID <input class="m-l-10" type="text" id="PlayID" />
+                      </div>
+                      <button id="startPlaying" class="m-b-5 configBtn play-pause-button">Start Playing</button>
+                    </div>
+                  </div>
+                  <video id="playVideo" autoplay playsinline></video>
+                </div>
+              </div>
+              <div class="preview-playInfo col-6">
                 <div class="preview-content">
                   <div class="preview-action">
                     <div class="preview-info">

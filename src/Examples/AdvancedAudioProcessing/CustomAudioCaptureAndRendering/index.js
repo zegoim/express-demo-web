@@ -103,8 +103,6 @@ function clearStream() {
   localStream && zg.destroyStream(localStream);  
   remoteStream && zg.destroyStream(remoteStream);
   remoteStream = null;
-  localStream = null;
-  $('#pubshlishVideo')[0].srcObject = null;
   $('#playVideo')[0].srcObject = null;
   isStart = false
 }
@@ -218,19 +216,23 @@ $('#start').on('click', util.throttle( async function () {
 
       // Step2 PublishingStream
       await startPublishingStream(PublishId);
+      $('#PublishID')[0].disabled = true
 
       // Step3 PlayingStream
-      const flagPlay =  await startPlayingStream(PlayID);
-      if(!flagPlay) {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Start Fail'
-      } else {
-        updateButton(this, 'Start', 'Stop');
-        isStart = true
-        $('#PlayID')[0].disabled = true
-      }
-      $('#customAudio')[0].play()
+      // Don't immediately playing stream after pushlishing stream
+      setTimeout(async () => {
+        const flagPlay =  await startPlayingStream(PlayID);
+        if(!flagPlay) {
+          this.classList.remove('border-primary');
+          this.classList.add('border-error')
+          this.innerText = 'Start Fail'
+        } else {
+          updateButton(this, 'Start', 'Stop');
+          isStart = true
+          $('#PlayID')[0].disabled = true
+        }
+        $('#customAudio')[0].play()
+      }, 500)
   } else {
       stopPlayingStream(PlayID)
       stopPublishingStream(PublishId);

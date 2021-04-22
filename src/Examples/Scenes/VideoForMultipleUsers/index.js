@@ -133,9 +133,13 @@ function playMultipleEvent() {
 	});
 
 	zg.on('roomStreamUpdate', async (roomID, updateType, streamList, extendedData) => {
+
+		// streams added
 		if (updateType === 'ADD') {
 			for (let i = 0; i < streamList.length; i++) {
 				playMultipleStreamList.push(streamList[i]);
+
+				// add item to streamList
 				appednHtml(streamList[i].streamID, streamList[i].user);
 				if (playObj[streamList[i].user.userID]) {
 					$(`#m-${streamList[i].user.userID}`).attr('data-id', streamList[i].streamID);
@@ -144,16 +148,18 @@ function playMultipleEvent() {
 				}
 				playObj[streamList[i].user.userID] = streamList[i].streamID;
 			}
-		} else if (updateType == 'DELETE') {
+		} else if (updateType == 'DELETE') { 	//  streams deleted
+
 			for (let k = 0; k < playMultipleStreamList.length; k++) {
 				for (let j = 0; j < streamList.length; j++) {
 					if (playMultipleStreamList[k].streamID === streamList[j].streamID) {
 						stopPlayingStream(playMultipleStreamList[k].streamID);
+						// remove item from streamList
 						removeHtml(playMultipleStreamList[k].streamID);
 						const node = $(`[data-id=${streamList[j].streamID}]`)[0];
 						if (node) {
 							const id = node.id.split('-')[1];
-							stopChangeUI.call($(`#b-${id}`)[0], id);
+							stopToChangeUI.call($(`#b-${id}`)[0], id);
 						}
 						playMultipleStreamList.splice(k--, 1);
 						break;
@@ -166,17 +172,21 @@ function playMultipleEvent() {
 	});
 
 	zg.on('roomUserUpdate', (roomID, updateType, userList) => {
-		if (updateType === 'ADD') {
+		if (updateType === 'ADD') { 	// users added
+
 			for (let i = 0; i < userList.length; i++) {
 				playMultipleUserList.push(userList[i]);
 				palyedObj[userList[i].userID] = false;
+				// add play cell to playList and add item to userList
 				appednHtml(null, userList[i]);
+				// bind event by userId
 				addMultiplePlayingEvent(userList[i].userID);
 			}
-		} else if (updateType == 'DELETE') {
+		} else if (updateType == 'DELETE') { // users deleted
 			for (let k = 0; k < playMultipleUserList.length; k++) {
 				for (let j = 0; j < userList.length; j++) {
 					if (playMultipleUserList[k].userID === userList[j].userID) {
+						// remove cell from playList and remove item from userList
 						removeHtml(null, playMultipleUserList[k]);
 						playMultipleUserList.splice(k--, 1);
 						break;
@@ -382,8 +392,11 @@ function changeVideo(flag) {
 	}
 }
 
+// When users or streams added
 function appednHtml(streamId, user) {
 	if (streamId) {
+
+		// add new item to streamList
 		$('#streamListUl').append(`
     <li id="l-${streamId}">
     <div class="drop-item">
@@ -396,6 +409,7 @@ function appednHtml(streamId, user) {
 	}
 
 	if (!streamId && user) {
+		// add new item to PlayList
 		$('#videoList').append(
 			`<div class="preview-playInfo col-6" id="m-${user.userID}">
         <div class="preview-content">
@@ -428,6 +442,8 @@ function appednHtml(streamId, user) {
       </div>
     </div>`
 		);
+
+		// add new item to userList
 		$('#userListUl').append(`
     <li id="u-${user.userID}">
     <div class="drop-item">
@@ -439,6 +455,7 @@ function appednHtml(streamId, user) {
 	}
 }
 
+// When users or streams deleted
 function removeHtml(streamId, user) {
 	if (streamId) {
 		document.getElementById(`l-${streamId}`).remove();
@@ -450,6 +467,7 @@ function removeHtml(streamId, user) {
 	}
 }
 
+// Bind event by userId
 function addMultiplePlayingEvent(userId) {
 	$(`#b-${userId}`).on(
 		'click',
@@ -482,13 +500,13 @@ function addMultiplePlayingEvent(userId) {
 					item.disabled = false;
 				});
 				stopPlayingStream(playObj[userId]);
-				stopChangeUI.call(this, userId);
+				stopToChangeUI.call(this, userId);
 			}
 		}, 500)
 	);
 }
 
-function stopChangeUI(userId) {
+function stopToChangeUI(userId) {
 	updateButton(this, 'Start Playing', 'Stop Playing');
 	const spanList = $(`#m-${userId} span`);
 	spanList[0].innerText = '';

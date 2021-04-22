@@ -159,7 +159,6 @@ async function startPublishingStream (streamId) {
       }
     });
     zg.startPublishingStream(streamId, localStream);
-    $('#pubshlishVideo')[0].srcObject = localStream;
     return true
   } catch(err) {
     console.error(err);
@@ -218,14 +217,7 @@ $('#start').on('click', util.throttle( async function () {
       }
 
       // Step2 PublishingStream
-      const flagPublish =  await startPublishingStream(PublishId);
-      if(!flagPublish) {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Start Fail'
-        return
-      }
-      $('#PublishID')[0].disabled = true
+      await startPublishingStream(PublishId);
 
       // Step3 PlayingStream
       const flagPlay =  await startPlayingStream(PlayID);

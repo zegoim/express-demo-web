@@ -84,6 +84,22 @@ async function enumDevices() {
 }
 
 function initEvent() {
+	zg.on('roomStateUpdate', (roomId, state) => {
+		if(state === 'CONNECTED' && isLoginRoom) {
+			$('#roomStateSuccessSvg').css('display', 'inline-block');
+			$('#roomStateErrorSvg').css('display', 'none');
+		}
+		
+		if (state === 'DISCONNECTED' && !isLoginRoom) {
+			$('#roomStateSuccessSvg').css('display', 'none');
+			$('#roomStateErrorSvg').css('display', 'inline-block');
+		}
+
+		if(state === 'DISCONNECTED' && isLoginRoom) {
+			location.reload()
+		}
+	})
+
 	zg.on('publisherStateUpdate', (result) => {
 		if (result.state === 'PUBLISHING') {
 			$('#pushlishInfo-id').text(result.streamID);
@@ -268,14 +284,13 @@ $('#LoginRoom').on(
 		this.classList.add('border-primary');
 		if (!isLoginRoom) {
 			try {
+				isLoginRoom = true;
 				await loginRoom(id, userID, userName);
 				updateButton(this, 'Login Room', 'Logout Room');
-				isLoginRoom = true;
 				$('#UserName')[0].disabled = true;
 				$('#RoomID')[0].disabled = true;
-				$('#roomStateSuccessSvg').css('display', 'inline-block');
-				$('#roomStateErrorSvg').css('display', 'none');
 			} catch (err) {
+				isLoginRoom = false;
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Login Fail Try Again';
@@ -289,13 +304,11 @@ $('#LoginRoom').on(
 				$('#PlayID')[0].disabled = false;
 				updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing');
 			}
+			isLoginRoom = false;
 			logoutRoom(id);
 			updateButton(this, 'Login Room', 'Logout Room');
-			isLoginRoom = false;
 			$('#UserName')[0].disabled = false;
 			$('#RoomID')[0].disabled = false;
-			$('#roomStateSuccessSvg').css('display', 'none');
-			$('#roomStateErrorSvg').css('display', 'inline-block');
 		}
 	}, 500)
 );

@@ -57,6 +57,23 @@ async function checkSystemRequirements() {
 }
 
 function initEvent() {
+  zg.on('roomStateUpdate', (roomId, state) => {
+		if(state === 'CONNECTED' && isLoginRoom) {
+			console.log(111);
+			$('#roomStateSuccessSvg').css('display', 'inline-block');
+			$('#roomStateErrorSvg').css('display', 'none');
+		}
+		
+		if (state === 'DISCONNECTED' && !isLoginRoom) {
+			$('#roomStateSuccessSvg').css('display', 'none');
+			$('#roomStateErrorSvg').css('display', 'inline-block');
+		}
+
+		if(state === 'DISCONNECTED' && isLoginRoom) {
+			location.reload()
+		}
+	})
+
   zg.on('publisherStateUpdate', result => {
     if(result.state === "PUBLISHING") {
       $('#pushlishInfo-id').text(result.streamID)
@@ -464,12 +481,10 @@ async function render() {
   setLogConfig()
   try {
     updateLogger(`[action] LoginRoom RoomID: ${roomID}`)
+    isLoginRoom = true;
     await loginRoom(roomID, userID, userID)
-    $('#roomStateSuccessSvg').css('display', 'inline-block')
-    $('#roomStateErrorSvg').css('display', 'none')
   } catch (err) {
-    $('#roomStateSuccessSvg').css('display', 'none')
-    $('#roomStateErrorSvg').css('display', 'inline-block')
+    isLoginRoom = false;
   }
 }
 

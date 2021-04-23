@@ -56,7 +56,18 @@ async function enumDevices() {
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'DISCONNECTED') {
+		if(state === 'CONNECTED' && isLogin) {
+			console.log(111);
+			$('#roomStateSuccessSvg').css('display', 'inline-block');
+			$('#roomStateErrorSvg').css('display', 'none');
+		}
+		
+		if (state === 'DISCONNECTED' && !isLogin) {
+			$('#roomStateSuccessSvg').css('display', 'none');
+			$('#roomStateErrorSvg').css('display', 'inline-block');
+		}
+
+		if(state === 'DISCONNECTED' && isLogin) {
 			location.reload()
 		}
 	})
@@ -213,16 +224,15 @@ $('#LoginRoom').on('click', async function() {
 	const userName = $('#UserName').val();
 	const id = $('#RoomID').val();
 	try {
+		isLogin = true;
 		await loginRoom(id, userID, userName);
 		$('#loginSuccessSvg').css('display', 'inline-block');
 	} catch (err) {
+		isLogin = false;
 		console.log(err);
 	}
-	isLogin = true
 	$('#UserName')[0].disabled = true;
 	$('#RoomID')[0].disabled = true;
-	$('#roomStateErrorSvg').css('display', 'none');
-	$('#roomStateSuccessSvg').css('display', 'inline-block');
 });
 
 $('#startPublishing').on('click', async function() {
@@ -258,10 +268,12 @@ $('#startPlaying').on('click', async function() {
 $('#reset').on('click', async function() {
 	await stopPublishingStream($('#PublishID').val());
 	await stopPlayingStream($('#PlayID').val());
-	isLogin && logoutRoom($('#RoomID').val());
+	if (isLogin) {
+		isLogin = false;
+		logoutRoom($('#RoomID').val());
+	}
 	clearStream();
 	zg = null;
-	isLogin = false;
 	$('#PlayID')[0].disabled = false;
 	$('#Video')[0].disabled = false;
 	$('#Audio')[0].disabled = false;
@@ -280,8 +292,6 @@ $('#reset').on('click', async function() {
 	$('#checkErrorSvg').css('display', 'none');
 	'#CreateZegoExpressEngine'[0].disabled = true;
 	'#CheckSystemRequire'[0].disabled = true;
-	$('#roomStateErrorSvg').css('display', 'inline-block');
-	$('#roomStateSuccessSvg').css('display', 'none');
 });
 
 // bind event end

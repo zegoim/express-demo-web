@@ -7,7 +7,7 @@ This is Express Example (Sample topic Demo) Web repositories
   1. Jquery.i18n is used in the project for internationalization, and it is necessary to simulate the server environment to read the configuration file. You can use a vscode plug-in Live Server to simulate. 
   Check out this [article](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) to learn how to use
 
-  2. Need to fill in appID and Server and tokenUrl in /src/keyCenter.js file
+  2. Need to fill in appID and Server and tokenUrl in `/src/keyCenter.js `file
 
 ## Directory structure diagram
 
@@ -21,5 +21,3 @@ express-demo-web
     └── Examples
 
 ```
-
-> clang-format 使用仓库内 `./buildtools` 目录下的二进制，不依赖外部。

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-lang="CustomVideoCapture">自定义视频采集</title>
+  <title data-lang="MediaTrackReplacement">音视频轨道替换</title>
   <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../../../assets/css/style.css">
@@ -42,8 +42,7 @@
             </li>
             <span class="sidebar-title" data-lang="CommonFeatures">常用功能</span>
             <li>
-              <a href="../../CommonFeatures/CommonVideoConfig/index.html" class="waves-effect"
-                data-lang="CommonVideoConfig">常用视频配置</a>
+              <a href="../../CommonFeatures/CommonVideoConfig/index.html" class="waves-effect" data-lang="CommonVideoConfig">常用视频配置</a>
             </li>
             <li>
               <a href="../../CommonFeatures/RoomMessage/index.html" class="waves-effect"
@@ -72,7 +71,8 @@
                 data-lang="SetVideoProperties">设置视频属性</a>
             </li>
             <li>
-              <a href="index.html" class="waves-effect" data-lang="CustomVideoCapture">自定义视频采集</a>
+              <a href="../../AdvancedVideoProcessing/CustomVideoCapture/index.html" class="waves-effect"
+                data-lang="CustomVideoCapture">自定义视频采集</a>
             </li>
             <span class="sidebar-title" data-lang="AdvancedAudioProcessing">音频进阶</span>
             <li>
@@ -119,7 +119,7 @@
     <div class="page-wrapper">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-12 preview-wrapper">
+          <div class="col-12 col-lg-6 preview-wrapper">
             <div class="preview-roomInfo">
               RoomID:&nbsp;<div id="roomInfo-id" class="m-r-10"></div>
               RoomState:&nbsp;<div id="roomInfo-state">
@@ -138,21 +138,15 @@
               </div>
             </div>
             <div class="row" id="videoList">
-              <div class="preview-pushlishInfo col-12 col-lg-6">
-                <div class="pushlishInfo-title">
-                  Custom Stream&emsp;
-                </div>
-                <div class="preview-content">
-                  <video id="customLocalVideo" crossorigin="anonymous" autoplay playsinline muted controls
-                    src="https://zego-public.oss-cn-shanghai.aliyuncs.com/sdk-doc/assets/big_buck_bunny.mp4"></video>
-                </div>
-              </div>
-              <div class="preview-playInfo col-12 col-lg-6">
-                <div class="pushlishInfo-title">
-                  Preview&emsp;PublishStreamID: <span id="pushlishInfo-id"></span>
-                </div>
+              <div class="preview-pushlishInfo col-lg-12 col-6 m-b-15">
                 <div class="preview-content">
                   <div class="preview-action">
+                    <div class="preview-info">
+                      <div>Resolution: <span id="publishResolution"></span></div>
+                      <div>Video Send Bitrate: <span id="sendBitrate"></span></div>
+                      <div>Video Send FPS: <span id="sendFPS"></span></div>
+                      <div>Packet Loss: <span id="sendPacket"></span></div>
+                    </div>
                     <div class="preview-video-action">
                       <div class="m-t-10 m-b-5">
                         Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
@@ -160,7 +154,29 @@
                       <button id="startPublishing" class="m-b-5 configBtn play-pause-button">Start Publishing</button>
                     </div>
                   </div>
-                  <video id="pubshlishVideo" autoplay muted playsinline></video>
+                  <video id="pubshlishVideo" autoplay playsinline></video>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6 action-wrapper">
+            <div class="action-step">
+              <div class="action-content">
+                <div class="font-bold m-b-5" data-lang="VideoTrackReplacement">视频轨道替换</div>
+                <div class="switch-field">
+                  <input type="radio" id="radio-one" name="switch-one" value="camera" disabled checked />
+                  <label for="radio-one" data-lang="Camera">摄像头</label>
+                  <input type="radio" id="radio-two" name="switch-one" value="screen" disabled />
+                  <label for="radio-two" data-lang="Screen">屏幕</label>
+                </div>
+                <div class="font-bold m-t-5" data-lang="AudioTrackReplacement">视频轨道替换</div>
+                <audio id="customAudio" crossOrigin="anonymous" preload playsinline controls
+                  src="../../../assets/16183688734997.mp3"></audio>
+                <div class="switch-field m-t-5">
+                  <input type="radio" id="Microphone" name="switch-two" value="Microphone" disabled checked />
+                  <label for="Microphone" data-lang="Microphone">摄像头</label>
+                  <input type="radio" id="CustomAudio" name="switch-two" value="CustomAudio" disabled />
+                  <label for="CustomAudio" data-lang="CustomAudioCaptureAndRendering">自定义音频采集</label>
                 </div>
               </div>
             </div>

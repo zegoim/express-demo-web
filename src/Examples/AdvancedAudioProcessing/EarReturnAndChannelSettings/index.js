@@ -233,6 +233,10 @@ async function stopPlayingStream(streamId) {
   clearStream('play')
 }
 
+async function setCaptureVolume (num) {
+  await zg.setCaptureVolume(localStream, num)
+}
+
 // uses SDK end
 
 
@@ -250,10 +254,7 @@ $('#startPublishing').on('click', util.throttle( async function () {
         updateButton(this, 'Start Publishing', 'Stop Publishing');
         published = true
         $('#PublishID')[0].disabled = true
-        $('#HeadphoneMonitor')[0].disabled = true
         $('#Channel')[0].disabled = true
-        
-        setHeadphoneMonitor($('#HeadphoneMonitor')[0].checked)
       } else {
         this.classList.remove('border-primary');
         this.classList.add('border-error')
@@ -270,9 +271,7 @@ $('#startPublishing').on('click', util.throttle( async function () {
       updateButton(this, 'Start Publishing', 'Stop Publishing')
       published = false
       $('#PublishID')[0].disabled = false
-      $('#HeadphoneMonitor')[0].disabled = false
       $('#Channel')[0].disabled = false
-      setHeadphoneMonitor(false)
       reSetVideoInfo('publish')
   }
 }, 500))
@@ -304,8 +303,13 @@ $('#startPlaying').on('click', util.throttle( async function () {
   }
 }, 500))
 
+$('#HeadphoneMonitor').on('click', util.throttle(function({target}) {
+  setHeadphoneMonitor(target.checked)
+}, 500))
+
 $('#VolumeInput').on('change', async function({ target }) {
   $('#VolumeValue').text(target.value)
+  setCaptureVolume(+target.value)
 })
 
 // bind event end
@@ -320,7 +324,7 @@ function getCreateStreamConfig() {
     camera: {
       video: true,
       audio: true,
-      channelCount: $('#Channel').val() * 1
+      channelCount: $('#Channel').val() * 1 // Set Channel
     }
   }
   return config
@@ -379,9 +383,11 @@ function reSetVideoInfo(flag) {
 
 function setHeadphoneMonitor(flag) {
   if(flag) {
-    $('#pubshlishVideo').attr('volume', $('#VolumeInput').val())
+    $('#pubshlishVideo')[0].volume = $('#VolumeInput').val() / 100
+    $('#pubshlishVideo')[0].muted = false
   } else {
-    $('#pubshlishVideo').removeAttr('volume')
+    // $('#pubshlishVideo').attr('muted', false)
+    $('#pubshlishVideo')[0].volume = 0
   }
 }
 

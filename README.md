@@ -17,7 +17,8 @@ This is Express Example (Sample topic Demo) Web repositories
 express-demo-web
 ├── README.md
 └── src
-    ├── KeyCenter.js
-    └── Examples
+    ├── Examples
+    ├── assets
+    └── KeyCenter.js
 
 ```

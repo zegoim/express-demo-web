@@ -316,7 +316,7 @@ $('#MicrophoneDevices').on('change', function({target}) {
 function getCreateStreamConfig() {
 	const config = {
 		camera: {
-			audioInput: $('#MirrorDevices').val(),
+			audioInput: $('#MicrophoneDevices').val(),
 			videoInput: $('#CameraDevices').val(),
 			video: $('#Camera')[0].checked,
 			audio: $('#Microphone')[0].checked

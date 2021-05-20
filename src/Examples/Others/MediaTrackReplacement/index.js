@@ -18,8 +18,6 @@ let localStream = null;
 let screenStream = null;
 let cameraStream = null;
 let MicrophoneStream = null;
-let isScreen = false;
-let isCamera = false;
 let isMicrophone = false;
 let published = false;
 
@@ -170,8 +168,14 @@ function clearStream(flag) {
 		$('#pubshlishVideo')[0].srcObject = null;
 		localStream = null;
 		published = false;
-		screenStream && zg.destroyStream(screenStream);
-		cameraStream && zg.destroyStream(cameraStream);
+		if(screenStream) {
+			zg.destroyStream(screenStream);
+			screenStream = null;
+		}
+		if(cameraStream) {
+			zg.destroyStream(cameraStream);
+			cameraStream = null;
+		}
 		MicrophoneStream && zg.destroyStream(MicrophoneStream);
 		$('#radio-one')[0].checked = true;
 		$('#radio-two')[0].checked = false;
@@ -253,7 +257,7 @@ $('#startPublishing').on(
 $('#radio-one').on('change', async function({ target }) {
 	if (target.checked) {
 		try {
-			if (!isCamera) {
+			if (!cameraStream) {
 				cameraStream = await zg.createStream({
 					camera: {
 						audio: false
@@ -261,9 +265,8 @@ $('#radio-one').on('change', async function({ target }) {
 				});
 			}
 			replaceTrack(cameraStream.getVideoTracks()[0]);
-			isCamera = true;
 		} catch (err) {
-			isCamera = false;
+			cameraStream = null;
 			console.log(err);
 		}
 	}
@@ -272,13 +275,12 @@ $('#radio-one').on('change', async function({ target }) {
 $('#radio-two').on('change', async function({ target }) {
 	if (target.checked) {
 		try {
-			if (!isScreen) {
+			if (!screenStream) {
 				screenStream = await zg.createStream({ screen: true });
 			}
 			replaceTrack(screenStream.getVideoTracks()[0]);
-			isScreen = true;
 		} catch (err) {
-			isScreen = false;
+			screenStream = null
 			$('#radio-one')[0].checked = true;
 			$('#radio-two')[0].checked = false;
 		}

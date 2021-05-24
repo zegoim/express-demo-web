@@ -238,6 +238,7 @@ $('#start').on(
 			isStart = false;
 			$('#PublishID')[0].disabled = false;
 			$('#AudioMixing')[0].disabled = true;
+			$('#AudioMixing').prop("checked",false);
 			clearStream();
 		}
 	}, 500)

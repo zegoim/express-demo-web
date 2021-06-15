@@ -276,9 +276,7 @@ $('#radio-two').on('change', async function({ target }) {
 	if (target.checked) {
 		try {
 			if (!screenStream) {
-				screenStream = await zg.createStream({ screen: {
-					audio: true
-				} });
+				screenStream = await zg.createStream({ screen:  true });
 			}
 			replaceTrack(screenStream.getVideoTracks()[0]);
 		} catch (err) {

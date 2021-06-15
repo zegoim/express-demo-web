@@ -168,6 +168,7 @@ function clearStream(flag) {
 function createZegoExpressEngine() {
 	zg = new ZegoExpressEngine(appID, server);
 	window.zg = zg;
+	setLogConfig();
 }
 
 // Step2 Login room
@@ -271,17 +272,6 @@ $('#CheckSystemRequire').on('click', async function() {
 		$('#checkErrorSvg').css('display', 'inline-block');
 	}
 	isChecked = true;
-	let config = localStorage.getItem('logConfig');
-	const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false;
-	if (config) {
-		config = JSON.parse(config);
-		zg.setLogConfig({
-			logLevel: config.logLevel,
-			remoteLogLevel: config.remoteLogLevel,
-			logURL: ''
-		});
-	}
-	zg.setDebugVerbose(DebugVerbose);
 });
 
 $('#LoginRoom').on(
@@ -479,7 +469,6 @@ function render() {
 	$('#Camera')[0].checked = true;
 	$('#Microphone')[0].checked = true;
 	$('#Video')[0].checked = true;
-	setLogConfig()
 }
 
 render();

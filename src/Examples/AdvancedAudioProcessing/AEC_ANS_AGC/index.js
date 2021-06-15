@@ -284,13 +284,11 @@ $('#startPlaying').on('click', util.throttle( async function () {
       if(flag) {
         updateButton(this, 'Start Playing', 'Stop Playing');
         played = true
-      $('#PlayID')[0].disabled = true
-        changeVideo()
+        $('#PlayID')[0].disabled = true
       } else {
         this.classList.remove('border-primary');
         this.classList.add('border-error')
         this.innerText = 'Playing Fail'
-        changeVideo(true)
       }
 
   } else {

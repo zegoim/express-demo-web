@@ -300,7 +300,9 @@ $('#startPlaying').on(
 
 function getCreateStreamConfig() {
 	const config = {
-		screen: true
+		screen: {
+			audio: true
+		}
 	};
 	return config;
 }

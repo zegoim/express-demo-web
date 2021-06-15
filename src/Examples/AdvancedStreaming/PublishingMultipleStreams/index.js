@@ -322,7 +322,9 @@ $('#startSecondPublishing').on('click', util.throttle( async function () {
   if(id === $('#PublishID').val() && published) return alert('PublishID already exists')
   if(!publishedSecond) {
       const flag =  await startPublishingSecondStream(id, {
-        screen: true
+        screen: {
+					audio: true
+				}
       });
       if(flag) {
         updateButton(this, 'Start Publishing', 'Stop Publishing');

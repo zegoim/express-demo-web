@@ -207,7 +207,7 @@ $('#startPlaying').on(
 		if (!played) {
 			const config = {
 				video: $('#Video')[0].checked ? undefined : false,
-				audio: $('#Audio')[0].checked
+				audio: $('#Audio')[0].checked ? undefined : false
 			};
 			const flag = await startPlayingStream(id, config);
 			if (flag) {

@@ -24,18 +24,18 @@ let played = false;
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED' && isLogin) {
+		if (state === 'CONNECTED' && isLogin) {
 			console.log(111);
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
-		
+
 		if (state === 'DISCONNECTED' && !isLogin) {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
 		}
 
-		if(state === 'DISCONNECTED' && isLogin) {
+		if (state === 'DISCONNECTED' && isLogin) {
 			location.reload()
 		}
 	})
@@ -147,6 +147,7 @@ async function stopPlayingStream(streamId) {
 
 function clearStream() {
 	remoteStream && zg.destroyStream(remoteStream);
+	$('#playVideo')[0].pause()
 	$('#playVideo')[0].srcObject = null;
 	remoteStream = null;
 	played = false
@@ -160,7 +161,7 @@ function clearStream() {
 
 $('#LoginRoom').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 
 		const userName = $('#UserName').val();
 		const id = $('#RoomID').val();
@@ -197,7 +198,7 @@ $('#LoginRoom').on(
 
 $('#startPlaying').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		if (!isLogin) return alert('should login room');
 
 		const id = $('#PlayID').val();
@@ -205,7 +206,7 @@ $('#startPlaying').on(
 		this.classList.add('border-primary');
 		if (!played) {
 			const config = {
-				video: $('#Video')[0].checked,
+				video: $('#Video')[0].checked ? undefined : false,
 				audio: $('#Audio')[0].checked
 			};
 			const flag = await startPlayingStream(id, config);

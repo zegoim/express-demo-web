@@ -1,7 +1,7 @@
 // require('../../../../jquery')
 // let appID = 1739272706;   // from  /src/KeyCenter.js
 // let server = 'wss://webliveroom-test.zego.im/ws';  // from  /src/KeyCenter.js
-// let tokenUrl = 'https://wsliveroom-demo.zego.im:8282/token';  // from  /src/KeyCenter.js
+// let tokenUrl = 'https://wsliveroom-alpha.zego.im:8282/token';  // from  /src/KeyCenter.js
 
 // ==============================================================
 // This part of the code defines the default values and global values

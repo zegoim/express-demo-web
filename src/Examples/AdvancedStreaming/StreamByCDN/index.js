@@ -394,7 +394,7 @@ async function render() {
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
   $('#PublishCdnUrl').val(`rtmp://rtmp.wsdemo.zego.im/livestream/zegotest-${appID}-0010`)
-  $('#CdnUrl').val(`http://hdl-wsdemo.zego.im/livestream/zegotest-${appID}-0010.flv`)
+  $('#CdnUrl').val(`https://hdl-wsdemo.zego.im/livestream/zegotest-${appID}-0010.flv`)
   createZegoExpressEngine()
   await checkSystemRequirements()
   enumDevices()

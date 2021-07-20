@@ -151,7 +151,7 @@
                       <div>Packet Loss: <span id="sendPacket"></span></div>
                     </div>
                     <div class="preview-video-action p-t-10 p-b-10">
-                      <button id="startPublishing" class="configBtn play-pause-button">Start Publishing</button>
+                      <button id="startPublishing" class="configBtn play-pause-button" title="createStream()/ startPublishingStream()">Start Publishing</button>
                     </div>
                   </div>
                   <video id="pubshlishVideo" autoplay muted playsinline></video>
@@ -170,7 +170,7 @@
                       <div>Packet Loss: <span id="receivePacket"></span></div>
                     </div>
                     <div class="preview-video-action p-t-10 p-b-10">
-                      <button id="startPlaying" class="configBtn play-pause-button">Start Playing</button>
+                      <button id="startPlaying" class="configBtn play-pause-button" title="startPlayingStream()">Start Playing</button>
                     </div>
                   </div>
                   <video id="playVideo" autoplay playsinline></video>
@@ -202,8 +202,8 @@
                   </div>
                   <div class="font-14 font-bold m-t-10">
                     <span data-lang="SendBroadcastMessage">Send BroadcastMessage</span>
-                    <input type="text" id="BroadcastMessage" placeholder="someMessage" />
-                    <button type="button" id="BroadcastMessageBtn" class="btn-info btn cuBtn">send</button>
+                    <input type="text" id="BroadcastMessage" placeholder="1024 bytes max" />
+                    <button type="button" id="BroadcastMessageBtn" class="btn-info btn cuBtn" title="sendBroadcastMessage()">send</button>
                   </div>
                 </div>
                 <div class="action-item">
@@ -213,8 +213,8 @@
                   </div>
                   <div class="font-14 font-bold m-t-15">
                     <span data-lang="SendBarrageMessage">Send BarrageMessage</span>
-                    <input type="text" id="BarrageMessage" placeholder="someMessage" />
-                    <button id="BarrageMessageBtn" type="button" class="btn-info btn cuBtn">send</button>
+                    <input type="text" id="BarrageMessage" placeholder="1024 bytes max" />
+                    <button id="BarrageMessageBtn" type="button" class="btn-info btn cuBtn" title="sendBarrageMessage()">send</button>
                   </div>
                 </div>
                 <div class="action-item">
@@ -224,9 +224,9 @@
                   </div>
                   <div class="font-14 font-bold m-t-15">
                     <div class="m-b-5" data-lang="SendCustomCommand">Send CustomCommand</div>
-                    <input type="text" id="CustomCommand" placeholder="message body" />
+                    <input type="text" id="CustomCommand" placeholder="1024 bytes max" />
                     <input type="text" id="CustomCommandUserId" placeholder="UserID" />
-                    <button id="CustomCommandBtn" type="button" class="btn-info btn cuBtn">send</button>
+                    <button id="CustomCommandBtn" type="button" class="btn-info btn cuBtn" title="sendCustomCommand()">send</button>
                   </div>
                 </div>
                 <div class="action-item">
@@ -236,9 +236,9 @@
                   </div>
                   <div class="font-14 font-bold m-t-10">
                     <div class="m-b-5" data-lang="SetRoomExtraInfo">Set RoomExtraInfo</div>
-                    <input type="text" id="RoomExtraInfoKey" placeholder="info Key" />
-                    <input type="text" id="RoomExtraInfoValue" placeholder="info Value" />
-                    <button id="RoomExtraInfoBtn" type="button" class="btn-info btn cuBtn">set</button>
+                    <input type="text" id="RoomExtraInfoKey" placeholder="info Key 10 bytes max" />
+                    <input type="text" id="RoomExtraInfoValue" placeholder="info Value 128 bytes max"/>
+                    <button id="RoomExtraInfoBtn" type="button" class="btn-info btn cuBtn" title="setRoomExtraInfo()">set</button>
                   </div>
                 </div>
               </div>
@@ -250,6 +250,7 @@
           </div>
         </div>
       </div>
+      <div class="goToDoc"><span  data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;<a target="_blank" href="https://doc-zh.zego.im/article/1062" data-lang="HelpDocs"> 帮助文档 </a> </div>
     </div>
     <!-- </div> -->
   </div>

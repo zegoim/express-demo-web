@@ -11,9 +11,9 @@ function setDebugVerbose(flag) {
 	zg.setDebugVerbose(flag);
 }
 
-$('#SetLogConfig').on('click', function() {
-	const logLevelList = [ 'debug', 'info', 'warn', 'error', 'report', 'disable' ];
-	const remoteLogLevelList = [ 'debug', 'info', 'warn', 'error', 'disable' ];
+$('#SetLogConfig').on('click', function () {
+	const logLevelList = ['debug', 'info', 'warn', 'error', 'report', 'disable'];
+	const remoteLogLevelList = ['debug', 'info', 'warn', 'error', 'disable'];
 	const logSelectIndex = $('#logLevel')[0].value;
 	const remoreLogSelectIndex = $('#remoteLogLevel')[0].value;
 	const config = {
@@ -28,36 +28,36 @@ $('#SetLogConfig').on('click', function() {
 	$('#successSvg').css('display', 'inline-block');
 });
 
-$('#logLevel').on('change', function() {
+$('#logLevel').on('change', function () {
 	$('#successSvg').css('display', 'none');
 })
 
-$('#remoteLogLevel').on('change', function() {
+$('#remoteLogLevel').on('change', function () {
 	$('#successSvg').css('display', 'none');
 })
 
-$('#debug-check').on('change', function() {
+$('#debug-check').on('change', function () {
 	$('#successSvg').css('display', 'none');
 	setDebugVerbose(this.checked);
 	localStorage.setItem('DebugVerbose', this.checked);
 });
 
-$('#radio-one').on('change', function({ target }) {
+$('#radio-one').on('change', function ({ target }) {
 	if (target.checked) {
 		localStorage.setItem('Language', target.value);
 	}
-  setTimeout(() => {
-    location.reload()
-  }, 100)
+	setTimeout(() => {
+		location.reload()
+	}, 100)
 });
 
-$('#radio-two').on('change', function({ target }) {
+$('#radio-two').on('change', function ({ target }) {
 	if (target.checked) {
 		localStorage.setItem('Language', target.value);
 	}
-  setTimeout(() => {
-    location.reload()
-  }, 100)
+	setTimeout(() => {
+		location.reload()
+	}, 100)
 });
 
 // render
@@ -75,12 +75,12 @@ $(function render() {
 	$('#remoteLogLevel').val(!selectRemoteLog ? 0 : selectRemoteLog.value);
 
 	const language = localStorage.getItem('Language');
-  const flag = !language ? true : language === 'zh' ? true : false
-	if(flag) {
-    $('#radio-one').attr('checked', true)
-    $('#radio-two').remove('checked')
-  } else {
-    $('#radio-two').attr('checked', true)
-    $('#radio-one').remove('checked')
-  }
+	const flag = !language ? true : language === 'zh' ? true : false
+	if (flag) {
+		$('#radio-one').attr('checked', true)
+		$('#radio-two').remove('checked')
+	} else {
+		$('#radio-two').attr('checked', true)
+		$('#radio-one').remove('checked')
+	}
 });

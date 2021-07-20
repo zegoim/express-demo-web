@@ -7992,3 +7992,9 @@ ul.drop li {
     transform: rotateY(0deg) translateY(0px);
   }
 }
+
+.goToDoc{
+  padding: 1%;
+  font-size: 14px;
+  font-weight: 300;
+}

@@ -50,24 +50,24 @@ async function enumDevices() {
 	audioInputList.push('<option value="0">禁止</option>');
 	videoInputList.push('<option value="0">禁止</option>');
 
-	// $('#MirrorDevices').html(audioInputList.join(''));
+	$('#MicrophoneDevices').html(audioInputList.join(''));
 	$('#CameraDevices').html(videoInputList.join(''));
 }
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED' && isLogin) {
+		if (state === 'CONNECTED' && isLogin) {
 			console.log(111);
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
-		
+
 		if (state === 'DISCONNECTED' && !isLogin) {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
 		}
 
-		if(state === 'DISCONNECTED' && isLogin) {
+		if (state === 'DISCONNECTED' && isLogin) {
 			location.reload()
 		}
 	})
@@ -104,17 +104,19 @@ async function checkSystemRequirements() {
 		console.warn('checkSystemRequirements ', result);
 
 		if (!result.webRTC) {
-			console.log('browser is not support webrtc!!');
+			console.error('browser is not support webrtc!!');
 			return false;
 		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
-			console.log('browser is not support H264 and VP8');
+			console.error('browser is not support H264 and VP8');
 			return false;
-		} else if (result.videoCodec.H264) {
-			if (!result.screenSharing) console.log('browser is not support screenSharing');
+		} else if (!result.camera && !result.microphones) {
+			console.error('camera and microphones not allowed to use');
+			return false;
+		} else if (result.videoCodec.VP8) {
+			if (!result.screenSharing) console.warn('browser is not support screenSharing');
 		} else {
-			console.log('不支持H264，请前往混流转码测试');
+			console.log('不支持VP8，请前往混流转码测试');
 		}
-
 		return true;
 	} catch (err) {
 		console.error('checkSystemRequirements', err);
@@ -151,7 +153,7 @@ function loginRoom(roomId, userId, userName) {
 async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
-		zg.startPublishingStream(streamId, localStream);
+		zg.startPublishingStream(streamId, localStream, { videoCodec: 'VP8' });
 		$('#pubshlishVideo')[0].srcObject = localStream;
 		return true;
 	} catch (err) {
@@ -200,14 +202,14 @@ function clearStream() {
 // This part of the code binds the button click event
 // ==============================================================
 
-$('#CreateZegoExpressEngine').on('click', function() {
+$('#CreateZegoExpressEngine').on('click', function () {
 	createZegoExpressEngine();
 	this.disabled = false;
 	$('#createSuccessSvg').css('display', 'inline-block');
 	initEvent();
 });
 
-$('#CheckSystemRequire').on('click', async function() {
+$('#CheckSystemRequire').on('click', async function () {
 	if (!zg) return alert('you should create zegoExpressEngine');
 	const result = await checkSystemRequirements();
 	if (result) {
@@ -220,7 +222,7 @@ $('#CheckSystemRequire').on('click', async function() {
 	}
 });
 
-$('#LoginRoom').on('click', async function() {
+$('#LoginRoom').on('click', async function () {
 	const userName = $('#UserName').val();
 	const id = $('#RoomID').val();
 	try {
@@ -235,7 +237,7 @@ $('#LoginRoom').on('click', async function() {
 	$('#RoomID')[0].disabled = true;
 });
 
-$('#startPublishing').on('click', async function() {
+$('#startPublishing').on('click', async function () {
 	const id = $('#PublishID').val();
 
 	const flag = await startPublishingStream(id, getCreateStreamConfig());
@@ -250,7 +252,7 @@ $('#startPublishing').on('click', async function() {
 	}
 });
 
-$('#startPlaying').on('click', async function() {
+$('#startPlaying').on('click', async function () {
 	const id = $('#PlayID').val();
 	const config = {
 		video: $('#Video')[0].checked,
@@ -265,7 +267,7 @@ $('#startPlaying').on('click', async function() {
 	}
 });
 
-$('#reset').on('click', async function() {
+$('#reset').on('click', async function () {
 	await stopPublishingStream($('#PublishID').val());
 	await stopPlayingStream($('#PlayID').val());
 	if (isLogin) {
@@ -307,7 +309,7 @@ function getCreateStreamConfig() {
 			audioInput: $('#MirrorDevices').val(),
 			videoInput: $('#CameraDevices').val(),
 			video: $('#Camera')[0].checked,
-			audio: $('#Microphone')[0].checked
+			audio: $('#Microphone')[0].checked,
 		}
 	};
 	return config;

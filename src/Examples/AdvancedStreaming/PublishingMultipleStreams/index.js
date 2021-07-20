@@ -34,6 +34,7 @@ function createZegoExpressEngine() {
   window.zg = zg
 }
 
+// Step1 Check system requirements
 async function checkSystemRequirements() {
 	console.log('sdk version is', zg.getVersion());
 	try {
@@ -42,17 +43,19 @@ async function checkSystemRequirements() {
 		console.warn('checkSystemRequirements ', result);
 
 		if (!result.webRTC) {
-			console.log('browser is not support webrtc!!');
+			console.error('browser is not support webrtc!!');
 			return false;
 		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
-			console.log('browser is not support H264 and VP8');
+			console.error('browser is not support H264 and VP8');
 			return false;
-		} else if (result.videoCodec.H264) {
-			if (!result.screenSharing) console.log('browser is not support screenSharing');
+		} else if (!result.camera && !result.microphones) {
+			console.error('camera and microphones not allowed to use');
+			return false;
+		} else if (result.videoCodec.VP8) {
+			if (!result.screenSharing) console.warn('browser is not support screenSharing');
 		} else {
-			console.log('不支持H264，请前往混流转码测试');
+			console.log('不支持VP8，请前往混流转码测试');
 		}
-
 		return true;
 	} catch (err) {
 		console.error('checkSystemRequirements', err);
@@ -207,7 +210,7 @@ function setLogConfig() {
 async function startPublishingStream (streamId, config) {
   try {
     localStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localStream);
+    zg.startPublishingStream(streamId, localStream, { videoCodec: "VP8" });
     $('#pubshlishVideo')[0].srcObject = localStream;
     return true
   } catch(err) {
@@ -219,7 +222,7 @@ async function startPublishingStream (streamId, config) {
 async function startPublishingSecondStream (streamId, config) {
   try {
     localSecondStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localSecondStream);
+    zg.startPublishingStream(streamId, localSecondStream, { videoCodec: "VP8" });
     $('#pubshlishSecondVideo')[0].srcObject = localSecondStream;
     return true
   } catch(err) {
@@ -323,7 +326,9 @@ $('#startSecondPublishing').on('click', util.throttle( async function () {
   if(!publishedSecond) {
       const flag =  await startPublishingSecondStream(id, {
         screen: {
-					audio: true
+					audio: true,
+          bitrate: 1500,
+          frameRate: 30
 				}
       });
       if(flag) {

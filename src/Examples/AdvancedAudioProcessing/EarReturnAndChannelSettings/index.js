@@ -30,6 +30,7 @@ function createZegoExpressEngine() {
   window.zg = zg
 }
 
+// Step1 Check system requirements
 async function checkSystemRequirements() {
 	console.log('sdk version is', zg.getVersion());
 	try {
@@ -38,17 +39,19 @@ async function checkSystemRequirements() {
 		console.warn('checkSystemRequirements ', result);
 
 		if (!result.webRTC) {
-			console.log('browser is not support webrtc!!');
+			console.error('browser is not support webrtc!!');
 			return false;
 		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
-			console.log('browser is not support H264 and VP8');
+			console.error('browser is not support H264 and VP8');
 			return false;
-		} else if (result.videoCodec.H264) {
-			if (!result.screenSharing) console.log('browser is not support screenSharing');
+		} else if (!result.camera && !result.microphones) {
+			console.error('camera and microphones not allowed to use');
+			return false;
+		} else if (result.videoCodec.VP8) {
+			if (!result.screenSharing) console.warn('browser is not support screenSharing');
 		} else {
-			console.log('不支持H264，请前往混流转码测试');
+			console.log('不支持VP8，请前往混流转码测试');
 		}
-
 		return true;
 	} catch (err) {
 		console.error('checkSystemRequirements', err);
@@ -201,7 +204,7 @@ function loginRoom(roomId, userId, userName) {
 async function startPublishingStream (streamId, config) {
   try {
     localStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localStream);
+    zg.startPublishingStream(streamId, localStream, { videoCodec: "VP8" });
     $('#pubshlishVideo')[0].srcObject = localStream;
     return true
   } catch(err) {

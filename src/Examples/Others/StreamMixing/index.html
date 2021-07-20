@@ -150,11 +150,11 @@
                       <div class="m-t-10 m-b-5">
                         First StreamID: <span id="PublishFirstID"></span>
                       </div>
-                      <button id="startFirstPublishing" class="m-b-5 configBtn play-pause-button">Start
+                      <button id="startFirstPublishing" class="m-b-5 configBtn play-pause-button" title="createStream()/startPublishingStream()">Start
                         Publishing</button>
                     </div>
                   </div>
-                  <video id="pubshlishFirstVideo" autoplay playsinline></video>
+                  <video id="pubshlishFirstVideo" autoplay playsinline muted></video>
                 </div>
               </div>
               <div class="preview-playInfo col-6 m-t-15">
@@ -167,7 +167,7 @@
                       <div class="m-t-10 m-b-5">
                         Second StreamID <span id="PublishSecondID"></span>
                       </div>
-                      <button id="startSecondPublishing" class="m-b-5 configBtn play-pause-button">Start
+                      <button id="startSecondPublishing" class="m-b-5 configBtn play-pause-button" title="createStream()/startPublishingStream()">Start
                         Publishing</button>
                     </div>
                   </div>
@@ -191,7 +191,7 @@
                 Mixed StreamID <input class="m-l-10" type="text" id="MixedStreamID" />
               </div>
             </div>
-            <button id="startMixTask" class="m-b-5 configBtn play-pause-button">Start Mix Task</button>
+            <button id="startMixTask" class="m-b-5 configBtn play-pause-button" title="startMixerTask()">Start Mix Task</button>
           </div>
           <div class="col-12 col-lg-6">
             <h4>Step3 <span data-lang="PlayMixedStream">Play Mixed Stream</span></h4>
@@ -201,7 +201,7 @@
                   <!-- <div class="m-t-10 m-b-5">
                     Mixed StreamID <input class="m-l-10" type="text" id="PlayID" />
                   </div> -->
-                  <button id="StartPlayingMixedStream" class="m-t-10 m-b-5 configBtn play-pause-button">
+                  <button id="StartPlayingMixedStream" class="m-t-10 m-b-5 configBtn play-pause-button" title="startPlayingStream()">
                     Start Playing Mixed Stream</button>
                 </div>
               </div>
@@ -210,6 +210,11 @@
           </div>
         </div>
       </div>
+      <div class="goToDoc">
+        <span  data-lang="MixStreamTips"> 请插入耳机后再体验耳返功能 </span> <br/>
+        <span  data-lang="MoreDocs">更多文档，请跳转至即构 </span>
+         &nbsp;<a target="_blank" href="https://doc-zh.zego.im/article/1063" data-lang="HelpDocs"> 帮助文档 </a> 
+        </div>
     </div>
     <!-- </div> -->
   </div>

@@ -222,3 +222,8 @@ option {
 .configBtn {
   width: 90%;
 }
+
+#startMixTask{
+  position: absolute;
+  bottom: 0px;
+}

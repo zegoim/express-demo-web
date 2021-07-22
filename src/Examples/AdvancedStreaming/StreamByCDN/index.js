@@ -19,6 +19,7 @@ let published = false;
 let played = false;
 let isTurnCdn = false;
 let cdnFlvPlayer = null;
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 
 // part end
 

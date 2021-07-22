@@ -18,6 +18,8 @@ let localStream = null;
 let remoteStream = null;
 let published = false;
 let played = false;
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+
 
 // part end
 

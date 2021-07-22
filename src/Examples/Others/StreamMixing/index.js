@@ -26,6 +26,7 @@ let mixed = false;
 let played = false;
 let mixerOutputList = null;
 let flvPlayer = null;
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 // part end
 
@@ -212,7 +213,7 @@ function setLogConfig() {
 async function startPublishingStream(streamId, config) {
 	try {
 		firstStream = await zg.createStream(config);
-		zg.startPublishingStream(streamId, firstStream, { videoCodec: "VP8" });
+		zg.startPublishingStream(streamId, firstStream, { videoCodec });
 		$('#pubshlishFirstVideo')[0].srcObject = firstStream;
 		return true;
 	} catch (err) {

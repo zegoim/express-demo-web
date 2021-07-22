@@ -18,6 +18,7 @@ let localStream = null;
 let remoteStream = null;
 let published = false;
 let played = false;
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 // part end
 
@@ -201,7 +202,8 @@ function setLogConfig() {
 async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
-		zg.startPublishingStream(streamId, localStream, { videoCodec: "VP8" });
+		zg.zegoWebRTC.rtcModules.streamCenter.isPeer = false;
+		zg.startPublishingStream(streamId, localStream, { videoCodec });
 		$('#pubshlishVideo')[0].srcObject = localStream;
 		return true;
 	} catch (err) {
@@ -221,6 +223,7 @@ async function startPlayingStream(streamId, options = {}) {
 	try {
 		remoteStream = await zg.startPlayingStream(streamId, options);
 		$('#playVideo')[0].srcObject = remoteStream;
+		$('#playVideo')[0].controls = "true"
 		return true;
 	} catch (err) {
 		return false;
@@ -305,9 +308,12 @@ function getCreateStreamConfig() {
 	const config = {
 		screen: {
 			audio: true,
-			bitrate: 2000,
-                                    frameRate: 15,
-                                    startBitrate: 800,
+			bitrate: 3000,
+                                    frameRate: 20,
+			width: 1080,
+			height: 720,
+			videoQuality: 4,
+			startBitrate: 'target' 
 		}
 	};
 	return config;

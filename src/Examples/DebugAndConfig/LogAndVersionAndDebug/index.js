@@ -1,5 +1,6 @@
 let zg = new ZegoExpressEngine(appID, server);
 window.zg = zg;
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 // setLogConfig
 function setLogConfig(logConfig) {
@@ -60,6 +61,24 @@ $('#radio-two').on('change', function ({ target }) {
 	}, 100)
 });
 
+$('#radio-video-one').on('change', function ({ target }) {
+	if (target.checked) {
+		localStorage.setItem('VideoCodec', target.value);
+	}
+	setTimeout(() => {
+		location.reload()
+	}, 100)
+});
+
+$('#radio-video-two').on('change', function ({ target }) {
+	if (target.checked) {
+		localStorage.setItem('VideoCodec', target.value);
+	}
+	setTimeout(() => {
+		location.reload()
+	}, 100)
+});
+
 // render
 $(function render() {
 	$('#AppID').text(appID);
@@ -82,5 +101,15 @@ $(function render() {
 	} else {
 		$('#radio-two').attr('checked', true)
 		$('#radio-one').remove('checked')
+	}
+
+	const videoCodec = localStorage.getItem('VideoCodec');
+	const flagVideo = !videoCodec ? true : videoCodec === 'VP8' ? true : false
+	if (flagVideo) {
+		$('#radio-video-one').attr('checked', true)
+		$('#radio-video-two').remove('checked')
+	} else {
+		$('#radio-video-two').attr('checked', true)
+		$('#radio-video-one').remove('checked')
 	}
 });

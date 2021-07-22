@@ -15,7 +15,7 @@ let zg = null;
 let isLoginRoom = false;
 let localStream = null;
 let remoteStream = null;
-
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 // part end
 
 // ==============================================================
@@ -173,7 +173,7 @@ function loginRoom(roomId, userId, userName) {
 async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
-		zg.startPublishingStream(streamId, localStream, { videoCodec: "VP8" });
+		zg.startPublishingStream(streamId, localStream, { videoCodec });
 		$('#pubshlishVideo')[0].srcObject = localStream;
 		return true;
 	} catch (err) {

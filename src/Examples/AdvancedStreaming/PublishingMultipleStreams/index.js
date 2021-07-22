@@ -22,6 +22,8 @@ let published = false;
 let played = false;
 let publishedSecond = false;
 let playedSecond = false;
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+
 
 // part end
 
@@ -210,7 +212,7 @@ function setLogConfig() {
 async function startPublishingStream (streamId, config) {
   try {
     localStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localStream, { videoCodec: "VP8" });
+    zg.startPublishingStream(streamId, localStream, { videoCodec });
     $('#pubshlishVideo')[0].srcObject = localStream;
     return true
   } catch(err) {
@@ -222,7 +224,7 @@ async function startPublishingStream (streamId, config) {
 async function startPublishingSecondStream (streamId, config) {
   try {
     localSecondStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localSecondStream, { videoCodec: "VP8" });
+    zg.startPublishingStream(streamId, localSecondStream, { videoCodec });
     $('#pubshlishSecondVideo')[0].srcObject = localSecondStream;
     return true
   } catch(err) {

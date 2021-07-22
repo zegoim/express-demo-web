@@ -16,6 +16,8 @@ let isLoginRoom = false;
 let isStart = false;
 let localStream = null;
 let remoteStream = null;
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+
 // part end
 
 // ==============================================================
@@ -176,7 +178,7 @@ async function startPublishingStream(streamId) {
 				source: audio
 			}
 		});
-		zg.startPublishingStream(streamId, localStream, { videoCodec: "VP8" });
+		zg.startPublishingStream(streamId, localStream, { videoCodec });
 		return true;
 	} catch (err) {
 		console.error(err);

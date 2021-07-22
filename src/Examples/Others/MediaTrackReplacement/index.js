@@ -20,6 +20,7 @@ let cameraStream = null;
 let MicrophoneStream = null;
 let isMicrophone = false;
 let published = false;
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 
 // part end
 
@@ -204,7 +205,7 @@ function setLogConfig() {
 async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
-		zg.startPublishingStream(streamId, localStream, { videoCodec: "VP8" });
+		zg.startPublishingStream(streamId, localStream, { videoCodec });
 		$('#pubshlishVideo')[0].srcObject = localStream;
 		return true;
 	} catch (err) {

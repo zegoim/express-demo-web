@@ -15,6 +15,7 @@ let zg = null;
 let remoteStream = null;
 let isLogin = false;
 let played = false;
+let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 // part end
 

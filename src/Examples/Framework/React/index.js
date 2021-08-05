@@ -5,6 +5,7 @@ class CommonUsageReact extends React.Component {
             userID: Util.getBrow() + '_' + new Date().getTime(),
             roomID:'0001',
             streamID: '0001',
+            playStreamID: '0001',
             zg: null,
             localStream: null,
             remoteStream: null,
@@ -259,7 +260,7 @@ class CommonUsageReact extends React.Component {
         }
     }
     async startPlaying(){
-        const flag = await this.startPlayingStream(this.state.streamID, {
+        const flag = await this.startPlayingStream(this.state.playStreamID, {
             video: this.state.videoCheckStatus,
             audio: this.state.audioCheckStatus
         });
@@ -274,7 +275,7 @@ class CommonUsageReact extends React.Component {
             return
         }
         await this.stopPublishingStream(this.state.streamID);
-        await this.stopPlayingStream(this.state.streamID);
+        await this.stopPlayingStream(this.state.playStreamID);
         if (this.state.isLogin) {
             await this.setState({
                 isLogin: false
@@ -498,7 +499,7 @@ class CommonUsageReact extends React.Component {
                         <div className="action-content">
                             <div className="publish-setting m-t-5">
                             <div className="action-input font-14 m-b-15">
-                                Play StreamID <input type="text" id="PlayID" name="streamID" value={this.state.streamID} onChange={this.changeValue.bind(this)} disabled={this.state.playStreamStatus} />
+                                Play StreamID <input type="text" id="PlayID" name="playStreamID" value={this.state.playStreamID} onChange={this.changeValue.bind(this)} disabled={this.state.playStreamStatus} />
                             </div>
                             <div className="font-12 publish-check m-b-15">
                                 <div className="check-wrappre m-r-5">

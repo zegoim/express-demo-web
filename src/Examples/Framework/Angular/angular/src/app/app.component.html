@@ -143,7 +143,7 @@
           <div class="row">
             <div class="preview-pushlishInfo col-lg-12 col-6">
               <div class="pushlishInfo-title">
-                <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id" *ngIf="publishStreamID">{{publishStreamID}}</span>
+                <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id" *ngIf="publishInfoStreamID">{{publishInfoStreamID}}</span>
               </div>
               <div class="preview-content">
                 <video id="pubshlishVideo" *ngIf="localStream" [srcObject]="localStream" autoplay playsinline muted
@@ -152,7 +152,7 @@
             </div>
             <div class="preview-playInfo m-t-10 col-lg-12 col-6">
               <div class="pushlishInfo-title">
-                <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id" *ngIf="playStreamID">{{playStreamID}}</span>
+                <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id" *ngIf="playInfoStreamID">{{playInfoStreamID}}</span>
               </div>
               <div class="preview-content">
                 <video id="playVideo" *ngIf="remoteStream" [srcObject]="remoteStream" autoplay playsinline
@@ -308,7 +308,7 @@
               <div class="action-content">
                 <div class="publish-setting m-t-5">
                   <div class="action-input font-14 m-b-15">
-                    Play StreamID <input type="text" id="PlayID" [(ngModel)]="streamID" [disabled]="playStreamStatus" />
+                    Play StreamID <input type="text" id="PlayID" [(ngModel)]="playStreamID" [disabled]="playStreamStatus" />
                   </div>
                   <div class="font-12 publish-check m-b-15">
                     <div class="check-wrappre m-r-5">

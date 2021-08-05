@@ -5,6 +5,7 @@ $(function(){
             userID: Util.getBrow() + '_' + new Date().getTime(),
             roomID: '0001',
             streamID: '0001',
+            playStreamID: '0001',
             zg: null,
             localStream: null,
             remoteStream: null,
@@ -230,7 +231,7 @@ $(function(){
                 }
             },
             async startPlaying(){
-                const flag = await this.startPlayingStream(this.streamID, {
+                const flag = await this.startPlayingStream(this.playStreamID, {
                     video: this.videoCheckStatus,
                     audio: this.audioCheckStatus
                 });
@@ -243,7 +244,7 @@ $(function(){
                     return
                 }
                 await this.stopPublishingStream(this.streamID);
-                await this.stopPlayingStream(this.streamID);
+                await this.stopPlayingStream(this.playStreamID);
                 if (this.isLogin) {
                     this.isLogin = false;
                     this.logoutRoom(this.roomID);

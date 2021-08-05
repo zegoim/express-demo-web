@@ -16,6 +16,7 @@ export class AppComponent {
   userID:string = getBrow() + '_' + new Date().getTime();
   roomID:string = '0001';
   streamID:string = '0001';
+  playStreamID:string = '0001';
   zg:any = null;
   localStream:any = null;
   remoteStream:any = null;
@@ -36,8 +37,8 @@ export class AppComponent {
   playStreamStatus:boolean = false;
   videoCheckStatus:boolean = true;
   audioCheckStatus:boolean = false;
-  publishStreamID:string = "";
-  playStreamID:string = "";
+  publishInfoStreamID:string = "";
+  playInfoStreamID:string = "";
 
   async enumDevices(){
     const deviceInfo = await this.zg.enumDevices();
@@ -77,17 +78,17 @@ export class AppComponent {
 
     this.zg.on('publisherStateUpdate', (result:any) => {
         if (result.state === 'PUBLISHING') {
-            this.publishStreamID = result.streamID;
+            this.publishInfoStreamID = result.streamID;
         } else if (result.state === 'NO_PUBLISH') {
-            this.publishStreamID = "";
+            this.publishInfoStreamID = "";
         }
     });
 
     this.zg.on('playerStateUpdate', (result:any) => {
         if (result.state === 'PLAYING') {
-            this.playStreamID = result.streamID;
+            this.playInfoStreamID = result.streamID;
         } else if (result.state === 'NO_PLAY') {
-            this.playStreamID = "";
+            this.playInfoStreamID = "";
         }
     });
   }
@@ -231,7 +232,7 @@ export class AppComponent {
     }
   }
   async startPlaying(){
-    const flag = await this.startPlayingStream(this.streamID, {
+    const flag = await this.startPlayingStream(this.playStreamID, {
         video: this.videoCheckStatus,
         audio: this.audioCheckStatus
     });
@@ -244,7 +245,7 @@ export class AppComponent {
         return
     }
     await this.stopPublishingStream(this.streamID);
-    await this.stopPlayingStream(this.streamID);
+    await this.stopPlayingStream(this.playStreamID);
     if (this.isLogin) {
         this.isLogin = false;
         this.logoutRoom(this.roomID);

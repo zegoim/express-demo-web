@@ -25,7 +25,9 @@ $(function(){
             videoCheckStatus:true,
             audioCheckStatus:false,
             playStreamStatus:false,
-            mirrorVal:'none'
+            mirrorVal:'none',
+            publishInfoStreamID:'',
+            playInfoStreamID:''
         },
         methods:{
             async enumDevices(){
@@ -66,17 +68,17 @@ $(function(){
 
                 zg.on('publisherStateUpdate', (result) => {
                     if (result.state === 'PUBLISHING') {
-                        $('#pushlishInfo-id').text(result.streamID);
+                        this.publishInfoStreamID = result.streamID;
                     } else if (result.state === 'NO_PUBLISH') {
-                        $('#pushlishInfo-id').text('');
+                        this.publishInfoStreamID = "";
                     }
                 });
 
                 zg.on('playerStateUpdate', (result) => {
                     if (result.state === 'PLAYING') {
-                        $('#playInfo-id').text(result.streamID);
+                        this.playInfoStreamID = result.streamID;
                     } else if (result.state === 'NO_PLAY') {
-                        $('#playInfo-id').text('');
+                        this.playInfoStreamID = "";
                     }
                 });
             },

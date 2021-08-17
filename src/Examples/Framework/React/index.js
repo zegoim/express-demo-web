@@ -25,7 +25,9 @@ class CommonUsageReact extends React.Component {
             videoCheckStatus:true,
             audioCheckStatus:false,
             playStreamStatus:false,
-            mirrorVal:'none'
+            mirrorVal:'none',
+            publishInfoStreamID:'',
+            playInfoStreamID:''
         };
         this.createZegoExpressEngineOption = this.createZegoExpressEngineOption.bind(this)
         this.CheckSystemRequire = this.CheckSystemRequire.bind(this)
@@ -80,17 +82,26 @@ class CommonUsageReact extends React.Component {
 
         this.state.zg.on('publisherStateUpdate', (result) => {
             if (result.state === 'PUBLISHING') {
-                $('#pushlishInfo-id').text(result.streamID);
+                this.setState({
+                    publishInfoStreamID: result.streamID
+                })
             } else if (result.state === 'NO_PUBLISH') {
-                $('#pushlishInfo-id').text('');
+                this.setState({
+                    publishInfoStreamID: ""
+                })
             }
         });
 
         this.state.zg.on('playerStateUpdate', (result) => {
             if (result.state === 'PLAYING') {
                 $('#playInfo-id').text(result.streamID);
+                this.setState({
+                    playInfoStreamID: result.streamID
+                })
             } else if (result.state === 'NO_PLAY') {
-                $('#playInfo-id').text('');
+                this.setState({
+                    playInfoStreamID: ""
+                })
             }
         });
     }
@@ -329,7 +340,7 @@ class CommonUsageReact extends React.Component {
                     <div className="row">
                         <div className="preview-pushlishInfo col-lg-12 col-6">
                         <div className="pushlishInfo-title">
-                            <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id"></span>
+                            <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id">{this.state.publishInfoStreamID}</span>
                         </div>
                         <div className="preview-content">
                             <video ref="pubshlishVideo" autoPlay playsInline muted
@@ -338,7 +349,7 @@ class CommonUsageReact extends React.Component {
                         </div>
                         <div className="preview-playInfo m-t-10 col-lg-12 col-6">
                         <div className="pushlishInfo-title">
-                            <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id"></span>
+                            <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id">{this.state.playInfoStreamID}</span>
                         </div>
                         <div className="preview-content">
                             <video ref="playVideo" autoPlay playsInline 

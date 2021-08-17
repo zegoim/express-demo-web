@@ -150,16 +150,16 @@
             <div class="row">
               <div class="preview-pushlishInfo col-lg-12 col-6">
                 <div class="pushlishInfo-title">
-                  <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id"></span>
+                  <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id">{{publishInfoStreamID}}</span>
                 </div>
                 <div class="preview-content">
-                  <video id="pubshlishVideo" ref="pubshlishVideo" autoplay playsinline muted 
+                  <video id="pubshlishVideo" ref="pubshlishVideo" autoplay playsinline :muted="true" 
                     :class="(mirrorVal=='onlyPreview' || mirrorVal=='both')?'mirror':''"></video>
                 </div>
               </div>
               <div class="preview-playInfo m-t-10 col-lg-12 col-6">
                 <div class="pushlishInfo-title">
-                  <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id"></span>
+                  <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id">{{playInfoStreamID}}</span>
                 </div>
                 <div class="preview-content">
                   <video id="playVideo" ref="playVideo" autoplay playsinline :class="(mirrorVal=='onlyPlay' || mirrorVal=='both')?'mirror':''"></video>

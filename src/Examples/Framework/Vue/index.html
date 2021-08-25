@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lang="Quickstart">快速开始</title>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon"/>
+  <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../assets/css/style.css">
+  <link rel="stylesheet" href="./index.css">
+  <script src="../../../assets/js/ZegoExpressWebRTC.js"></script>
+</head>
+
+<body class="fix-sidebar card-no-border">
+  <div class="preloader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+    </svg>
+  </div>
+
+  <div class="container main-wrapper">
+    <!-- <div class="row"> -->
+    <aside class="left-sidebar">
+      <div class="scroll-sidebar">
+        <nav class="sidebar-nav">
+          <ul id="sidebarnav">
+            <span class="sidebar-title" data-lang="Quickstart">快速开始</span>
+            <li>
+              <a href="../../QuickStart/CommonUsage/index.html" class="waves-effect" data-lang="CommonUsage">实现流程</a>
+            </li>
+            <li>
+              <a href="../../QuickStart/Publishing/index.html" class="waves-effect" data-lang="Publishing">推流</a>
+            </li>
+            <li>
+              <a href="../../QuickStart/Playing/index.html" class="waves-effect" data-lang="Playing">拉流</a>
+            </li>
+            <span class="sidebar-title" data-lang="Scenes">最佳实践</span>
+            <li>
+              <a href="../../Scenes/VideoForMultipleUsers/index.html" class="waves-effect"
+                data-lang="VideoForMultipleUsers">多人视频通话</a>
+            </li>
+            <li>
+              <a href="index.html" class="waves-effect" data-lang="Vue">使用 Vue 实现音视频功能</a>
+            </li>
+            <li>
+              <a href="../../Framework/Angular/dist/index.html" class="waves-effect" data-lang="Angular">使用 Angular 实现音视频功能</a>
+            </li>
+            <li>
+              <a href="../../Framework/React/index.html" class="waves-effect" data-lang="React">使用 React 实现音视频功能</a>
+            </li>
+            <span class="sidebar-title" data-lang="CommonFeatures">常用功能</span>
+            <li>
+              <a href="../../CommonFeatures/CommonVideoConfig/index.html" class="waves-effect"
+                data-lang="CommonVideoConfig">常用视频配置</a>
+            </li>
+            <li>
+              <a href="../../CommonFeatures/RoomMessage/index.html" class="waves-effect"
+                data-lang="RoomMessage">实时消息</a>
+            </li>
+            <span class="sidebar-title" data-lang="AdvancedStreaming">推拉流进阶</span>
+            <li>
+              <a href="../../AdvancedStreaming/StreamMonitoring/index.html" class="waves-effect"
+                data-lang="StreamMonitoring">推拉流信息监测</a>
+            </li>
+            <li>
+              <a href="../../AdvancedStreaming/PublishingMultipleStreams/index.html" class="waves-effect"
+                data-lang="PublishingMultipleStreams">推多路流</a>
+            </li>
+            <li>
+              <a href="../../AdvancedStreaming/StreamByCDN/index.html" class="waves-effect"
+                data-lang="StreamByCDN">通过CDN推拉流</a>
+            </li>
+            <li>
+              <a href="../../AdvancedStreaming/LowLatencyLive/index.html" class="waves-effect"
+                data-lang="LowLatencyLive">低延迟直播</a>
+            </li>
+            <span class="sidebar-title" data-lang="AdvancedVideoProcessing">视频进阶</span>
+            <li>
+              <a href="../../AdvancedVideoProcessing/EncodingAndDecoding/index.html" class="waves-effect"
+                data-lang="SetVideoProperties">设置视频属性</a>
+            </li>
+            <li>
+              <a href="../../AdvancedVideoProcessing/CustomVideoCapture/index.html" class="waves-effect"
+                data-lang="CustomVideoCapture">自定义视频采集</a>
+            </li>
+            <span class="sidebar-title" data-lang="AdvancedAudioProcessing">音频进阶</span>
+            <li>
+              <a href="../../AdvancedAudioProcessing/EarReturnAndChannelSettings/index.html" class="waves-effect"
+                data-lang="EarReturnAndChannelSettings">耳返</a>
+            </li>
+            <li>
+              <a href="../../AdvancedAudioProcessing/SoundLevelAndAudioSpectrum/index.html" class="waves-effect"
+                data-lang="SoundLevelAndAudioSpectrum">音频频谱与声浪</a>
+            </li>
+            <li>
+              <a href="../../AdvancedAudioProcessing/AEC_ANS_AGC/index.html" class="waves-effect"
+                data-lang="AEC_ANS_AGC">音频3A处理</a>
+            </li>
+            <li>
+              <a href="../../AdvancedAudioProcessing/AudioMixing/index.html" class="waves-effect"
+                data-lang="AudioMixing">混音</a>
+            </li>
+            <li>
+              <a href="../../AdvancedAudioProcessing/CustomAudioCaptureAndRendering/index.html" class="waves-effect"
+                data-lang="CustomAudioCaptureAndRendering">自定义音频采集与渲染</a>
+            </li>
+            <span class="sidebar-title" data-lang="Others">其他功能</span>
+            <li>
+              <a href="../../Others/StreamMixing/index.html" class="waves-effect" data-lang="StreamMixing">多路混流</a>
+            </li>
+            <li>
+              <a href="../../Others/ScreenSharing/index.html" class="waves-effect" data-lang="ScreenSharing">屏幕共享</a>
+            </li>
+            <li>
+              <a href="../../Others/MediaTrackReplacement/index.html" class="waves-effect"
+                data-lang="MediaTrackReplacement">音视频轨道替换</a>
+            </li>
+            <span class="sidebar-title" data-lang="DebugAndConfig">调试与配置</span>
+            <li>
+              <a href="../../DebugAndConfig/LogAndVersionAndDebug/index.html" class="waves-effect"
+                data-lang="Log_Version_Debug">日志、版本号、调试信息</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <div class="page-wrapper" id="page-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 col-lg-6 preview-wrapper">
+            <div class="preview-roomInfo">
+              RoomID:&nbsp;<div id="roomInfo-id" class="m-r-10"></div>
+              RoomState:&nbsp;<div id="roomInfo-state">
+                <div class="success-svg" id="roomStateSuccessSvg" v-show="connectStatus=='CONNECTED'" style="display: inline-block;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+                <div class="error-svg" id="roomStateErrorSvg" v-show="connectStatus=='DISCONNECTED'" style="display: inline-block;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="preview-pushlishInfo col-lg-12 col-6">
+                <div class="pushlishInfo-title">
+                  <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id">{{publishInfoStreamID}}</span>
+                </div>
+                <div class="preview-content">
+                  <video id="pubshlishVideo" ref="pubshlishVideo" autoplay playsinline :muted="true" 
+                    :class="(mirrorVal=='onlyPreview' || mirrorVal=='both')?'mirror':''"></video>
+                </div>
+              </div>
+              <div class="preview-playInfo m-t-10 col-lg-12 col-6">
+                <div class="pushlishInfo-title">
+                  <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id">{{playInfoStreamID}}</span>
+                </div>
+                <div class="preview-content">
+                  <video id="playVideo" ref="playVideo" autoplay playsinline :class="(mirrorVal=='onlyPlay' || mirrorVal=='both')?'mirror':''"></video>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6 action-wrapper">
+            <div class="action-step">
+              <div class="action-title">
+                Step1&emsp;<span class="action-info">Create ZegoExpressEngine</span>
+              </div>
+              <div class="btn-wrapper">
+                <button @click="createZegoExpressEngineOption" type="button" class="btn-outline-info btn cuBtn" title="new ZegoExpressEngine()">
+                  <div class="success-svg" id="createSuccessSvg" v-show="createSuccessSvgStatus" style="display: inline-block;">
+                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height=15 width="15"
+                      viewBox="0 0 48 48" aria-hidden="true">
+                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                    </svg>
+                  </div>
+                  Create Engine
+                </button>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-title">
+                Step2&emsp;<span class="action-info">Test Compatiblity</span>
+              </div>
+              <div class="btn-wrapper">
+                <button @click="CheckSystemRequire" type="button" 
+                    :class="[checkSystemRequireStatus=='ERROR'?'btn-outline-danger':'btn-outline-info' ,'btn' ,'cuBtn']" 
+                    title="checkSystemRequirements()">
+                  <div class="success-svg" id="checkSuccessSvg" v-show="checkSystemRequireStatus=='SUCCESS'" style="display: inline-block;">
+                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
+                      viewBox="0 0 48 48" aria-hidden="true">
+                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                    </svg>
+                  </div>
+                  <div class="error-svg" id="checkErrorSvg" v-show="checkSystemRequireStatus=='ERROR'" style="display: inline-block;">
+                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
+                      viewBox="0 0 48 48" aria-hidden="true">
+                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 14 34 34 M34 14 14 34" />
+                    </svg>
+                  </div>
+                  <div class="warn-svg" id="checkWarnSvg" style="display: none;">
+                    <svg t="1617876217862" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                      xmlns="http://www.w3.org/2000/svg" p-id="8340" width="15" height="15">
+                      <circle class="circle" fill="#5bb543" cx="512" cy="512" r="510" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        d="M512 736.1m-63 0a63 63 0 1 0 126 0 63 63 0 1 0-126 0Z" fill="#FFFFFF" p-id="8344"></path>
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-miterlimit="10"
+                        d="M512 611.8s63-220.5 63-306.3S549.5 204 512 204s-63 15.8-63 101.5 63 306.3 63 306.3z"></path>
+                    </svg>
+                  </div>
+                  Test Compatiblity
+                </button>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-title">
+                Step3&emsp;<span class="action-info">Login Room</span>
+              </div>
+              <div class="action-content">
+                <div class="action-room font-14">
+                  <div class="action-roomId f-b-3">
+                    RoomID <input type="text" id="RoomID" :value="roomID" :disabled="isLogin" />
+                  </div>
+                  <div class="action-userName f-b-7">
+                    UserName <input type="text" class="w-70" id="UserName" :value="userID" :disabled="isLogin" />
+                  </div>
+                </div>
+                <!-- <button id="LoginRoom" type="button" class="btn-info btn cuBtn">Login Room</button> -->
+                <button id="LoginRoom" class="play-pause-button" title="loginRoom()" @click="loginRoomOption">
+                  <div class="success-svg m-r-5" id="loginSuccessSvg" v-show="isLogin" style="display: inline-block;">
+                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
+                      viewBox="0 0 48 48" aria-hidden="true">
+                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                    </svg>
+                  </div>
+                  Login Room
+                </button>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-title">
+                Step4&emsp;<span class="action-info">Start Publishing Stream</span>
+                <div class="action-content">
+                  <div class="publish-setting m-t-10">
+                    <div class="action-input font-14 m-b-15">
+                      Publish StreamID <input type="text" id="PublishID" v-model="streamID" :disabled="publishStreamStatus"/>
+                    </div>
+                    <div class="font-12 publish-check m-b-15">
+                      <div class="check-wrappre m-r-5">
+                        <label class="form-check-label m-r-5" for="Camera" data-lang="Camera">Camera</label>
+                        <input class="check-input" type="checkbox" v-model="cameraCheckStatus" id="Camera" :disabled="publishStreamStatus">
+                      </div>
+                      <div class="check-wrappre">
+                        <label class="form-check-label m-r-5" for="Microphone" data-lang="Microphone">Microphone</label>
+                        <input class="check-input" type="checkbox" v-model="microphoneCheckStatus" id="Microphone" :disabled="publishStreamStatus">
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <button id="startPublishing" type="button" class="btn-info btn cuBtn">Start
+                    Publishing</button> -->
+                  <button id="startPublishing" @click="startPublishing" class="play-pause-button" title="createStream() / startPublishingStream()">
+                    <div class="success-svg m-r-5" id="publishSuccessSvg" v-show="publishStreamStatus" style="display: inline-block;">
+                      <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
+                        viewBox="0 0 48 48" aria-hidden="true">
+                        <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                        <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                      </svg>
+                    </div>Start Publishing</button>
+                  <div class="publish-setting m-t-10 m-b-10">
+                    <div class="font-12 select-wrapper">
+                      <span data-lang="Mirror">Mirror</span>
+                      <select class="form-control form-control-sm m-l-5" id="Mirror" v-model="mirrorVal" :disabled="publishStreamStatus">
+                        <option value="none">none</option>
+                        <option value="onlyPreview">onlyPreview</option>
+                        <option value="onlyPlay">onlyPlay</option>
+                        <option value="both">both</option>
+                      </select>
+                    </div>
+                    <div class="font-12 select-wrapper f-b-7">
+                      <span data-lang="CameraSwitch">Camera Switch</span>
+                      <select class="form-control form-control-sm m-l-5" id="CameraDevices" v-model="cameraDevicesVal" :disabled="publishStreamStatus">
+                        <option :value="item.deviceID" v-for="item in videoDeviceList">{{item.deviceName}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="font-12 select-wrapper">
+                    <span data-lang="MicrophoneSwitch">Microphone Switch</span>
+                    <select class="form-control form-control-sm m-l-5" id="MicrophoneDevices" :disabled="!microphoneCheckStatus" @change="changeAudioDevices" v-model="microphoneDevicesVal">
+                        <option :value="item.deviceID" v-for="item in audioDeviceList">{{item.deviceName}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-title">
+                Step5&emsp;<span class="action-info">Start Play Stream</span>
+                <div class="action-content">
+                  <div class="publish-setting m-t-5">
+                    <div class="action-input font-14 m-b-15">
+                      Play StreamID <input type="text" id="PlayID" v-model="playStreamID" :disabled="playStreamStatus" />
+                    </div>
+                    <div class="font-12 publish-check m-b-15">
+                      <div class="check-wrappre m-r-5">
+                        <label class="form-check-label m-r-5" for="Video" data-lang="Video">Video</label>
+                        <input class="check-input" type="checkbox" id="Video" v-model="videoCheckStatus" :disabled="playStreamStatus">
+                      </div>
+                      <div class="check-wrappre">
+                        <label class="form-check-label m-r-5" for="Audio" data-lang="Audio">Audio</label>
+                        <input class="check-input" type="checkbox" id="Audio" v-model="audioCheckStatus" :disabled="playStreamStatus">
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <button id="startPlaying" type="button" class="btn-info btn cuBtn">Start Playing</button> -->
+                  <button id="startPlaying" class="play-pause-button" @click="startPlaying" title="startPlayingStream()">
+                    <div class="success-svg m-r-5" id="playSuccessSvg" v-show="playStreamStatus" style="display: inline-block;">
+                      <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
+                        viewBox="0 0 48 48" aria-hidden="true">
+                        <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                        <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                      </svg>
+                    </div>Start Playing</button>
+                </div>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-content">
+                <button id="reset" type="button" @click="reset" class="btn-danger btn cuBtn">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ul class="goToDoc">
+        <li>
+          <span data-lang="HelpDocsVideoCodec"> Web 端视频编码默认使用 VP8，体验和其他端互通，请在调试与配置页面修改为 H.264 </span>
+          &nbsp;
+          <a href="https://doc-zh.zego.im/article/7638" data-lang="HelpSettingsPage" target="_blank"> 点击修改 </a>
+        </li>
+        <li>
+          <span  data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;
+          <a href="https://doc-zh.zego.im/article/7638" data-lang="HelpDocs" target="_blank"> 帮助文档 </a>
+        </li> 
+      </ul>
+    </div>
+    <!-- </div> -->
+  </div>
+
+  <script src="../../../assets/js/jquery.min.js"></script>
+  <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
+  <script src="../../../assets/js/metisMenu.min.js"></script>
+  <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
+  <script src="../../../assets/js/bootstrap.min.js"></script>
+  <script src="../../../assets/js/vconsole.min.js"></script>
+  <script src="../../../assets/js/custom.js"></script>
+  <script src="../../../KeyCenter.js"></script>
+  <script src="../../../assets/js/vue.min.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

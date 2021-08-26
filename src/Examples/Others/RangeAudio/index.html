@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lang="RangeAudio"></title>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../assets/css/style.css">
+  <link rel="stylesheet" href="./index.css">
+  <script src="../../../assets/js/express_sdk/core.js"></script>
+  <script src="../../../assets/js/express_sdk/range-audio.js"></script>
+</head>
+
+<body class="fix-sidebar card-no-border">
+  <div class="preloader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+    </svg>
+  </div>
+
+  <div class="container main-wrapper">
+    <div class="page-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 col-lg-6 preview-wrapper">
+            <div class="preview-roomInfo">
+              RoomID:&nbsp;<div id="roomInfo-id" class="m-r-10"></div>
+              RoomState:&nbsp;<div id="roomInfo-state">
+                <div class="success-svg" id="roomStateSuccessSvg" style="display: none;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+                <div class="error-svg" id="roomStateErrorSvg" style="display: inline-block;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-title">
+                <span class="action-info" data-lang="LoginRoom">登录房间</span>
+              </div>
+              <div class="action-content">
+                <div class="action-form font-14">
+                  <div class="action-item">
+                    <span data-lang="RoomID">房间 ID</span>
+                    <input type="text" id="room-id" onchange="setRoomID()" />
+                  </div>
+                  <div class="action-item">
+                    <span data-lang="UserID">用户 ID</span>
+                    <input type="text" id="user-id" onchange="setUserID()" />
+                  </div>
+                </div>
+                <!-- <button id="LoginRoom" type="button" class="btn-info btn cuBtn">Login Room</button> -->
+                <button id="LoginRoom" class="play-pause-button" title="loginRoom" onclick="loginRoom()">
+                  <div class="success-svg m-r-5" id="loginSuccessSvg" style="display: none;">
+                    <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15"
+                      viewBox="0 0 48 48" aria-hidden="true">
+                      <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                      <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                    </svg>
+                  </div>
+
+                  <span id="text-login-room" data-lang="LoginRoom">Login Room</span>
+                  <span id="text-logout-room" data-lang="LogoutRoom">Logut Room</span>
+
+                </button>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-title">
+                <span class="action-info" data-lang="TeamAudio">小队语音</span>
+              </div>
+              <div class="action-content">
+                <div class="action-form font-14">
+                  <div class="action-item">
+                    <span data-lang="UserID">AudioMode</span>
+
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="team-mode0" name="customRadio" class="custom-control-input"
+                        onchange="setTeamMode(0)">
+                      <label class="custom-control-label" for="team-mode0" data-lang="WorldMode">全世界</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="team-mode1" name="customRadio" class="custom-control-input"
+                        onchange="setTeamMode(1)">
+                      <label class="custom-control-label" for="team-mode1" data-lang="OnlyTeamMode">仅小队</label>
+                    </div>
+                  </div>
+                  <div class="action-item">
+                    <span data-lang="TeamID">小队ID</span>
+                    <input type="text" id="team-id" onchange="setTeamID()" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-title">
+                <span class="action-info" data-lang="RangeAudio">范围语音</span>
+              </div>
+              <div class="action-content">
+                <div class="action-form font-14">
+                  <div class="action-item">
+                    <span data-lang="Microphone">开启麦克风</span>
+
+                    <span>
+                      <span id="text-mic-off" class="span-off">OFF</span>
+                      <span id="text-mic-on" class="span-on">ON</span>
+                    </span>
+                    <span id="state"></span>
+                    <button class="enable-button play-pause-button" title="enableMicrophone"
+                      onclick="enableMicrophone()">
+                      <span id="text-mic-enable" data-lang="Enable">开启</span>
+                      <span id="text-mic-disable" data-lang="Disable">关闭</span>
+                    </button>
+                  </div>
+                  <div class="action-item">
+                    <span data-lang="Speaker">开启扬声器</span>
+
+                    <span>
+                      <span id="text-speaker-off" class="span-off">OFF</span>
+                      <span id="text-speaker-on" class="span-on">ON</span>
+                    </span>
+                    <button class="enable-button play-pause-button" id="enable-speaker" title="enableSpeaker"
+                      onclick="enableSpeaker()">
+                      <span id="text-speaker-enable" data-lang="Enable">开启</span>
+                      <span id="text-speaker-disable" data-lang="Disable">关闭</span>
+                    </button>
+                  </div>
+                  <div class="action-item">
+                    <span data-lang="ReceviceRange">收听范围</span>
+                    <input type="number" id="receive-range" min="0" max="200" onchange="setReceiveRange()" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-title">
+                <span class="action-info" data-lang="Spatializer">3D 音效</span>
+              </div>
+              <div class="action-content">
+                <div class="action-form font-14">
+                  <div class="action-item">
+                    <span data-lang="Spatializer">3D 音效</span>
+
+                    <span id="text-3d-off" class="span-off">OFF</span>
+                    <span id="text-3d-on" class="span-on">ON</span>
+                    <button class="enable-button play-pause-button" id="enable-spatializer" title="enableSpatializer"
+                      onclick="enableSpatializer()">
+                      <span id="text-3d-enable" data-lang="Enable">开启</span>
+                      <span id="text-3d-disable" data-lang="Disable">关闭</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="action-step">
+              <div class="action-title">
+                <span class="action-info" data-lang="UserPosition">用户位置</span>
+                <div class="action-content">
+                  <div class="action-form font-14" id="user-list">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6 action-wrapper">
+            <div class="action-step">
+              <div class="action-title">
+                <span class="action-info" data-lang="OwnPositionAndOrientation">自身方位</span>
+              </div>
+              <div class="action-content">
+                <div class="action-form font-14">
+                  <span class="action-subtitle" data-lang="OwnPosition">自身位置</span>
+                  <div class="action-item">
+                    <span data-lang="Forward">前</span>&emsp;
+                    <span id="position-forward-text">1</span>&emsp;
+                    <input id="position-forward" type="range" step="1" min="-100" max="100"
+                      onchange="setSelfPosition()">
+                  </div>
+                  <div class="action-item">
+                    <span data-lang="Right">右</span>&emsp;
+                    <span id="position-right-text">1</span>&emsp;
+                    <input id="position-right" type="range" step="1" min="-100" max="100" onchange="setSelfPosition()">
+                  </div>
+                  <div class="action-item">
+                    <span data-lang="Up">上</span>&emsp;
+                    <span id="position-up-text">1</span>&emsp;
+                    <input id="position-up" type="range" step="1" min="-100" max="100" onchange="setSelfPosition()">
+                  </div>
+                </div>
+
+                <div class="action-form font-14">
+                  <span class="action-subtitle" data-lang="OwnOrientation">自身方向</span>
+                  <div class="action-item">
+                    <span data-lang="ForwardRotate">绕前轴旋转</span>
+                    &emsp;<span id="rotate-forward-text">1deg</span>&emsp;<input id="rotate-forward" type="range"
+                      step="1" min="-180" max="180" onchange="setSelfRotate()">
+                  </div>
+                  <div class="action-item">
+                    <span data-lang="RightRotate">绕右轴旋转</span>
+                    &emsp;<span id="rotate-right-text">1deg</span>&emsp;<input id="rotate-right" type="range" step="1"
+                      min="-180" max="180" onchange="setSelfRotate()">
+                  </div>
+                  <div class="action-item">
+                    <span data-lang="UpRotate">绕上轴旋转</span>
+                    &emsp;<span id="rotate-up-text">1deg</span>&emsp;<input id="rotate-up" type="range" step="1"
+                      min="-180" max="180" onchange="setSelfRotate()">
+                  </div>
+                  <div class="show_rotatebox">
+                    <div class="rotatebox" ref="head" id="rotate-box">
+                      <div>front</div>
+                      <div>back</div>
+                      <div>right</div>
+                      <div>left</div>
+                      <div>bottom</div>
+                      <div>top</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- dialog -->
+  <div class="modal fade" tabindex="-1" id="notice-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" data-lang="Notice">提示</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p data-lang="NoAllowAutoPlay">当前浏览器默认不支持自动播放声音，是否允许自动播放</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" data-lang="Cancel">取消</button>
+          <button type="button" class="btn btn-primary" id="btn-allow" data-lang="Confirm">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../../assets/js/left-menu.js"></script>
+  <script src="../../../assets/js/jquery.min.js"></script>
+  <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
+  <script src="../../../assets/js/metisMenu.min.js"></script>
+  <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
+  <script src="../../../assets/js/bootstrap.min.js"></script>
+  <script src="../../../assets/js/vconsole.min.js"></script>
+  <script src="../../../assets/js/custom.js"></script>
+  <script src="../../../KeyCenter.js"></script>
+  <script src="index.js"></script>
+</body>
+
+</html>

@@ -5,11 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-lang="CustomAudioCaptureAndRendering">自定义音频采集</title>
-  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon"/>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../../../assets/css/style.css">
   <link rel="stylesheet" href="./index.css">
-  <script src="../../../assets/js/ZegoExpressWebRTC.js"></script>
+  <script src="../../../assets/js/express_sdk/ZegoExpressWebRTC.js"></script>
 </head>
 
 <body class="fix-sidebar card-no-border">
@@ -21,109 +21,6 @@
 
   <div class="container main-wrapper">
     <!-- <div class="row"> -->
-    <aside class="left-sidebar">
-      <div class="scroll-sidebar">
-        <nav class="sidebar-nav">
-          <ul id="sidebarnav">
-            <span class="sidebar-title" data-lang="Quickstart">快速开始</span>
-            <li>
-              <a href="../../QuickStart/CommonUsage/index.html" class="waves-effect" data-lang="CommonUsage">实现流程</a>
-            </li>
-            <li>
-              <a href="../../QuickStart/Publishing/index.html" class="waves-effect" data-lang="Publishing">推流</a>
-            </li>
-            <li>
-              <a href="../../QuickStart/Playing/index.html" class="waves-effect" data-lang="Playing">拉流</a>
-            </li>
-            <span class="sidebar-title" data-lang="Scenes">最佳实践</span>
-            <li>
-              <a href="../../Scenes/VideoForMultipleUsers/index.html" class="waves-effect"
-                data-lang="VideoForMultipleUsers">多人视频通话</a>
-            </li>
-            <li>
-              <a href="../../Framework/Vue/index.html" class="waves-effect" data-lang="Vue">使用 Vue 实现音视频功能</a>
-            </li>
-            <li>
-              <a href="../../Framework/Angular/dist/index.html" class="waves-effect" data-lang="Angular">使用 Angular 实现音视频功能</a>
-            </li>
-            <li>
-              <a href="../../Framework/React/index.html" class="waves-effect" data-lang="React">使用 React 实现音视频功能</a>
-            </li>
-            <span class="sidebar-title" data-lang="CommonFeatures">常用功能</span>
-            <li>
-              <a href="../../CommonFeatures/CommonVideoConfig/index.html" class="waves-effect"
-                data-lang="CommonVideoConfig">常用视频配置</a>
-            </li>
-            <li>
-              <a href="../../CommonFeatures/RoomMessage/index.html" class="waves-effect"
-                data-lang="RoomMessage">实时消息</a>
-            </li>
-            <span class="sidebar-title" data-lang="AdvancedStreaming">推拉流进阶</span>
-            <li>
-              <a href="../../AdvancedStreaming/StreamMonitoring/index.html" class="waves-effect"
-                data-lang="StreamMonitoring">推拉流信息监测</a>
-            </li>
-            <li>
-              <a href="../../AdvancedStreaming/PublishingMultipleStreams/index.html" class="waves-effect"
-                data-lang="PublishingMultipleStreams">推多路流</a>
-            </li>
-            <li>
-              <a href="../../AdvancedStreaming/StreamByCDN/index.html" class="waves-effect"
-                data-lang="StreamByCDN">通过CDN推拉流</a>
-            </li>
-            <li>
-              <a href="../../AdvancedStreaming/LowLatencyLive/index.html" class="waves-effect"
-                data-lang="LowLatencyLive">低延迟直播</a>
-            </li>
-            <span class="sidebar-title" data-lang="AdvancedVideoProcessing">视频进阶</span>
-            <li>
-              <a href="../../AdvancedVideoProcessing/EncodingAndDecoding/index.html" class="waves-effect"
-                data-lang="SetVideoProperties">设置视频属性</a>
-            </li>
-            <li>
-              <a href="../../AdvancedVideoProcessing/CustomVideoCapture/index.html" class="waves-effect"
-                data-lang="CustomVideoCapture">自定义视频采集</a>
-            </li>
-            <span class="sidebar-title" data-lang="AdvancedAudioProcessing">音频进阶</span>
-            <li>
-              <a href="../../AdvancedAudioProcessing/EarReturnAndChannelSettings/index.html" class="waves-effect"
-                data-lang="EarReturnAndChannelSettings">耳返</a>
-            </li>
-            <li>
-              <a href="../../AdvancedAudioProcessing/SoundLevelAndAudioSpectrum/index.html" class="waves-effect"
-                data-lang="SoundLevelAndAudioSpectrum">音频频谱与声浪</a>
-            </li>
-            <li>
-              <a href="../../AdvancedAudioProcessing/AEC_ANS_AGC/index.html" class="waves-effect"
-                data-lang="AEC_ANS_AGC">音频3A处理</a>
-            </li>
-            <li>
-              <a href="index.html" class="waves-effect" data-lang="AudioMixing">混音</a>
-            </li>
-            <li>
-              <a href="../../AdvancedAudioProcessing/CustomAudioCaptureAndRendering/index.html" class="waves-effect"
-                data-lang="CustomAudioCaptureAndRendering">自定义音频采集与渲染</a>
-            </li>
-            <span class="sidebar-title" data-lang="Others">其他功能</span>
-            <li>
-              <a href="../../Others/StreamMixing/index.html" class="waves-effect" data-lang="StreamMixing">多路混流</a>
-            </li>
-            <li>
-              <a href="../../Others/ScreenSharing/index.html" class="waves-effect" data-lang="ScreenSharing">屏幕共享</a>
-            </li>
-            <li>
-              <a href="../../Others/MediaTrackReplacement/index.html" class="waves-effect"
-                data-lang="MediaTrackReplacement">音视频轨道替换</a>
-            </li>
-            <span class="sidebar-title" data-lang="DebugAndConfig">调试与配置</span>
-            <li>
-              <a href="../../DebugAndConfig/LogAndVersionAndDebug/index.html" class="waves-effect"
-                data-lang="Log_Version_Debug">日志、版本号、调试信息</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </aside>
 
     <div class="page-wrapper">
       <div class="container-fluid">
@@ -152,7 +49,7 @@
                   <span data-lang="Preview">Preview</span>
                 </div>
                 <div class="preview-content">
-                  <video id="pubshlishVideo" crossorigin="anonymous" controls autoplay  playsinline></video>
+                  <video id="pubshlishVideo" crossorigin="anonymous" controls autoplay playsinline></video>
                 </div>
               </div>
               <!-- <div class="preview-playInfo col-12">
@@ -177,7 +74,7 @@
                 <div class="m-b-10 font-12 font-medium">
                   <div class="m-t-10 m-b-5 flex-c">
                     <div>
-                      RoomID <input class="m-l-10" type="text" id="RoomID" disabled/>
+                      RoomID <input class="m-l-10" type="text" id="RoomID" disabled />
                     </div>
                     <div class="check-wrappre">
                       <label class="form-check-label m-r-15" for="AudioMixing" data-lang="AudioMixing">Start Audio
@@ -192,7 +89,8 @@
                     Play StreamID <input class="m-l-10" type="text" id="PlayID" />
                   </div> -->
                 </div>
-                <button id="start" class="m-b-5 configBtn play-pause-button" title="startMixingAudio()/stopMixingAudio()">Start</button>
+                <button id="start" class="m-b-5 configBtn play-pause-button"
+                  title="startMixingAudio()/stopMixingAudio()">Start</button>
               </div>
             </div>
           </div>
@@ -202,17 +100,19 @@
         <li>
           <span data-lang="HelpDocsVideoCodec"> Web 端视频编码默认使用 VP8，体验和其他端互通，请在调试与配置页面修改为 H.264 </span>
           &nbsp;
-          <a href="../../DebugAndConfig/LogAndVersionAndDebug/index.html" data-lang="HelpSettingsPage" target="_blank"> 点击修改 </a>
+          <a href="../../DebugAndConfig/LogAndVersionAndDebug/index.html" data-lang="HelpSettingsPage" target="_blank">
+            点击修改 </a>
         </li>
         <li>
-          <span  data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;
+          <span data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;
           <a href="https://doc-zh.zego.im/article/4849" data-lang="HelpDocs" target="_blank"> 帮助文档 </a>
-        </li> 
+        </li>
       </ul>
     </div>
     <!-- </div> -->
   </div>
 
+  <script src="../../../assets/js/left-menu.js"></script>
   <script src="../../../assets/js/jquery.min.js"></script>
   <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
   <script src="../../../assets/js/metisMenu.min.js"></script>

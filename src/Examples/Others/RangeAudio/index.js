@@ -96,7 +96,7 @@ function setTeamID(val) {
   } else {
     data.teamID = document.getElementById("team-id").value || undefined
   }
-  rangeAudio.setRangeAudioTeamID(data.teamID)
+  rangeAudio.setTeamID(data.teamID)
   console.log('setTeamID', data.teamID);
 }
 

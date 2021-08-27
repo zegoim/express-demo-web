@@ -49,6 +49,14 @@ function setLoginState(val) {
     Object.keys(data.userListMap).forEach(item => {
       delete data.userListMap[item]
     })
+  } else {
+    // 初始化 3D 音效
+    // Initialize 3D sound
+    rangeAudio.enableSpatializer(data.isSpatializer);
+    // 开启更新自身位置
+    enableUpdatePositionTimer(true)
+    // 设置队伍 ID
+    setTeamID(data.teamID)
   }
 
 }
@@ -374,7 +382,6 @@ function syncPositionInfo() {
   setUserID(data.userID)
   // 初始化小队信息
   // Initialization team information
-  setTeamID(data.teamID)
   document.querySelector("#team-mode" + data.teamMode).checked = true
   // 初始化范围语音功能
   // Initialize range voice function
@@ -385,13 +392,11 @@ function syncPositionInfo() {
   })
   // 初始化 3D 音效
   // Initialize 3D sound
-  rangeAudio.enableSpatializer(data.isSpatializer);
   updateSpatializerState(data.isSpatializer);
   // 初始化自身方位
   // Initialize self orientation
   setSelfPosition()
   setSelfRotate()
-  enableUpdatePositionTimer(true)
   // 授权浏览器自动播放声音
   // Authorize the browser to automatically play sound
   const allowAutoPlay = rangeAudio.isAudioContextRunning()

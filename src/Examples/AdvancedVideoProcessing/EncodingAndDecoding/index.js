@@ -147,7 +147,7 @@ function clearStream(flag) {
 
   if(flag === 'publish') {
     localStream && zg.destroyStream(localStream);
-    $('#pubshlishVideo')[0].srcObject = null;
+    $('#publishVideo')[0].srcObject = null;
     localStream = null;
     published = false
     if($('#PublishID').val() === $('#PlayID').val()) {
@@ -207,7 +207,7 @@ async function startPublishingStream (streamId, config = {}) {
   try {
     localStream = await zg.createStream();
     zg.startPublishingStream(streamId, localStream, config);
-    $('#pubshlishVideo')[0].srcObject = localStream;
+    $('#publishVideo')[0].srcObject = localStream;
     return true
   } catch(err) {
     return false

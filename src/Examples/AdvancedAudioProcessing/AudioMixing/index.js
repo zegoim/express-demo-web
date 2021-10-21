@@ -126,7 +126,7 @@ function clearStream() {
 	remoteStream && zg.destroyStream(remoteStream);
 	remoteStream = null;
 	localStream = null;
-	$('#pubshlishVideo')[0].srcObject = null;
+	$('#publishVideo')[0].srcObject = null;
 	isStart = false;
 }
 
@@ -175,7 +175,7 @@ async function startPublishingStream(streamId) {
 	try {
 		localStream = await zg.createStream();
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		$('#pubshlishVideo')[0].srcObject = localStream;
+		$('#publishVideo')[0].srcObject = localStream;
 		return true;
 	} catch (err) {
 		console.error(err);

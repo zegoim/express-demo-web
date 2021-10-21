@@ -223,7 +223,7 @@ function playMultipleEvent() {
 function clearStream(flag) {
 	if (flag === 'publish') {
 		localStream && zg.destroyStream(localStream);
-		$('#pubshlishVideo')[0].srcObject = null;
+		$('#publishVideo')[0].srcObject = null;
 		localStream = null;
 		published = false;
 	}
@@ -286,7 +286,7 @@ async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		$('#pubshlishVideo')[0].srcObject = localStream;
+		$('#publishVideo')[0].srcObject = localStream;
 		return true;
 	} catch (err) {
 		return false;
@@ -402,10 +402,10 @@ function changeVideo(flag) {
 	}
 	const value = $('#Mirror').val();
 	if (value === 'onlyPreview') {
-		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
+		$('#publishVideo').css('transform', 'scale(-1, 1)');
 	} else if (value === 'onlyPlay') {
 		$('video').each((index, video) => {
-			if (video.id !== 'pubshlishVideo') video.setAttribute('transform', 'scale(-1, 1)');
+			if (video.id !== 'publishVideo') video.setAttribute('transform', 'scale(-1, 1)');
 		});
 	} else if (value === 'both') {
 		$('video').each((index, video) => {

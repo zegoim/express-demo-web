@@ -162,7 +162,7 @@ class CommonUsageReact extends React.Component {
         try {
             this.state.localStream = await zg.createStream(config);
             zg.startPublishingStream(streamId, this.state.localStream, { videoCodec:this.state.videoCodec });
-            this.refs.pubshlishVideo.srcObject = this.state.localStream;
+            this.refs.publishVideo.srcObject = this.state.localStream;
             return true;
         } catch (err) {
             return false;
@@ -192,7 +192,7 @@ class CommonUsageReact extends React.Component {
     }
     clearStream(){
         this.state.localStream && zg.destroyStream(this.state.localStream);
-        this.refs.pubshlishVideo.srcObject = null;
+        this.refs.publishVideo.srcObject = null;
         this.state.remoteStream && zg.destroyStream(this.state.remoteStream);
         this.refs.playVideo.srcObject = null;
         this.setState({
@@ -343,7 +343,7 @@ class CommonUsageReact extends React.Component {
                             <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id">{this.state.publishInfoStreamID}</span>
                         </div>
                         <div className="preview-content">
-                            <video ref="pubshlishVideo" autoPlay playsInline muted
+                            <video ref="publishVideo" autoPlay playsInline muted
                                 className={ `${(this.state.mirrorVal=='onlyPreview' || this.state.mirrorVal=='both') ?'mirror':''}`}></video>
                         </div>
                         </div>

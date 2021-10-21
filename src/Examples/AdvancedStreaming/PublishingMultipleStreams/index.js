@@ -168,7 +168,7 @@ function clearStream(flag) {
 
   if(flag === 'publish') {
     localStream && zg.destroyStream(localStream);
-    $('#pubshlishVideo')[0].srcObject = null;
+    $('#publishVideo')[0].srcObject = null;
     localStream = null;
     published = false
   }
@@ -182,7 +182,7 @@ function clearStream(flag) {
 
   if(flag === 'publishSecond') {
     localSecondStream && zg.destroyStream(localSecondStream);
-    $('#pubshlishSecondVideo')[0].srcObject = null;
+    $('#publishSecondVideo')[0].srcObject = null;
     localSecondStream = null;
     publishedSecond = false
   }
@@ -213,7 +213,7 @@ async function startPublishingStream (streamId, config) {
   try {
     localStream = await zg.createStream(config);
     zg.startPublishingStream(streamId, localStream, { videoCodec });
-    $('#pubshlishVideo')[0].srcObject = localStream;
+    $('#publishVideo')[0].srcObject = localStream;
     return true
   } catch(err) {
     return false
@@ -225,7 +225,7 @@ async function startPublishingSecondStream (streamId, config) {
   try {
     localSecondStream = await zg.createStream(config);
     zg.startPublishingStream(streamId, localSecondStream, { videoCodec });
-    $('#pubshlishSecondVideo')[0].srcObject = localSecondStream;
+    $('#publishSecondVideo')[0].srcObject = localSecondStream;
     return true
   } catch(err) {
     return false

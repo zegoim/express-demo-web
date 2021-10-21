@@ -171,14 +171,14 @@ function initEvent() {
 function clearStream(flag) {
 	if (flag === 'first') {
 		firstStream && zg.destroyStream(firstStream);
-		$('#pubshlishFirstVideo')[0].srcObject = null;
+		$('#publishFirstVideo')[0].srcObject = null;
 		firstStream = null;
 		firstPublished = false;
 	}
 
 	if (flag === 'second') {
 		secondStream && zg.destroyStream(secondStream);
-		$('#pubshlishSecondVideo')[0].srcObject = null;
+		$('#publishSecondVideo')[0].srcObject = null;
 		secondStream = null;
 		secondPublished = false;
 	}
@@ -214,7 +214,7 @@ async function startPublishingStream(streamId, config) {
 	try {
 		firstStream = await zg.createStream(config);
 		zg.startPublishingStream(streamId, firstStream, { videoCodec });
-		$('#pubshlishFirstVideo')[0].srcObject = firstStream;
+		$('#publishFirstVideo')[0].srcObject = firstStream;
 		return true;
 	} catch (err) {
 		return false;
@@ -225,7 +225,7 @@ async function startPublishingSecondStream(streamId, config) {
 	try {
 		secondStream = await zg.createStream(config);
 		zg.startPublishingStream(streamId, secondStream);
-		$('#pubshlishSecondVideo')[0].srcObject = secondStream;
+		$('#publishSecondVideo')[0].srcObject = secondStream;
 		return true;
 	} catch (err) {
 		return false;

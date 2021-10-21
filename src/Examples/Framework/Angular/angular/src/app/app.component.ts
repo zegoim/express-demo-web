@@ -172,7 +172,7 @@ export class AppComponent {
   }
   clearStream(){
       this.localStream && this.zg.destroyStream(this.localStream);
-    //   this.$refs['pubshlishVideo'].srcObject = null;
+    //   this.$refs['publishVideo'].srcObject = null;
       this.localStream = null;
       this.remoteStream && this.zg.destroyStream(this.remoteStream);
     //   this.$refs['playVideo'].srcObject = null;

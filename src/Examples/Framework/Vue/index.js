@@ -144,7 +144,7 @@ $(function(){
                 try {
                     this.localStream = await zg.createStream(config);
                     zg.startPublishingStream(streamId, this.localStream, { videoCodec:this.videoCodec });
-                    this.$refs['pubshlishVideo'].srcObject = this.localStream;
+                    this.$refs['publishVideo'].srcObject = this.localStream;
                     return true;
                 } catch (err) {
                     return false;
@@ -174,7 +174,7 @@ $(function(){
             },
             clearStream(){
                 this.localStream && zg.destroyStream(this.localStream);
-                this.$refs['pubshlishVideo'].srcObject = null;
+                this.$refs['publishVideo'].srcObject = null;
                 this.localStream = null;
                 this.remoteStream && zg.destroyStream(this.remoteStream);
                 this.$refs['playVideo'].srcObject = null;

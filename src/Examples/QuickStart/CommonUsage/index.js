@@ -155,7 +155,7 @@ async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		$('#pubshlishVideo')[0].srcObject = localStream;
+		$('#publishVideo')[0].srcObject = localStream;
 		return true;
 	} catch (err) {
 		return false;
@@ -190,7 +190,7 @@ async function stopPlayingStream(streamId) {
 
 function clearStream() {
 	localStream && zg.destroyStream(localStream);
-	$('#pubshlishVideo')[0].srcObject = null;
+	$('#publishVideo')[0].srcObject = null;
 	localStream = null;
 	remoteStream && zg.destroyStream(remoteStream);
 	$('#playVideo')[0].srcObject = null;
@@ -319,17 +319,17 @@ function getCreateStreamConfig() {
 // Change video direction
 function changeVideo(flag) {
 	if (flag) {
-		$('#pubshlishVideo').css('transform', 'none');
+		$('#publishVideo').css('transform', 'none');
 		$('#playVideo').css('transform', 'none');
 		return;
 	}
 	const value = $('#Mirror').val();
 	if (value === 'onlyPreview') {
-		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
+		$('#publishVideo').css('transform', 'scale(-1, 1)');
 	} else if (value === 'onlyPlay') {
 		$('#playVideo').css('transform', 'scale(-1, 1)');
 	} else if (value === 'both') {
-		$('#pubshlishVideo').css('transform', 'scale(-1, 1)');
+		$('#publishVideo').css('transform', 'scale(-1, 1)');
 		$('#playVideo').css('transform', 'scale(-1, 1)');
 	}
 }

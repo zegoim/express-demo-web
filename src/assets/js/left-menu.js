@@ -5,6 +5,9 @@ const menu = `
     <ul id="sidebarnav">
       <span class="sidebar-title" data-lang="Quickstart">快速开始</span>
       <li>
+        <a href="../../QuickStart/VideoTalk/index.html" class="waves-effect" data-lang="VideoTalk">视频通话</a>
+      </li>
+      <li>
         <a href="../../QuickStart/CommonUsage/index.html" class="waves-effect" data-lang="CommonUsage">实现流程</a>
       </li>
       <li>

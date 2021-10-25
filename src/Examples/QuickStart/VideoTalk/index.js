@@ -8,7 +8,7 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '1001';
+let roomID = '0001';
 let streamID = 'web_' + new Date().getTime();
 let remoteStreamID = null;
 
@@ -64,7 +64,6 @@ async function checkSystemRequirements() {
 function initEvent() {
     zg.on('roomStateUpdate', (roomId, state) => {
         if (state === 'CONNECTED' && isLogin) {
-            console.log(111);
             $('#roomStateSuccessSvg').css('display', 'inline-block');
             $('#roomStateErrorSvg').css('display', 'none');
         }
@@ -95,6 +94,8 @@ function initEvent() {
         }
     });
 
+    const playVideoEl = $('.preview-playInfo')
+    playVideoEl.hide();
     zg.on('roomStreamUpdate', async (roomID, updateType, streamList, extendedData) => {
 
         // streams added
@@ -102,21 +103,23 @@ function initEvent() {
             const addStream = streamList[streamList.length - 1]
             if (addStream && addStream.streamID) {
                 // play the last stream
-                if(remoteStreamID) {
+                if (remoteStreamID) {
                     zg.stopPlayingStream(remoteStreamID)
                 }
                 remoteStreamID = addStream.streamID
-                $('#PlayID').text(remoteStreamID)
+                $('#PlayUserID').text(addStream.user.userID)
                 remoteStream = await zg.startPlayingStream(remoteStreamID)
                 $('#playVideo')[0].srcObject = remoteStream;
+                playVideoEl.show();
             }
-        } else if (updateType == 'DELETE') { 	
+        } else if (updateType == 'DELETE') {
             //  del stream
             const delStream = streamList[streamList.length - 1]
             if (delStream && delStream.streamID) {
                 if (delStream.streamID === remoteStreamID) {
                     zg.stopPlayingStream(remoteStreamID)
                     remoteStreamID = null
+                    playVideoEl.hide();
                 }
             }
         }
@@ -147,7 +150,7 @@ function loginRoom(roomId, userId, userName) {
             tokenUrl,
             {
                 app_id: appID,
-                id_name: userID
+                id_name: userId
             },
             async (token) => {
                 try {
@@ -202,19 +205,24 @@ $('#LoginRoom').on(
     'click',
     util.throttle(async function () {
 
-        const userName = $('#UserName').val();
+        userID = $('#UserID').val();
         const id = $('#RoomID').val();
-
-        if (!userName) return alert('UserName is Empty');
+        const streamID = $('#PublishID').val()
+        if (!userID) return alert('userID is Empty');
         if (!id) return alert('RoomID is Empty');
+        if (!streamID) return alert('StreamID is Empty');
+
         this.classList.add('border-primary');
         if (!isLogin) {
             try {
                 isLogin = true;
-                await loginRoom(id, userID, userName);
+                await loginRoom(id, userID, userID);
                 updateButton(this, 'Login Room', 'Logout Room');
-                $('#UserName')[0].disabled = true;
+                $('#UserID')[0].disabled = true;
                 $('#RoomID')[0].disabled = true;
+                const flag = await startPublishingStream(streamID, { camera: {} });
+                published = true;
+                $('#PublishID')[0].disabled = true;
             } catch (err) {
                 isLogin = false;
                 this.classList.remove('border-primary');
@@ -225,44 +233,19 @@ $('#LoginRoom').on(
         } else {
             if (localStream) {
                 $('#PublishID')[0].disabled = false;
-                updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
             }
             isLogin = false;
             logoutRoom(id);
             updateButton(this, 'Login Room', 'Logout Room');
-            $('#UserName')[0].disabled = false;
+            $('#UserID')[0].disabled = false;
             $('#RoomID')[0].disabled = false;
-        }
-    }, 500)
-);
-
-$('#startPublishing').on(
-    'click',
-    util.throttle(async function () {
-        if (!isLogin) return alert('should login room');
-
-        const id = $('#PublishID').val();
-        if (!id) return alert('StreamID is Empty');
-        this.classList.add('border-primary');
-        if (!published) {
-            const flag = await startPublishingStream(id, { camera: {} });
-            if (flag) {
-                updateButton(this, 'Start Publishing', 'Stop Publishing');
-                published = true;
-                $('#PublishID')[0].disabled = true;
-            } else {
-                this.classList.remove('border-primary');
-                this.classList.add('border-error');
-                this.innerText = 'Publishing Fail Try Again';
-            }
-        } else {
-            stopPublishingStream(streamID);
-            updateButton(this, 'Start Publishing', 'Stop Publishing');
-            published = false;
             $('#PublishID')[0].disabled = false;
+            $('.preview-playInfo').hide();
+            published = false;
         }
     }, 500)
 );
+
 
 // bind event end
 
@@ -299,9 +282,8 @@ function updateButton(button, preText, afterText) {
 // ==============================================================
 
 async function render() {
-    $('#roomInfo-id').text(roomID);
     $('#RoomID').val(roomID);
-    $('#UserName').val(userID);
+    $('#UserID').val(userID);
     $('#UserID').val(userID);
     $('#PublishID').val(streamID);
     createZegoExpressEngine();

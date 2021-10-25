@@ -26,23 +26,6 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-12 col-lg-6 preview-wrapper">
-            <div class="preview-roomInfo">
-              RoomID:&nbsp;<div id="roomInfo-id" class="m-r-10"></div>
-              RoomState:&nbsp;<div id="roomInfo-state">
-                <div class="success-svg" id="roomStateSuccessSvg" style="display: none;">
-                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
-                    viewBox="0 0 48 48" aria-hidden="true">
-                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
-                  </svg>
-                </div>
-                <div class="error-svg" id="roomStateErrorSvg" style="display: inline-block;">
-                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
-                    viewBox="0 0 48 48" aria-hidden="true">
-                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
-                  </svg>
-                </div>
-              </div>
-            </div>
             <div class="row" id="videoList">
               <div class="preview-pushlishInfo col-lg-12 col-6 m-b-15">
                 <div class="preview-content">
@@ -61,7 +44,7 @@
                   <div class="preview-action">
                     <div class="preview-video-action">
                       <div class="m-t-10 m-b-5">
-                        Playing StreamID: <span class="m-l-10" id="PlayID" ></span>
+                        UserID: <span class="m-l-10" id="PlayUserID"></span>
                       </div>
                     </div>
                   </div>
@@ -76,13 +59,18 @@
                 <span class="action-info">Login Room</span>
               </div>
               <div class="action-content">
-                <div class="action-room font-14">
-                  <div class="action-roomId f-b-3">
-                    RoomID <input type="text" id="RoomID" />
-                  </div>
-                  <div class="action-userName f-b-7">
-                    UserName <input type="text" class="w-70" id="UserName" />
-                  </div>
+
+                <div class="action-roomId m-b-15">
+                  RoomID <input type="text" id="RoomID" class="w-50" />
+                  <div class="desc" data-lang="RoomIDDesc"></div>
+                </div>
+                <div class="action-userName m-b-15">
+                  UserID <input type="text" id="UserID" class="w-50" />
+                  <div class="desc" data-lang="UserIDDesc"></div>
+                </div>
+                <div class="action-input m-b-15">
+                  Publish StreamID <input type="text" id="PublishID" class="w-50" />
+                  <div class="desc" data-lang="StreamIDDesc"></div>
                 </div>
                 <!-- <button id="LoginRoom" type="button" class="btn-info btn cuBtn">Login Room</button> -->
                 <button id="LoginRoom" class="play-pause-button" title="loginRoom()">
@@ -96,22 +84,6 @@
                   </div>
                   Login Room
                 </button>
-              </div>
-            </div>
-            <div class="action-step">
-              <div class="action-title">
-                <span class="action-info">Start Publishing Stream</span>
-                <div class="action-content">
-                  <div class="publish-setting m-t-10">
-                    <div class="action-input font-14 m-b-15">
-                      Publish StreamID <input type="text" id="PublishID" />
-                    </div>
-                  </div>
-                  <!-- <button id="startPublishing" type="button" class="btn-info btn cuBtn">Start
-                    Publishing</button> -->
-                  <button id="startPublishing" class="play-pause-button" title="startPublishingStream()">Start
-                    Publishing</button>
-                </div>
               </div>
             </div>
           </div>

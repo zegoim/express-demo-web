@@ -5,7 +5,7 @@ select {
 .KeyCenter {
   font-size: 16px;
   font-weight: 500;
-	color: #000;
+  color: #000;
 }
 
 .KeyCenterValue {
@@ -14,95 +14,99 @@ select {
 }
 
 .debug-check {
-	display: flex;
-	align-items: center;
+  display: flex;
+  align-items: center;
 }
 
-.debug-check > input[type=checkbox]{
-	height: 0;
-	width: 0;
-	visibility: hidden;
+.debug-check > input[type="checkbox"] {
+  height: 0;
+  width: 0;
+  visibility: hidden;
 }
 
 .debug-check > label {
-	cursor: pointer;
-	text-indent: -9999px;
-	width: 40px;
-	height: 20px;
-	background: grey;
-	display: inline-block;
-	border-radius: 100px;
-	position: relative;
-	margin-bottom: 0;
+  cursor: pointer;
+  text-indent: -9999px;
+  width: 40px;
+  height: 20px;
+  background: grey;
+  display: inline-block;
+  border-radius: 100px;
+  position: relative;
+  margin-bottom: 0;
 }
 
 .debug-check > label:after {
-	content: '';
-	position: absolute;
-	top: 2px;
-	left: 2px;
-	width: 16px;
-	height: 16px;
-	background: #fff;
-	border-radius: 100%;
-	transition: 0.3s;
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 100%;
+  transition: 0.3s;
 }
 
 .debug-check > input:checked + label {
-	background: #009efb;
+  background: #009efb;
 }
 
 .debug-check > input:checked + label:after {
-	left: calc(100% - 2px);
-	transform: translateX(-100%);
+  left: calc(100% - 2px);
+  transform: translateX(-100%);
 }
 
 .debug-check > label:active:after {
-	width: 23px;
+  width: 23px;
 }
 
 .switch-field {
-	display: flex;
-	margin-bottom: 36px;
-	overflow: hidden;
+  display: flex;
+  margin-bottom: 36px;
+  overflow: hidden;
 }
 
 .switch-field input {
-	position: absolute !important;
-	clip: rect(0, 0, 0, 0);
-	height: 1px;
-	width: 1px;
-	border: 0;
-	overflow: hidden;
+  position: absolute !important;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  width: 1px;
+  border: 0;
+  overflow: hidden;
 }
 
 .switch-field label {
-	background-color: #e4e4e4;
-	color: rgba(0, 0, 0, 0.6);
-	font-size: 14px;
-	line-height: 1;
-	text-align: center;
-	padding: 8px 32px;
-	margin-right: -1px;
-	border: 1px solid rgba(0, 0, 0, 0.2);
-	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
-	transition: all 0.1s ease-in-out;
+  background-color: #e4e4e4;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+  line-height: 1;
+  text-align: center;
+  padding: 8px 32px;
+  margin-right: -1px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.1s ease-in-out;
 }
 
 .switch-field label:hover {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .switch-field input:checked + label {
-	background-color: #009efb;
-	box-shadow: none;
-	color: #fff;
+  background-color: #009efb;
+  box-shadow: none;
+  color: #fff;
 }
 
 .switch-field label:first-of-type {
-	border-radius: 4px 0 0 4px;
+  border-radius: 4px 0 0 4px;
 }
 
 .switch-field label:last-of-type {
-	border-radius: 0 4px 4px 0;
+  border-radius: 0 4px 4px 0;
+}
+
+h4 {
+  margin-top: 6px;
 }

@@ -83,7 +83,6 @@ $('#radio-video-two').on('change', function ({ target }) {
 $(function render() {
 	$('#AppID').text(appID);
 	$('#Server').text(server);
-	$('#TokenUrl').text(tokenUrl);
 	$('#SDKVersion').text(`SDK: ${zg.getVersion()}`);
 	$('#DemoVersion').text(`Demo: ${zg.getVersion()}`);
 	$('#debug-check')[0].checked = localStorage.getItem('DebugVerbose') === 'true' ? true : false;

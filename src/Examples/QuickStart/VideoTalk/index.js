@@ -144,27 +144,19 @@ function setLogConfig() {
 
 //  Login room
 function loginRoom(roomId, userId, userName) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         // Need to get the token before logging in to the room
-        $.get(
-            tokenUrl,
-            {
-                app_id: appID,
-                id_name: userId
-            },
-            async (token) => {
-                try {
-                    await zg.loginRoom(roomId, token, {
-                        userID: userId,
-                        userName
-                    });
-                    resolve();
-                } catch (err) {
-                    reject();
-                }
-            }
-        );
-    });
+        let token = $("#Token").val()
+        try {
+            await zg.loginRoom(roomId, token, {
+                userID: userId,
+                userName
+            });
+            resolve();
+        } catch (err) {
+            reject();
+        }
+    })
 }
 
 

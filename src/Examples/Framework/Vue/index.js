@@ -4,6 +4,7 @@ $(function(){
         data: {
             userID: Util.getBrow() + '_' + new Date().getTime(),
             roomID: '0001',
+            token: "",
             streamID: '0001',
             playStreamID: '0001',
             zg: null,
@@ -116,27 +117,10 @@ $(function(){
                 }
             },
             // Step3 Login room
-            loginRoom(roomId, userId, userName) {
-                return new Promise((resolve, reject) => {
-                    // Need to get the token before logging in to the room
-                    $.get(
-                        tokenUrl,
-                        {
-                            app_id: appID,
-                            id_name: userId
-                        },
-                        async (token) => {
-                            try {
-                                await zg.loginRoom(roomId, token, {
-                                    userID: userId,
-                                    userName
-                                });
-                                resolve();
-                            } catch (err) {
-                                reject();
-                            }
-                        }
-                    );
+            loginRoom(roomId, userId, userName, token) {
+                return zg.loginRoom(roomId, token, {
+                    userID: userId,
+                    userName
                 });
             },
             // Step4 Start Publishing Stream
@@ -196,11 +180,13 @@ $(function(){
             // This part of the code binds the button click event
             // ==============================================================
             createZegoExpressEngineOption(){
-                this.createZegoExpressEngine();
-                this.createSuccessSvgStatus = true;
-                this.initEvent();
+                if(!this.createSuccessSvgStatu) {
+                    this.createZegoExpressEngine();
+                    this.createSuccessSvgStatus = true;
+                    this.initEvent();
+                }
             },
-            async CheckSystemRequire(){
+            async checkSystemRequire(){
                 if (!this.zg) return alert('you should create zegoExpressEngine');
                 const result = await this.checkSystemRequirements();
                 if (result) {
@@ -212,8 +198,7 @@ $(function(){
             },
             async loginRoomOption(){
                 try {
-                    this.isLogin = true;
-                    await this.loginRoom(this.roomID, this.userID, this.userID);
+                    this.isLogin =  await this.loginRoom(this.roomID, this.userID, this.userID, this.token);
                 } catch (err) {
                     this.isLogin = false;
                     console.log(err);
@@ -260,6 +245,6 @@ $(function(){
                 this.checkSystemRequireStatus = '';
                 this.audioCheckStatus = false;
             }
-        }
+        },
     })
 })

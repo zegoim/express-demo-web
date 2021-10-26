@@ -18,7 +18,7 @@ let localStream = null;
 let remoteStream = null;
 let published = false;
 let played = false;
-let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 
 
 // part end
@@ -104,17 +104,17 @@ function setLogConfig() {
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED' && isLoginRoom) {
+		if (state === 'CONNECTED' && isLoginRoom) {
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
-		
+
 		if (state === 'DISCONNECTED' && !isLoginRoom) {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
 		}
 
-		if(state === 'DISCONNECTED' && isLoginRoom) {
+		if (state === 'DISCONNECTED' && isLoginRoom) {
 			location.reload()
 		}
 	})
@@ -177,26 +177,10 @@ function createZegoExpressEngine() {
 }
 
 // Step2 Login room
-function loginRoom(roomId, userId, userName) {
-	return new Promise((resolve, reject) => {
-		$.get(
-			tokenUrl,
-			{
-				app_id: appID,
-				id_name: userID
-			},
-			async (token) => {
-				try {
-					await zg.loginRoom(roomId, token, {
-						userID: userId,
-						userName
-					});
-					resolve();
-				} catch (err) {
-					reject();
-				}
-			}
-		);
+function loginRoom(roomId, userId, userName, token) {
+	return zg.loginRoom(roomId, token, {
+		userID: userId,
+		userName
 	});
 }
 
@@ -257,7 +241,7 @@ async function stopPlayingStream(streamId) {
 // This part of the code binds the button click event
 // ==============================================================
 
-$('#CreateZegoExpressEngine').on('click', function() {
+$('#CreateZegoExpressEngine').on('click', function () {
 	createZegoExpressEngine();
 	// this.setAttribute('class', 'btn-info btn cuBtn')
 	this.setAttribute('disabled', 'disabled');
@@ -265,7 +249,7 @@ $('#CreateZegoExpressEngine').on('click', function() {
 	initEvent();
 });
 
-$('#CheckSystemRequire').on('click', async function() {
+$('#CheckSystemRequire').on('click', async function () {
 	if (!zg) return alert('you should create zegoExpressEngine');
 	const result = await checkSystemRequirements();
 	if (result) {
@@ -281,22 +265,23 @@ $('#CheckSystemRequire').on('click', async function() {
 
 $('#LoginRoom').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		if (!zg) return alert('should create zegoExpressEngine');
 		if (!isChecked) return alert('should test compatiblity');
 
-		const userName = $('#UserName').val();
+		const userID = $('#UserID').val();
 		const id = $('#RoomID').val();
+		const token = $('#Token').val();
 
-		if (!userName) return alert('UserName is Empty');
+		if (!userID) return alert('UserID is Empty');
 		if (!id) return alert('RoomID is Empty');
 		this.classList.add('border-primary');
 		if (!isLoginRoom) {
 			try {
 				isLoginRoom = true;
-				await loginRoom(id, userID, userName);
+				await loginRoom(id, userID, userID, token);
 				updateButton(this, 'Login Room', 'Logout Room');
-				$('#UserName')[0].disabled = true;
+				$('#UserID')[0].disabled = true;
 				$('#RoomID')[0].disabled = true;
 			} catch (err) {
 				isLoginRoom = false;
@@ -316,7 +301,7 @@ $('#LoginRoom').on(
 			isLoginRoom = false;
 			logoutRoom(id);
 			updateButton(this, 'Login Room', 'Logout Room');
-			$('#UserName')[0].disabled = false;
+			$('#UserID')[0].disabled = false;
 			$('#RoomID')[0].disabled = false;
 		}
 	}, 500)
@@ -324,7 +309,7 @@ $('#LoginRoom').on(
 
 $('#startPublishing').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		if (!zg) return alert('should create zegoExpressEngine');
 		if (!isChecked) return alert('should test compatiblity');
 		if (!isLoginRoom) return alert('should login room');
@@ -369,7 +354,7 @@ $('#startPublishing').on(
 
 $('#startPlaying').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		if (!zg) return alert('should create zegoExpressEngine');
 		if (!isChecked) return alert('should test compatiblity');
 		if (!isLoginRoom) return alert('should login room');
@@ -470,7 +455,7 @@ function changeVideo(flag) {
 function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
-	$('#UserName').val(userID);
+	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
 	$('#Camera')[0].checked = true;

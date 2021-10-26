@@ -1,0 +1,46 @@
+let appID,// 请从官网控制台获取对应的appID
+  server // 请从官网控制台获取对应的server地址，否则可能登录失败
+
+let appInfo = {}
+if (!appID || !server) {
+  try {
+    const appInfoStr = localStorage.getItem("app_info")
+    const parseAppInfo = JSON.parse(appInfoStr)
+    appInfo = parseAppInfo || appInfo
+  } catch (error) {
+    localStorage.removeItem("app_info")
+  }
+} else {
+  localStorage.setItem("app_info", JSON.stringify({
+    appID,
+    server
+  }))
+}
+appID = appInfo.appID;
+server = appInfo.server;
+
+$("#AppID").val(appID)
+$("#Server").val(server)
+
+function setAppIDAndServer(newAppID, newServer) {
+  if (isNaN(newAppID)) {
+    alert("AppID is wrong")
+    return
+  } else if (!newServer) {
+    alert("Server is wrong")
+    return
+  } else {
+    appID = newAppID
+    server = newServer
+    localStorage.setItem("app_info", JSON.stringify({
+      appID,
+      server
+    }))
+  }
+}
+
+$("#submit").click(() => {
+  const newAppID = parseInt($("#AppID").val())
+  const newServer = $("#Server").val()
+  setAppIDAndServer(newAppID, newServer)
+})

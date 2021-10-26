@@ -101,6 +101,10 @@ const menu = `
       </li>
       <span class="sidebar-title" data-lang="DebugAndConfig">调试与配置</span>
       <li>
+        <a href="../../DebugAndConfig/InitSettings/index.html" class="waves-effect"
+          data-lang="InitSettings">初始设置</a>
+      </li>
+      <li>
         <a href="../../DebugAndConfig/LogAndVersionAndDebug/index.html" class="waves-effect"
           data-lang="Log_Version_Debug">日志、版本号、调试信息</a>
       </li>

@@ -1,0 +1,235 @@
+* {
+	word-break: break-all;
+  }
+  /* 房间状态样式 */
+  .preview-roomInfo {
+	font-weight: 500;
+  }
+  #roomInfo-id {
+	display: inline-block;
+	font-weight: normal;
+  }
+  
+  #roomInfo-state {
+	display: inline-block;
+	font-weight: normal;
+  }
+  
+  /* 步骤样式 */
+  .action-step {
+	margin: 10px 0;
+  }
+  
+  .action-content {
+	width: 100%;
+	background-color: rgb(252, 250, 250);
+	border-radius: 10px;
+	padding: 10px;
+  }
+  
+  .action-title {
+	font-weight: 700px;
+	color: black;
+  }
+  
+  .action-info {
+	font-size: 14px;
+  }
+  
+  .action-form {
+	display: flex;
+	flex-direction: column;
+  }
+  
+  .action-form .user-item {
+	display: flex;
+	justify-content: space-between;
+  }
+  
+  .action-form .user-item + .user-item {
+	margin-top: 5px;
+  }
+  .user-item .user-name {
+	margin-right: 5px;
+  }
+  
+  .play-pause-button {
+	margin-top: 15px;
+  }
+  .enable-button.play-pause-button {
+	margin: 0;
+	width: 100px;
+	height: 24;
+  }
+  
+  .action-item {
+	display: flex;
+	justify-content: space-between;
+	font-size: 16px;
+  }
+  .action-item input {
+	flex: 2;
+  }
+  
+  .action-item + .action-item {
+	margin-top: 10px;
+  }
+  
+  .action-subtitle {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 5px 0;
+  }
+  
+  /* 控件样式 */
+  
+  input {
+	min-width: 80px;
+	height: 21px;
+	border: 1px solid #ced4da;
+	border-radius: 0.25rem;
+	color: #495057;
+  }
+  
+  .publish-setting {
+	display: flex;
+	align-items: center;
+  }
+  
+  .publish-check {
+	flex-basis: 50%;
+	display: flex;
+	justify-content: space-around;
+  }
+  
+  .check-wrapper {
+	text-align: center;
+	display: flex;
+	align-items: center;
+  }
+  
+  .check-input {
+	display: inline-block;
+	width: auto !important;
+	height: auto !important;
+  }
+  
+  select {
+	width: 45% !important;
+	height: 21px !important;
+	padding: 0 !important;
+	font-size: 12px !important;
+  }
+  
+  .select-wrapper {
+	flex-basis: 30%;
+	display: flex;
+	align-items: center;
+	white-space: nowrap;
+  }
+  
+  option {
+	height: 21px !important;
+	font-size: 14px;
+  }
+  
+  /* 旋转盒子 */
+  .show_rotatebox {
+	width: 100%;
+	height: 250px;
+	border: 1px solid #dfdfdf;
+	transform-style: preserve-3d;
+	transform: rotateX(180deg);
+	perspective: 10000px;
+  }
+  
+  .rotatebox {
+	width: 140px;
+	height: 140px;
+	position: absolute;
+	transform-style: preserve-3d;
+	transition: transform 0.5s;
+	left: 50%;
+	top: 50%;
+  }
+  
+  .rotatebox div {
+	width: 140px;
+	height: 140px;
+	background-color: rgba(0, 255, 0, 0.9);
+	position: absolute;
+	text-align: center;
+	line-height: 140px;
+	font-size: 20px;
+	font-weight: bold;
+  }
+  
+  .rotatebox div:nth-of-type(1) {
+	transform: translateZ(70px) rotateZ(180deg) rotateY(0deg);
+	background-color: rgba(255, 152, 0, 0.9);
+  }
+  
+  .rotatebox div:nth-of-type(2) {
+	transform: translateZ(-70px) rotateZ(180deg) rotateY(180deg);
+	background-color: rgba(255, 152, 0, 0.9);
+  }
+  
+  .rotatebox div:nth-of-type(3) {
+	transform: translateX(70px) rotateX(180deg) rotateY(90deg);
+	background-color: rgba(0, 255, 255, 0.9);
+  }
+  
+  .rotatebox div:nth-of-type(4) {
+	transform: translateX(-70px) rotateX(180deg) rotateY(-90deg);
+	background-color: rgba(0, 255, 255, 0.9);
+  }
+  
+  .rotatebox div:nth-of-type(5) {
+	transform: translateY(-70px) rotateX(90deg);
+	background-color: rgba(255, 0, 0, 0.9);
+  }
+  
+  .rotatebox div:nth-of-type(6) {
+	transform: translateY(70px) rotateX(-90deg);
+	background-color: rgba(255, 0, 0, 0.9);
+  }
+  
+  .span-on {
+	color: #009688;
+  }
+  .span-off {
+	color: #ff5722;
+  }
+  
+  @media (max-width: 375px) {
+	.preview-playInfo {
+	  margin-top: 0 !important;
+	}
+  }
+  
+  /* 
+  
+  .btn-wrapper {
+	display: flex;
+	width: 100%;
+	background-color: rgb(252, 250, 250);
+	border-radius: 10px;
+	height: 30px;
+	justify-content: center;
+	align-items: center;
+  }
+  
+  
+  
+  .cuBtn {
+	display: block;
+	padding: 0 12px;
+	font-size: 13px;
+	cursor: pointer;
+	height: 30px;
+	width: 95%;
+  }
+  
+  
+  */
+  

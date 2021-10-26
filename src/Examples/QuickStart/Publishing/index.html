@@ -61,11 +61,31 @@
               </div>
               <div class="action-content">
                 <div class="action-room font-14">
-                  <div class="action-roomId f-b-3">
-                    RoomID <input type="text" id="RoomID" />
+                  <div class="action-roomId ">
+                    RoomID 
+                    <div class="icon-question">?
+                      <div class="pop-box" data-lang="RoomIDDesc">Tooltip text</div>
+                    </div>
+                    <input type="text" class="w-70" id="RoomID" />
                   </div>
-                  <div class="action-userName f-b-7">
-                    UserName <input type="text" class="w-70" id="UserName" />
+                  <div class="action-userName">
+                    UserID 
+                    <div class="icon-question">?
+                      <div class="pop-box">
+                        <span data-lang="UserIDDesc"></span>
+                      </div>
+                    </div>
+                    <input type="text" class="w-70" id="UserID" />
+                  </div>
+                  <div class="action-token">
+                    Token 
+                    <div class="icon-question">?
+                      <div class="pop-box">
+                        <span data-lang="TokenDesc"></span>
+                        <a href="https://console.zego.im"  data-lang="ApplyToken" target="_blank"></a>
+                      </div>
+                    </div>
+                    <input type="text" class="w-70" id="Token" />
                   </div>
                 </div>
                 <!-- <button id="LoginRoom" type="button" class="btn-info btn cuBtn">Login Room</button> -->

@@ -15,7 +15,7 @@ let zg = null;
 let localStream = null;
 let remoteStream = null;
 let isLogin = false;
-let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
+let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 // part end
 
@@ -126,27 +126,10 @@ async function checkSystemRequirements() {
 }
 
 // Step3 Login room
-function loginRoom(roomId, userId, userName) {
-	return new Promise((resolve, reject) => {
-		// Need to get the token before logging in to the room
-		$.get(
-			tokenUrl,
-			{
-				app_id: appID,
-				id_name: userID
-			},
-			async (token) => {
-				try {
-					await zg.loginRoom(roomId, token, {
-						userID: userId,
-						userName
-					});
-					resolve();
-				} catch (err) {
-					reject();
-				}
-			}
-		);
+function loginRoom(roomId, userId, userName, token) {
+	return zg.loginRoom(roomId, token, {
+		userID: userId,
+		userName
 	});
 }
 
@@ -224,17 +207,18 @@ $('#CheckSystemRequire').on('click', async function () {
 });
 
 $('#LoginRoom').on('click', async function () {
-	const userName = $('#UserName').val();
+	const userID = $('#UserID').val();
 	const id = $('#RoomID').val();
+	const token = $('#Token').val();
 	try {
 		isLogin = true;
-		await loginRoom(id, userID, userName);
+		await loginRoom(id, userID, userID, token);
 		$('#loginSuccessSvg').css('display', 'inline-block');
 	} catch (err) {
 		isLogin = false;
 		console.log(err);
 	}
-	$('#UserName')[0].disabled = true;
+	$('#UserID')[0].disabled = true;
 	$('#RoomID')[0].disabled = true;
 });
 
@@ -285,7 +269,7 @@ $('#reset').on('click', async function () {
 	$('#Microphone')[0].disabled = false;
 	$('#Mirror')[0].disabled = false;
 	$('#CameraDevices')[0].disabled = false;
-	$('#UserName')[0].disabled = false;
+	$('#UserID')[0].disabled = false;
 	$('#RoomID')[0].disabled = false;
 	$('#createSuccessSvg').css('display', 'none');
 	$('#checkSuccessSvg').css('display', 'none');
@@ -343,7 +327,7 @@ function changeVideo(flag) {
 function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
-	$('#UserName').val(userID);
+	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
 	$('#Camera')[0].checked = true;

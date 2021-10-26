@@ -15,7 +15,7 @@ let zg = null;
 let remoteStream = null;
 let isLogin = false;
 let played = false;
-let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
+let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 // part end
 
@@ -100,27 +100,10 @@ async function checkSystemRequirements() {
 }
 
 //  Login room
-function loginRoom(roomId, userId, userName) {
-	return new Promise((resolve, reject) => {
-		// Need to get the token before logging in to the room
-		$.get(
-			tokenUrl,
-			{
-				app_id: appID,
-				id_name: userID
-			},
-			async (token) => {
-				try {
-					await zg.loginRoom(roomId, token, {
-						userID: userId,
-						userName
-					});
-					resolve();
-				} catch (err) {
-					reject();
-				}
-			}
-		);
+function loginRoom(roomId, userId, userName, token) {
+	return zg.loginRoom(roomId, token, {
+		userID: userId,
+		userName
 	});
 }
 
@@ -166,18 +149,20 @@ $('#LoginRoom').on(
 	'click',
 	util.throttle(async function () {
 
-		const userName = $('#UserName').val();
+		const userID = $('#UserID').val();
 		const id = $('#RoomID').val();
+		const token = $('#Token').val();
 
-		if (!userName) return alert('UserName is Empty');
+		if (!userID) return alert('userID is Empty');
 		if (!id) return alert('RoomID is Empty');
 		this.classList.add('border-primary');
 		if (!isLogin) {
 			try {
 				isLogin = true;
-				await loginRoom(id, userID, userName);
+				await loginRoom(id, userID, userID, token);
+				debugger
 				updateButton(this, 'Login Room', 'Logout Room');
-				$('#UserName')[0].disabled = true;
+				$('#UserID')[0].disabled = true;
 				$('#RoomID')[0].disabled = true;
 			} catch (err) {
 				isLogin = false;
@@ -193,7 +178,7 @@ $('#LoginRoom').on(
 			isLogin = false;
 			logoutRoom(id);
 			updateButton(this, 'Login Room', 'Logout Room');
-			$('#UserName')[0].disabled = false;
+			$('#UserID')[0].disabled = false;
 			$('#RoomID')[0].disabled = false;
 		}
 	}, 500)
@@ -211,7 +196,7 @@ $('#startPlaying').on(
 			const config = {
 				video: $('#Video')[0].checked ? undefined : false,
 				audio: $('#Audio')[0].checked ? undefined : false,
-				videoCodec : 'VP8'
+				videoCodec: 'VP8'
 			};
 			const flag = await startPlayingStream(id, config);
 			if (flag) {
@@ -269,7 +254,7 @@ function updateButton(button, preText, afterText) {
 async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
-	$('#UserName').val(userID);
+	$('#UserID').val(userID);
 	$('#PlayID').val(streamID);
 	$('#Video')[0].checked = true;
 	createZegoExpressEngine();

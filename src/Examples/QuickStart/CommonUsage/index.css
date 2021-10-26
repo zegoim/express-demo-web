@@ -26,7 +26,6 @@
   font-weight: normal;
 }
 
-
 .logger-wrapper {
   margin-top: 20px;
   width: 100%;
@@ -75,25 +74,49 @@
 }
 
 .action-room {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding-bottom: 15px;
 }
-
-.f-b-3 {
-  flex-basis: 30%;
+.action-room > div + div {
+  margin-top: 4px;
 }
-
-.f-b-7 {
-  flex-basis: 70% !important;
+.icon-question {
+  display: inline-block;
+  text-align: center;
+  line-height: 16px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #0575ff;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+/* Tooltip text */
+.icon-question .pop-box {
+  visibility: hidden;
+  width: 120px;
+  background-color: #fff;
+  box-shadow: 0 0 10px #dfdfdf;
+  color: #000;
+  text-align: center;
+  border-radius: 6px;
+  padding: 4px;
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+  font-weight: 100;
+  font-size: 12px;
+}
+/* Show the tooltip text when you mouse over the tooltip container */
+.icon-question:hover .pop-box {
+  visibility: visible;
 }
 
 input {
   width: 40%;
-  height: 21px ;
+  height: 21px;
   border: 1px solid #ced4da;
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   color: #495057;
 }
 

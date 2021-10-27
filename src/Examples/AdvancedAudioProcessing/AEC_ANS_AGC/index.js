@@ -13,7 +13,7 @@ let streamID = '0019'
 
 let zg = null;
 let isChecked = false;
-let isLoginRoom = false;
+let isLogin = false;
 let localStream = null;
 let remoteStream = null;
 let published = false;
@@ -95,18 +95,17 @@ async function enumDevices() {
 
 function initEvent() {
   zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED' && isLoginRoom) {
-			console.log(111);
+		if(state === 'CONNECTED' && isLogin) {
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
 		
-		if (state === 'DISCONNECTED' && !isLoginRoom) {
+		if (state === 'DISCONNECTED' && !isLogin) {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
 		}
 
-		if(state === 'DISCONNECTED' && isLoginRoom) {
+		if(state === 'DISCONNECTED' && isLogin) {
 			location.reload()
 		}
 	})
@@ -142,28 +141,14 @@ function initEvent() {
   })
 }
 
-function clearStream(flag) {
 
-  if(flag === 'publish') {
-    localStream && zg.destroyStream(localStream);
-    $('#publishVideo')[0].srcObject = null;
-    localStream = null;
-    published = false
-    if($('#PublishID').val() === $('#PlayID').val()) {
-      remoteStream && zg.destroyStream(remoteStream);
-      $('#playVideo')[0].srcObject = null;
-      remoteStream = null;
-      played = false
-    }
-  }
-
-  if(flag === 'play') {
-    remoteStream && zg.destroyStream(remoteStream);
-    $('#playVideo')[0].srcObject = null;
-    remoteStream = null;
-    played = false
-  }
+function destroyStream() {
+  localStream && zg.destroyStream(localStream);
+  $('#publishVideo')[0].srcObject = null;
+  localStream = null;
+  published = false;
 }
+
 
 function setLogConfig() {
   let config = localStorage.getItem('logConfig')
@@ -178,28 +163,11 @@ function setLogConfig() {
   }
   zg.setDebugVerbose(DebugVerbose);
 }
-
-function loginRoom(roomId, userId, userName) {
-  return new Promise((resolve, reject) => {
-    $.get(
-      tokenUrl,
-      {
-        app_id: appID,
-        id_name: userID
-      },
-      async (token) => {
-        try {
-          await zg.loginRoom(roomId, token, {
-            userID: userId,
-            userName
-          });
-          resolve()
-        } catch (err) {
-          reject()
-        }
-      }
-    );
-  })
+function loginRoom(roomId, userId, userName, token) {
+	return zg.loginRoom(roomId, token, {
+		userID: userId,
+		userName
+	});
 }
 
 async function startPublishingStream(streamId, config) {
@@ -218,7 +186,7 @@ async function stopPublishingStream(streamId) {
   if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
     stopPlayingStream(streamId)
   }
-  clearStream('publish')
+  destroyStream()
 }
 
 async function startPlayingStream(streamId, options = {}) {
@@ -233,7 +201,6 @@ async function startPlayingStream(streamId, options = {}) {
 
 async function stopPlayingStream(streamId) {
   zg.stopPlayingStream(streamId)
-  clearStream('play')
 }
 
 // uses SDK end
@@ -242,6 +209,45 @@ async function stopPlayingStream(streamId) {
 // ============================================================== 
 // This part of the code binds the button click event
 // ==============================================================  
+$('#LoginRoom').on(
+	'click',
+	util.throttle(async function () {
+
+		const userID = $('#UserID').val();
+		const id = $('#RoomID').val();
+		const token = $('#Token').val();
+		$("#roomInfo-id").text(id)
+
+		if (!userID) return alert('userID is Empty');
+		if (!id) return alert('RoomID is Empty');
+		this.classList.add('border-primary');
+		if (!isLogin) {
+			try {
+				isLogin = true;
+				await loginRoom(id, userID, userID, token);
+				
+        updateButton(this, 'Login Room', 'Logout Room');
+				$('#UserID')[0].disabled = true;
+				$('#RoomID')[0].disabled = true;
+        $('#LoginRoom').hide()
+			} catch (err) {
+				isLogin = false;
+				this.classList.remove('border-primary');
+				this.classList.add('border-error');
+				this.innerText = 'Login Fail Try Again';
+			}
+		} else {
+			if (localStream) {
+				updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
+			}
+			isLogin = false;
+			logoutRoom(id);
+			updateButton(this, 'Login Room', 'Logout Room');
+			$('#UserID')[0].disabled = false;
+			$('#RoomID')[0].disabled = false;
+		}
+	}, 500)
+);
 
 $('#startPublishing').on('click', util.throttle( async function () {
   const id = $('#PublishID').val();
@@ -377,12 +383,6 @@ async function render() {
   enumDevices()
   initEvent()
   setLogConfig()
-  try {
-    isLoginRoom = true;
-    await loginRoom(roomID, userID, userID)
-  } catch (err) {
-    isLoginRoom = false;
-  }
 }
 
 render()

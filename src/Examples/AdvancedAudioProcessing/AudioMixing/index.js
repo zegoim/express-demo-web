@@ -12,7 +12,7 @@ let roomID = '0020';
 let streamID = '0020';
 
 let zg = null;
-let isLoginRoom = false;
+let isLogin = false;
 let isStart = false;
 let localStream = null;
 let remoteStream = null;
@@ -92,18 +92,17 @@ async function enumDevices() {
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if (state === 'CONNECTED' && isLoginRoom) {
-			console.log(111);
+		if (state === 'CONNECTED' && isLogin) {
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
 
-		if (state === 'DISCONNECTED' && !isLoginRoom) {
+		if (state === 'DISCONNECTED' && !isLogin) {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
 		}
 
-		if (state === 'DISCONNECTED' && isLoginRoom) {
+		if (state === 'DISCONNECTED' && isLogin) {
 			location.reload();
 		}
 	});
@@ -121,9 +120,8 @@ function initEvent() {
 	});
 }
 
-function clearStream() {
+function destroyStream() {
 	localStream && zg.destroyStream(localStream);
-	remoteStream && zg.destroyStream(remoteStream);
 	remoteStream = null;
 	localStream = null;
 	$('#publishVideo')[0].srcObject = null;
@@ -144,26 +142,10 @@ function setLogConfig() {
 	zg.setDebugVerbose(DebugVerbose);
 }
 
-function loginRoom(roomId, userId, userName) {
-	return new Promise((resolve, reject) => {
-		$.get(
-			tokenUrl,
-			{
-				app_id: appID,
-				id_name: userID
-			},
-			async (token) => {
-				try {
-					await zg.loginRoom(roomId, token, {
-						userID: userId,
-						userName
-					});
-					resolve();
-				} catch (err) {
-					reject();
-				}
-			}
-		);
+function loginRoom(roomId, userId, userName, token) {
+	return zg.loginRoom(roomId, token, {
+		userID: userId,
+		userName
 	});
 }
 
@@ -214,7 +196,44 @@ async function stopMixingAudio(streamId) {
 // ==============================================================
 // This part of the code binds the some  event
 // ==============================================================
+$('#LoginRoom').on(
+	'click',
+	util.throttle(async function () {
 
+		const userID = $('#UserID').val();
+		const id = $('#RoomID').val();
+		const token = $('#Token').val();
+		$("#roomInfo-id").text(id)
+
+		if (!userID) return alert('userID is Empty');
+		if (!id) return alert('RoomID is Empty');
+		this.classList.add('border-primary');
+		if (!isLogin) {
+			try {
+				isLogin = true;
+				await loginRoom(id, userID, userID, token);
+				updateButton(this, 'Login Room', 'Logout Room');
+				$('#UserID')[0].disabled = true;
+				$('#RoomID')[0].disabled = true;
+				$('#LoginRoom').hide()
+			} catch (err) {
+				isLogin = false;
+				this.classList.remove('border-primary');
+				this.classList.add('border-error');
+				this.innerText = 'Login Fail Try Again';
+			}
+		} else {
+			if (localStream) {
+				updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
+			}
+			isLogin = false;
+			logoutRoom(id);
+			updateButton(this, 'Login Room', 'Logout Room');
+			$('#UserID')[0].disabled = false;
+			$('#RoomID')[0].disabled = false;
+		}
+	}, 500)
+);
 $('#start').on(
 	'click',
 	util.throttle(async function() {
@@ -244,7 +263,7 @@ $('#start').on(
 			$('#PublishID')[0].disabled = false;
 			$('#AudioMixing')[0].disabled = true;
 			$('#AudioMixing').prop("checked",false);
-			clearStream();
+			destroyStream();
 		}
 	}, 500)
 );
@@ -304,7 +323,6 @@ function checkVideo() {
 async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
-	$('#UserName').val(userID);
 	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
@@ -314,12 +332,6 @@ async function render() {
 	enumDevices();
 	initEvent();
 	setLogConfig();
-	try {
-    isLoginRoom = true;
-		await loginRoom(roomID, userID, userID);
-	} catch (err) {
-		isLoginRoom = false;
-	}
 }
 
 render();

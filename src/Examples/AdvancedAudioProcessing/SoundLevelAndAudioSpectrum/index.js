@@ -12,10 +12,10 @@ let roomID = '0018';
 let streamID = '0018';
 
 let zg = null;
-let isLoginRoom = false;
+let isLogin = false;
 let localStream = null;
 let remoteStream = null;
-let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 // part end
 
 // ==============================================================
@@ -91,18 +91,18 @@ async function enumDevices() {
 // init SDK Event
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if (state === 'CONNECTED' && isLoginRoom) {
+		if (state === 'CONNECTED' && isLogin) {
 			console.log(111);
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
 
-		if (state === 'DISCONNECTED' && !isLoginRoom) {
+		if (state === 'DISCONNECTED' && !isLogin) {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
 		}
 
-		if (state === 'DISCONNECTED' && isLoginRoom) {
+		if (state === 'DISCONNECTED' && isLogin) {
 			location.reload();
 		}
 	});
@@ -125,10 +125,10 @@ function initEvent() {
 
 	zg.on('soundLevelUpdate', (streamList) => {
 		streamList.forEach((stream) => {
-      if(stream.streamID === streamID) {
-        const value = Math.round(stream.soundLevel)
-        $('#SoundLevelProgressbar').progressbar(value)
-      }
+			if (stream.streamID === streamID) {
+				const value = Math.round(stream.soundLevel)
+				$('#SoundLevelProgressbar').progressbar(value)
+			}
 		});
 	});
 }
@@ -147,26 +147,10 @@ function setLogConfig() {
 	zg.setDebugVerbose(DebugVerbose);
 }
 
-function loginRoom(roomId, userId, userName) {
-	return new Promise((resolve, reject) => {
-		$.get(
-			tokenUrl,
-			{
-				app_id: appID,
-				id_name: userID
-			},
-			async (token) => {
-				try {
-					await zg.loginRoom(roomId, token, {
-						userID: userId,
-						userName
-					});
-					resolve();
-				} catch (err) {
-					reject();
-				}
-			}
-		);
+function loginRoom(roomId, userId, userName, token) {
+	return zg.loginRoom(roomId, token, {
+		userID: userId,
+		userName
 	});
 }
 
@@ -182,11 +166,11 @@ async function startPublishingStream(streamId, config) {
 }
 
 function startSoundLevelDelegate(time) {
-  zg.setSoundLevelDelegate(true, time);
+	zg.setSoundLevelDelegate(true, time);
 }
 
 function stopSoundLevelDelegate() {
-  zg.setSoundLevelDelegate(false);
+	zg.setSoundLevelDelegate(false);
 }
 
 // uses SDK end
@@ -195,14 +179,60 @@ function stopSoundLevelDelegate() {
 // This part of the code bind checkbox change event
 // ==============================================================
 
-$('#SoundLevelMonitor').on('change', function({ target }) {
+$('#SoundLevelMonitor').on('change', function ({ target }) {
 	if (target.checked) {
 		startSoundLevelDelegate(100)
 	} else {
-    stopSoundLevelDelegate()
+		stopSoundLevelDelegate()
 		$('#SoundLevelProgressbar').progressbar(0)
 	}
 });
+// uses SDK end
+
+// ==============================================================
+// This part of the code binds the button click event
+// ==============================================================
+
+$('#LoginRoom').on(
+	'click',
+	util.throttle(async function () {
+
+		const userID = $('#UserID').val();
+		const id = $('#RoomID').val();
+		const token = $('#Token').val();
+		$("#roomInfo-id").text(id)
+
+		if (!userID) return alert('userID is Empty');
+		if (!id) return alert('RoomID is Empty');
+		this.classList.add('border-primary');
+		if (!isLogin) {
+			try {
+				isLogin = true;
+				await loginRoom(id, userID, userID, token);
+				updateButton(this, 'Login Room', 'Logout Room');
+				$('#UserID')[0].disabled = true;
+				$('#RoomID')[0].disabled = true;
+				$('#LoginRoom').hide()
+				startPublishingStream(streamID, getCreateStreamConfig());
+			} catch (err) {
+				isLogin = false;
+				this.classList.remove('border-primary');
+				this.classList.add('border-error');
+				this.innerText = 'Login Fail Try Again';
+				throw err
+			}
+		} else {
+			if (localStream) {
+				updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
+			}
+			isLogin = false;
+			logoutRoom(id);
+			updateButton(this, 'Login Room', 'Logout Room');
+			$('#UserID')[0].disabled = false;
+			$('#RoomID')[0].disabled = false;
+		}
+	}, 500)
+);
 
 // bind event end
 
@@ -221,11 +251,11 @@ function getCreateStreamConfig() {
 // PROGRESSBAR CLASS DEFINITION
 // ==============================================================
 
-const Progressbar = function(element) {
+const Progressbar = function (element) {
 	this.$element = $(element);
 };
 
-Progressbar.prototype.update = function(value) {
+Progressbar.prototype.update = function (value) {
 	var $div = this.$element.find('div');
 	var $span = $div.find('span');
 	$div.attr('aria-valuenow', value);
@@ -234,8 +264,8 @@ Progressbar.prototype.update = function(value) {
 };
 
 // PROGRESSBAR PLUGIN DEFINITION
-$.fn.progressbar = function(option) {
-	return this.each(function() {
+$.fn.progressbar = function (option) {
+	return this.each(function () {
 		var $this = $(this),
 			data = $this.data('jbl.progressbar');
 
@@ -246,6 +276,25 @@ $.fn.progressbar = function(option) {
 };
 
 // class defintion end
+
+function updateButton(button, preText, afterText) {
+	if (button.classList.contains('playing')) {
+		button.classList.remove('paused', 'playing', 'border-error', 'border-primary');
+		button.classList.add('paused');
+		button.innerText = afterText;
+	} else {
+		if (button.classList.contains('paused')) {
+			button.classList.remove('border-error', 'border-primary');
+			button.classList.add('playing');
+			button.innerText = preText;
+		}
+	}
+	if (!button.classList.contains('paused')) {
+		button.classList.remove('border-error', 'border-primary');
+		button.classList.add('paused');
+		button.innerText = afterText;
+	}
+}
 
 // ==============================================================
 // This part of the code Initialization web page
@@ -259,13 +308,6 @@ async function render() {
 	enumDevices();
 	initEvent();
 	setLogConfig();
-	try {
-		isLoginRoom = true
-		await loginRoom(roomID, userID, userID);
-	} catch (err) {
-		isLoginRoom = false
-	}
-	await startPublishingStream(streamID, getCreateStreamConfig());
 }
 
 render();

@@ -16,7 +16,7 @@ let mixStreamID = 'mix_0025';
 
 let zg = null;
 let isChecked = false;
-let isLoginRoom = false;
+let isLogin = false;
 let firstStream = null;
 let secondStream = null;
 let remoteStream = null;
@@ -99,44 +99,27 @@ async function enumDevices() {
 	$('#MirrorDevices').html(audioInputList.join(''));
 	$('#CameraDevices').html(videoInputList.join(''));
 }
-
-function loginRoom(roomId, userId, userName) {
-	return new Promise((resolve, reject) => {
-		$.get(
-			tokenUrl,
-			{
-				app_id: appID,
-				id_name: userID
-			},
-			async (token) => {
-				try {
-					await zg.loginRoom(roomId, token, {
-						userID: userId,
-						userName
-					});
-					resolve();
-				} catch (err) {
-					reject();
-				}
-			}
-		);
+function loginRoom(roomId, userId, userName, token) {
+	return zg.loginRoom(roomId, token, {
+		userID: userId,
+		userName
 	});
 }
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED' && isLoginRoom) {
+		if(state === 'CONNECTED' && isLogin) {
 			console.log(111);
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
 		
-		if (state === 'DISCONNECTED' && !isLoginRoom) {
+		if (state === 'DISCONNECTED' && !isLogin) {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
 		}
 
-		if(state === 'DISCONNECTED' && isLoginRoom) {
+		if(state === 'DISCONNECTED' && isLogin) {
 			location.reload()
 		}
 	})
@@ -181,18 +164,6 @@ function clearStream(flag) {
 		$('#publishSecondVideo')[0].srcObject = null;
 		secondStream = null;
 		secondPublished = false;
-	}
-
-	if (flag === 'play' || flag === 'mixed') {
-		remoteStream && zg.destroyStream(remoteStream);
-		$('#playVideo')[0].srcObject = null;
-		remoteStream = null;
-		played = false;
-		if (flvPlayer) {
-			flvPlayer.destroy();
-			flvPlayer = null;
-		}
-		updateButton($('#StartPlayingMixedStream')[0], 'Start Playing Mixed Stream', 'Stop Playing Mixed Stream');
 	}
 }
 
@@ -254,7 +225,6 @@ async function startPlayingStream(streamId, options = {}) {
 
 async function stopPlayingStream(streamId) {
 	zg.stopPlayingStream(streamId);
-	clearStream('play');
 }
 
 async function startMixerTask(taskID, streamList, mixStreamId) {
@@ -287,7 +257,44 @@ async function stopMixerTask(taskID) {
 // ==============================================================
 // This part of the code binds the button click event
 // ==============================================================
+$('#LoginRoom').on(
+	'click',
+	util.throttle(async function () {
 
+		const userID = $('#UserID').val();
+		const id = $('#RoomID').val();
+		const token = $('#Token').val();
+		$("#roomInfo-id").text(id)
+
+		if (!userID) return alert('userID is Empty');
+		if (!id) return alert('RoomID is Empty');
+		this.classList.add('border-primary');
+		if (!isLogin) {
+			try {
+				isLogin = true;
+				await loginRoom(id, userID, userID, token);
+				updateButton(this, 'Login Room', 'Logout Room');
+				$('#UserID')[0].disabled = true;
+				$('#RoomID')[0].disabled = true;
+				$('#LoginRoom').hide()
+			} catch (err) {
+				isLogin = false;
+				this.classList.remove('border-primary');
+				this.classList.add('border-error');
+				this.innerText = 'Login Fail Try Again';
+			}
+		} else {
+			if (localStream) {
+				updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
+			}
+			isLogin = false;
+			logoutRoom(id);
+			updateButton(this, 'Login Room', 'Logout Room');
+			$('#UserID')[0].disabled = false;
+			$('#RoomID')[0].disabled = false;
+		}
+	}, 500)
+);
 $('#startFirstPublishing').on(
 	'click',
 	util.throttle(async function() {
@@ -459,6 +466,8 @@ function updateButton(button, preText, afterText) {
 
 async function render() {
 	$('#roomInfo-id').text(roomID);
+	$('#RoomID').val(roomID);
+	$('#UserID').val(userID);
 	$('#PublishFirstID').text(streamFirstID);
 	$('#PublishSecondID').text(streamSecondID);
 	$('#PlayID').val(mixStreamID);
@@ -470,12 +479,6 @@ async function render() {
 	enumDevices();
 	initEvent();
 	setLogConfig();
-	try {
-		isLoginRoom = true;
-		await loginRoom(roomID, userID, userID);
-	} catch (err) {
-		isLoginRoom = false;
-	}
 }
 
 render();

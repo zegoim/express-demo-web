@@ -35,6 +35,14 @@ function setUserID(val) {
     data.userID = document.querySelector("#user-id").value
   }
 }
+function setToken(val) {
+  if (val || val === "") {
+    data.token = val
+    document.querySelector("input#token").value = data.token
+  } else {
+    data.token = document.querySelector("#token").value
+  }
+}
 function setLoginState(val) {
   data.isLogin = val
   document.querySelector("#roomStateSuccessSvg").style.display = val ? "inline-block" : "none"
@@ -61,25 +69,22 @@ function setLoginState(val) {
 
 }
 async function loginRoom() {
-  const { userID, roomID } = data
+  const { userID, roomID, token } = data
   if (!data.isLogin) {
     document.querySelector("#LoginRoom").disabled = true
-    $.get(
-      tokenUrl,
-      {
-        app_id: appID,
-        id_name: userID
-      },
-      async (token) => {
-        const result = await zg.loginRoom(roomID, token, {
-          userID,
-        }, {
-          userUpdate: true
-        });
-        setLoginState(result)
-        document.querySelector("#LoginRoom").disabled = false
-      }
-    );
+    try {
+      debugger
+      const result = await zg.loginRoom(roomID, token, {
+        userID,
+      }, {
+        userUpdate: true
+      });
+      setLoginState(result)
+      document.querySelector("#LoginRoom").disabled = false
+    } catch (error) {
+      document.querySelector("#LoginRoom").disabled = false
+      alert(JSON.stringify(error))
+    }
   } else {
     zg.logoutRoom()
     setLoginState(false)

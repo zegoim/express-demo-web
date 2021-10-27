@@ -48,13 +48,32 @@
               </div>
               <div class="action-content">
                 <div class="action-form font-14">
-                  <div class="action-item">
-                    <span data-lang="RoomID">房间 ID</span>
+                  <div class="action-item col-12 col-lg-4">
+                    <span>RoomID</span>
+                    <div class="icon-question">?
+                      <div class="pop-box" data-lang="RoomIDDesc">Tooltip text</div>
+                    </div>
                     <input type="text" id="room-id" onchange="setRoomID()" />
                   </div>
-                  <div class="action-item">
-                    <span data-lang="UserID">用户 ID</span>
+                  <div class="action-item col-12 col-lg-4">
+                    <span>UserID</span>
+                    <div class="icon-question">?
+                      <div class="pop-box">
+                        <span data-lang="UserIDDesc"></span>
+                      </div>
+                    </div>
+                    
                     <input type="text" id="user-id" onchange="setUserID()" />
+                  </div>
+                  <div class="action-item col-12 col-lg-4">
+                    <span>Token</span>
+                    <div class="icon-question">?
+                      <div class="pop-box">
+                        <span data-lang="TokenDesc"></span>
+                        <a href="https://console.zego.im" data-lang="ApplyToken" target="_blank"></a>
+                      </div>
+                    </div>
+                    <input type="text" id="token" onchange="setToken()" />
                   </div>
                 </div>
                 <!-- <button id="LoginRoom" type="button" class="btn-info btn cuBtn">Login Room</button> -->

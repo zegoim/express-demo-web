@@ -73,7 +73,6 @@ async function loginRoom() {
   if (!data.isLogin) {
     document.querySelector("#LoginRoom").disabled = true
     try {
-      debugger
       const result = await zg.loginRoom(roomID, token, {
         userID,
       }, {

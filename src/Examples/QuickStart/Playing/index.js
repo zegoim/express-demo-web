@@ -160,7 +160,6 @@ $('#LoginRoom').on(
 			try {
 				isLogin = true;
 				await loginRoom(id, userID, userID, token);
-				debugger
 				updateButton(this, 'Login Room', 'Logout Room');
 				$('#UserID')[0].disabled = true;
 				$('#RoomID')[0].disabled = true;

@@ -13,12 +13,12 @@ let streamID = '0007'
 
 let zg = null;
 let isChecked = false;
-let isLoginRoom = false;
+let isLogin = false;
 let localStream = null;
 let remoteStream = null;
 let published = false;
 let played = false;
-let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 
 // part end
 
@@ -33,89 +33,89 @@ function createZegoExpressEngine() {
 
 // Step1 Check system requirements
 async function checkSystemRequirements() {
-	console.log('sdk version is', zg.getVersion());
-	try {
-		const result = await zg.checkSystemRequirements();
+  console.log('sdk version is', zg.getVersion());
+  try {
+    const result = await zg.checkSystemRequirements();
 
-		console.warn('checkSystemRequirements ', result);
+    console.warn('checkSystemRequirements ', result);
 
-		if (!result.webRTC) {
-			console.error('browser is not support webrtc!!');
-			return false;
-		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
-			console.error('browser is not support H264 and VP8');
-			return false;
-		} else if (!result.camera && !result.microphones) {
-			console.error('camera and microphones not allowed to use');
-			return false;
-		} else if (result.videoCodec.VP8) {
-			if (!result.screenSharing) console.warn('browser is not support screenSharing');
-		} else {
-			console.log('不支持VP8，请前往混流转码测试');
-		}
-		return true;
-	} catch (err) {
-		console.error('checkSystemRequirements', err);
-		return false;
-	}
+    if (!result.webRTC) {
+      console.error('browser is not support webrtc!!');
+      return false;
+    } else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
+      console.error('browser is not support H264 and VP8');
+      return false;
+    } else if (!result.camera && !result.microphones) {
+      console.error('camera and microphones not allowed to use');
+      return false;
+    } else if (result.videoCodec.VP8) {
+      if (!result.screenSharing) console.warn('browser is not support screenSharing');
+    } else {
+      console.log('不支持VP8，请前往混流转码测试');
+    }
+    return true;
+  } catch (err) {
+    console.error('checkSystemRequirements', err);
+    return false;
+  }
 }
 
 function initEvent() {
   zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED' && isLoginRoom) {
-			console.log(111);
-			$('#roomStateSuccessSvg').css('display', 'inline-block');
-			$('#roomStateErrorSvg').css('display', 'none');
-		}
-		
-		if (state === 'DISCONNECTED' && !isLoginRoom) {
-			$('#roomStateSuccessSvg').css('display', 'none');
-			$('#roomStateErrorSvg').css('display', 'inline-block');
-		}
+    if (state === 'CONNECTED' && isLogin) {
+      console.log(111);
+      $('#roomStateSuccessSvg').css('display', 'inline-block');
+      $('#roomStateErrorSvg').css('display', 'none');
+    }
 
-		if(state === 'DISCONNECTED' && isLoginRoom) {
-			location.reload()
-		}
-	})
+    if (state === 'DISCONNECTED' && !isLogin) {
+      $('#roomStateSuccessSvg').css('display', 'none');
+      $('#roomStateErrorSvg').css('display', 'inline-block');
+    }
+
+    if (state === 'DISCONNECTED' && isLogin) {
+      location.reload()
+    }
+  })
 
   zg.on('publisherStateUpdate', result => {
-    if(result.state === "PUBLISHING") {
+    if (result.state === "PUBLISHING") {
       $('#pushlishInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PUBLISH") {
+    } else if (result.state === "NO_PUBLISH") {
       $('#pushlishInfo-id').text('')
     }
   })
 
   zg.on('playerStateUpdate', result => {
-    if(result.state === "PLAYING") {
+    if (result.state === "PLAYING") {
       $('#playInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PLAY") {
+    } else if (result.state === "NO_PLAY") {
       $('#playInfo-id').text('')
     }
   })
 
   zg.on('publishQualityUpdate', (streamId, stats) => {
-    $('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
+    $('#publishResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`)
     $('#sendBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
     $('#sendFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
     $('#sendPacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
   })
 
   zg.on('playQualityUpdate', (streamId, stats) => {
-      $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`) 
-      $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
-      $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
-      $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
+    $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`)
+    $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+    $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+    $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
   })
 
   zg.on('IMRecvBroadcastMessage', (roomID, messageInfo) => {
-    for(let i = 0; i < messageInfo.length; i++) {
+    for (let i = 0; i < messageInfo.length; i++) {
       updateLogger(`[BroadcastMessage] ${messageInfo[i].fromUser.userName}: ${messageInfo[i].message}`)
       $('#BroadcastMessageReceived').text(messageInfo[i].message)
     }
   })
   zg.on('IMRecvBarrageMessage', (roomID, chatData) => {
-    for(let i = 0; i < chatData.length; i++) {
+    for (let i = 0; i < chatData.length; i++) {
       updateLogger(`[BarrageMessage] ${chatData[i].fromUser.userName}: ${chatData[i].message}`)
       $('#BarrageMessageReceived').text(chatData[i].message)
     }
@@ -125,9 +125,9 @@ function initEvent() {
     $('#CustomCommandReceived').text(command)
   })
   zg.on('roomExtraInfoUpdate', (roomID, roomExtraInfoList) => {
-    for(let i = 0 ; i< roomExtraInfoList.length; i++) {
+    for (let i = 0; i < roomExtraInfoList.length; i++) {
       updateLogger(`[roomExtraInfo] ${roomExtraInfoList[i].updateUser.userName} 
-      set key: ${roomExtraInfoList[i].key } value: ${roomExtraInfoList[i].value}`)
+      set key: ${roomExtraInfoList[i].key} value: ${roomExtraInfoList[i].value}`)
       $('#RoomExtraInfo').text(roomExtraInfoList[i].value)
     }
   })
@@ -137,23 +137,12 @@ function initEvent() {
   })
 }
 
-function clearStream(flag) {
-
-  if(flag === 'publish') {
-    localStream && zg.destroyStream(localStream);
-    $('#publishVideo')[0].srcObject = null;
-    localStream = null;
-    published = false
-    if($('#PublishID').val() === $('#PlayID').val()) {
-      remoteStream && zg.destroyStream(remoteStream);
-      $('#playVideo')[0].srcObject = null;
-      remoteStream = null;
-      played = false
-    }
-  }
-
-  if(flag === 'play') {
-    remoteStream && zg.destroyStream(remoteStream);
+function destroyStream() {
+  localStream && zg.destroyStream(localStream);
+  $('#publishVideo')[0].srcObject = null;
+  localStream = null;
+  published = false
+  if ($('#PublishID').val() === $('#PlayID').val()) {
     $('#playVideo')[0].srcObject = null;
     remoteStream = null;
     played = false
@@ -163,58 +152,42 @@ function clearStream(flag) {
 function setLogConfig() {
   let config = localStorage.getItem('logConfig')
   const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
-  if(config) {
+  if (config) {
     config = JSON.parse(config)
     zg.setLogConfig({
       logLevel: config.logLevel,
       remoteLogLevel: config.remoteLogLevel,
       logURL: '',
-  });
+    });
   }
   zg.setDebugVerbose(DebugVerbose);
 }
 
-function loginRoom(roomId, userId, userName) {
-  return new Promise((resolve, reject) => {
-    $.get(
-      tokenUrl,
-      {
-        app_id: appID,
-        id_name: userID
-      },
-      async (token) => {
-        try {
-          await zg.loginRoom(roomId, token, {
-            userID: userId,
-            userName
-          });
-          resolve()
-        } catch (err) {
-          reject()
-        }
-      }
-    );
-  })
+function loginRoom(roomId, userId, userName, token) {
+  return zg.loginRoom(roomId, token, {
+    userID: userId,
+    userName
+  });
 }
 
-async function startPublishingStream (streamId, config) {
+async function startPublishingStream(streamId, config) {
   try {
     localStream = await zg.createStream(config);
     zg.startPublishingStream(streamId, localStream, { videoCodec });
     $('#publishVideo')[0].srcObject = localStream;
     return true
-  } catch(err) {
+  } catch (err) {
     return false
   }
-  
+
 }
 
 async function stopPublishingStream(streamId) {
   zg.stopPublishingStream(streamId)
-  if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
+  if (remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
     stopPlayingStream($('#playInfo-id').text())
   }
-  clearStream('publish')
+  destroyStream()
 }
 
 async function startPlayingStream(streamId, options = {}) {
@@ -229,7 +202,6 @@ async function startPlayingStream(streamId, options = {}) {
 
 async function stopPlayingStream(streamId) {
   zg.stopPlayingStream(streamId)
-  clearStream('play')
 }
 
 async function sendBroadcastMessage(roomId, message) {
@@ -237,7 +209,7 @@ async function sendBroadcastMessage(roomId, message) {
     const data = await zg.sendBroadcastMessage(roomId, message)
     return data
   } catch (err) {
-    return {errorCode: 1, extendedData: JSON.stringify(err)}
+    return { errorCode: 1, extendedData: JSON.stringify(err) }
   }
 }
 
@@ -246,7 +218,7 @@ async function sendBarrageMessage(roomId, message) {
     const data = await zg.sendBarrageMessage(roomId, message)
     return data
   } catch (err) {
-    return {errorCode: 1, extendedData: JSON.stringify(err)}
+    return { errorCode: 1, extendedData: JSON.stringify(err) }
   }
 }
 
@@ -255,7 +227,7 @@ async function sendCustomCommand(roomId, message, userId) {
     const data = await zg.sendCustomCommand(roomId, message, [userId])
     return data
   } catch (err) {
-    return {errorCode: 1, extendedData: JSON.stringify(err)}
+    return { errorCode: 1, extendedData: JSON.stringify(err) }
   }
 }
 
@@ -264,7 +236,7 @@ async function setRoomExtraInfo(roomId, key, value) {
     const data = await zg.setRoomExtraInfo(roomId, key, value)
     return data
   } catch (err) {
-    return {errorCode: 1, extendedData: JSON.stringify(err)}
+    return { errorCode: 1, extendedData: JSON.stringify(err) }
   }
 }
 
@@ -275,72 +247,110 @@ async function setRoomExtraInfo(roomId, key, value) {
 // This part of the code binds the button click event
 // ==============================================================  
 
-$('#startPublishing').on('click', util.throttle( async function () {
+$('#LoginRoom').on(
+  'click',
+  util.throttle(async function () {
+
+    const userID = $('#UserID').val();
+    const id = $('#RoomID').val();
+    const token = $('#Token').val();
+    $("#roomInfo-id").text(id)
+
+    if (!userID) return alert('userID is Empty');
+    if (!id) return alert('RoomID is Empty');
+    this.classList.add('border-primary');
+    if (!isLogin) {
+      try {
+        isLogin = true;
+        await loginRoom(id, userID, userID, token);
+        updateButton(this, 'Login Room', 'Logout Room');
+        $('#UserID')[0].disabled = true;
+        $('#RoomID')[0].disabled = true;
+        $('#LoginRoom').hide()
+      } catch (err) {
+        isLogin = false;
+        this.classList.remove('border-primary');
+        this.classList.add('border-error');
+        this.innerText = 'Login Fail Try Again';
+      }
+    } else {
+      if (localStream) {
+        updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
+      }
+      isLogin = false;
+      updateButton(this, 'Login Room', 'Logout Room');
+      $('#UserID')[0].disabled = false;
+      $('#RoomID')[0].disabled = false;
+    }
+  }, 500)
+);
+
+$('#startPublishing').on('click', util.throttle(async function () {
   const id = $('#PublishID').val();
-  if(!id) return alert('PublishID is empty')
+  if (!id) return alert('PublishID is empty')
   this.classList.add('border-primary')
-  if(!published) {
-      const flag =  await startPublishingStream(id);
-      if(flag) {
-        updateButton(this, 'Start Publishing', 'Stop Publishing');
-        published = true
-        $('#PublishID')[0].disabled = true
-        changeVideo()
-      } else {
-        changeVideo(true)
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Publishing Fail'
-      }
+  if (!published) {
+    const flag = await startPublishingStream(id);
+    if (flag) {
+      updateButton(this, 'Start Publishing', 'Stop Publishing');
+      published = true
+      $('#PublishID')[0].disabled = true
+      changeVideo()
+    } else {
+      changeVideo(true)
+      this.classList.remove('border-primary');
+      this.classList.add('border-error')
+      this.innerText = 'Publishing Fail'
+    }
 
   } else {
-      if(remoteStream && id === $('#PlayID').val()) {
+    if (remoteStream && id === $('#PlayID').val()) {
       $('#PlayID')[0].disabled = false
-        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
-        reSetVideoInfo()
-      }
-      stopPublishingStream(id);
-      updateButton(this, 'Start Publishing', 'Stop Publishing')
-      published = false
-      $('#PublishID')[0].disabled = false
-      reSetVideoInfo('publish')
+      updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+      reSetVideoInfo()
+    }
+    stopPublishingStream(id);
+    updateButton(this, 'Start Publishing', 'Stop Publishing')
+    published = false
+    $('#PublishID')[0].disabled = false
+    reSetVideoInfo('publish')
   }
 }, 500))
 
-$('#startPlaying').on('click', util.throttle( async function () {
+$('#startPlaying').on('click', util.throttle(async function () {
   const id = $('#PlayID').val();
-  if(!id) return alert('PublishID is empty')
+  if (!id) return alert('PublishID is empty')
   this.classList.add('border-primary')
-  if(!played) {
-      const flag =  await startPlayingStream(id);
-      if(flag) {
-        updateButton(this, 'Start Playing', 'Stop Playing');
-        played = true
+  if (!played) {
+    const flag = await startPlayingStream(id);
+    if (flag) {
+      updateButton(this, 'Start Playing', 'Stop Playing');
+      played = true
       $('#PlayID')[0].disabled = true
-        changeVideo()
-      } else {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Playing Fail'
-        changeVideo(true)
-      }
+      changeVideo()
+    } else {
+      this.classList.remove('border-primary');
+      this.classList.add('border-error')
+      this.innerText = 'Playing Fail'
+      changeVideo(true)
+    }
 
   } else {
-      stopPlayingStream(id);
-      updateButton(this, 'Start Playing', 'Stop Playing')
-      played = false
-      $('#PlayID')[0].disabled = false
-      reSetVideoInfo('play')
+    stopPlayingStream(id);
+    updateButton(this, 'Start Playing', 'Stop Playing')
+    played = false
+    $('#PlayID')[0].disabled = false
+    reSetVideoInfo('play')
   }
 }, 500))
 
-$('#BroadcastMessageBtn').on('click', util.throttle(async function() {
+$('#BroadcastMessageBtn').on('click', util.throttle(async function () {
   const message = $('#BroadcastMessage').val()
-  if(!message) return alert('message is empty')
+  if (!message) return alert('message is empty')
 
   updateLogger('[action] sendBroadcastMessage')
   const result = await sendBroadcastMessage(roomID, message)
-  if(result.errorCode === 0) {
+  if (result.errorCode === 0) {
     updateLogger('[info] sendBroadcastMessage success')
     updateLogger(`[BroadcastMessage] ${userID}: ${message}`)
     $('#BroadcastMessage').val('')
@@ -349,13 +359,13 @@ $('#BroadcastMessageBtn').on('click', util.throttle(async function() {
   }
 }, 500))
 
-$('#BarrageMessageBtn').on('click', util.throttle(async function() {
+$('#BarrageMessageBtn').on('click', util.throttle(async function () {
   const message = $('#BarrageMessage').val()
-  if(!message) return alert('message is empty')
+  if (!message) return alert('message is empty')
 
   updateLogger('[action] sendBarrageMessage')
   const result = await sendBarrageMessage(roomID, message)
-  if(result.errorCode  === 0) {
+  if (result.errorCode === 0) {
     updateLogger('[info] sendBarrageMessage success')
     updateLogger(`[BarrageMessage] ${userID}: ${message}`)
     $('#BarrageMessage').val('')
@@ -364,15 +374,15 @@ $('#BarrageMessageBtn').on('click', util.throttle(async function() {
   }
 }, 500))
 
-$('#CustomCommandBtn').on('click', util.throttle(async function() {
+$('#CustomCommandBtn').on('click', util.throttle(async function () {
   const message = $('#CustomCommand').val()
   const userId = $('#CustomCommandUserId').val()
-  if(!message) return alert('message is empty')
-  if(!userId) return alert('userId is empty')
+  if (!message) return alert('message is empty')
+  if (!userId) return alert('userId is empty')
 
   updateLogger('[action] sendCustomCommand')
   const result = await sendCustomCommand(roomID, message, userId)
-  if(result.errorCode  === 0) {
+  if (result.errorCode === 0) {
     updateLogger('[info] sendCustomCommand success')
     updateLogger(`[sendCustomCommand] ${userID}: ${message}`)
     $('#CustomCommand').val('')
@@ -382,16 +392,16 @@ $('#CustomCommandBtn').on('click', util.throttle(async function() {
   }
 }, 500))
 
-$('#RoomExtraInfoBtn').on('click', util.throttle(async function() {
+$('#RoomExtraInfoBtn').on('click', util.throttle(async function () {
 
   const key = $('#RoomExtraInfoKey').val()
   const value = $('#RoomExtraInfoValue').val()
-  if(!key) return alert('key is empty')
-  if(!value) return alert('value is empty')
+  if (!key) return alert('key is empty')
+  if (!value) return alert('value is empty')
 
   updateLogger('[action] setRoomExtraInfo')
   const result = await setRoomExtraInfo(roomID, key, value)
-  if(result.errorCode  === 0) {
+  if (result.errorCode === 0) {
     updateLogger('[info] setRoomExtraInfo success')
   } else {
     updateLogger(`[info] setRoomExtraInfo fail, extendedData: ${result.extendedData || ''}`)
@@ -429,35 +439,35 @@ function updateLogger(text) {
     <div>${text}</div>
   `)
   const scrollHeight = $('#logger').prop("scrollHeight");
-  $('#logger').scrollTop(scrollHeight,200);
+  $('#logger').scrollTop(scrollHeight, 200);
 }
 
 function changeVideo(flag) {
-  if(flag) {
+  if (flag) {
     $('#publishVideo').css('transform', 'none')
     $('#playVideo').css('transform', 'none')
     return
   }
-  const value =  $('#Mirror').val()
-  if(value === 'onlyPreview') {
+  const value = $('#Mirror').val()
+  if (value === 'onlyPreview') {
     $('#publishVideo').css('transform', 'scale(-1, 1)')
-  } else if(value === 'onlyPlay'){
+  } else if (value === 'onlyPlay') {
     $('#playVideo').css('transform', 'scale(-1, 1)')
-  } else if(value === 'both') {
+  } else if (value === 'both') {
     $('#publishVideo').css('transform', 'scale(-1, 1)')
     $('#playVideo').css('transform', 'scale(-1, 1)')
   }
 }
 
 function reSetVideoInfo(flag) {
-  if(flag === 'publish' || !flag) {
-    $('#publishResolution').text('') 
+  if (flag === 'publish' || !flag) {
+    $('#publishResolution').text('')
     $('#sendBitrate').text('')
     $('#sendFPS').text('')
     $('#sendPacket').text('')
   }
-  if(flag === 'play' || !flag) {
-    $('#playResolution').text('') 
+  if (flag === 'play' || !flag) {
+    $('#playResolution').text('')
     $('#receiveBitrate').text('')
     $('#receiveFPS').text('')
     $('#receivePacket').text('')
@@ -483,13 +493,8 @@ async function render() {
   await checkSystemRequirements()
   initEvent()
   setLogConfig()
-  try {
-    updateLogger(`[action] LoginRoom RoomID: ${roomID}`)
-    isLoginRoom = true;
-    await loginRoom(roomID, userID, userID)
-  } catch (err) {
-    isLoginRoom = false;
-  }
+  updateLogger(`[action] LoginRoom RoomID: ${roomID}`)
+
 }
 
 render()

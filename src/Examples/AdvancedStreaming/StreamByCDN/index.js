@@ -304,7 +304,7 @@ $('#PlayStreamFromURL').on('click', util.throttle( async function () {
   const cdnVideoElement = $('#playVideo')[0] || 
   $('CdnPlay').append(
     `
-    <video id="playVideo" autoplay muted preload="auto"
+    <video controls id="playVideo" autoplay muted preload="auto"
     x-webkit-airplay="true"
     x5-video-player-type="h5-page"
     webkit-playsinline="true"

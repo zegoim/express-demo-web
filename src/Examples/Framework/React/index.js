@@ -343,7 +343,7 @@ class CommonUsageReact extends React.Component {
                             <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id">{this.state.publishInfoStreamID}</span>
                         </div>
                         <div className="preview-content">
-                            <video ref="publishVideo" autoPlay playsInline muted
+                            <video controls ref="publishVideo" autoPlay playsInline muted
                                 className={ `${(this.state.mirrorVal=='onlyPreview' || this.state.mirrorVal=='both') ?'mirror':''}`}></video>
                         </div>
                         </div>
@@ -352,7 +352,7 @@ class CommonUsageReact extends React.Component {
                             <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id">{this.state.playInfoStreamID}</span>
                         </div>
                         <div className="preview-content">
-                            <video ref="playVideo" autoPlay playsInline 
+                            <video controls ref="playVideo" autoPlay playsInline 
                                 className={ `${(this.state.mirrorVal=='onlyPlay' || this.state.mirrorVal=='both') ?'mirror':''}`}></video>
                         </div>
                         </div>

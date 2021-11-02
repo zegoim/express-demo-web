@@ -53,7 +53,7 @@
                     id="pushlishInfo-id">{{publishInfoStreamID}}</span>
                 </div>
                 <div class="preview-content">
-                  <video id="publishVideo" ref="publishVideo" autoplay playsinline :muted="true"
+                  <video controls id="publishVideo" ref="publishVideo" autoplay playsinline :muted="true"
                     :class="(mirrorVal=='onlyPreview' || mirrorVal=='both')?'mirror':''"></video>
                 </div>
               </div>
@@ -63,7 +63,7 @@
                     id="playInfo-id">{{playInfoStreamID}}</span>
                 </div>
                 <div class="preview-content">
-                  <video id="playVideo" ref="playVideo" autoplay playsinline
+                  <video controls id="playVideo" ref="playVideo" autoplay playsinline
                     :class="(mirrorVal=='onlyPlay' || mirrorVal=='both')?'mirror':''"></video>
                 </div>
               </div>

@@ -467,7 +467,7 @@ function appednHtml(streamId, user) {
             <button id='b-${user.userID}' class="m-b-5 play-pause-button">Start Playing</button>
           </div>
         </div>
-        <video autoplay playsinline></video>
+        <video controls autoplay playsinline></video>
       </div>
       <div class="font-12 t-nowrap">
 			StreamID: <span id="s-${user.userID}"></span>

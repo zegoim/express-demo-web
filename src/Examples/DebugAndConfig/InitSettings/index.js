@@ -25,10 +25,10 @@ $("#Server").val(server)
 function setAppIDAndServer(newAppID, newServer) {
   if (isNaN(newAppID)) {
     alert("AppID is wrong")
-    return
+    return false
   } else if (!newServer) {
     alert("Server is wrong")
-    return
+    return false
   } else {
     appID = newAppID
     server = newServer
@@ -37,10 +37,17 @@ function setAppIDAndServer(newAppID, newServer) {
       server
     }))
   }
+  return true
 }
 
 $("#submit").click(() => {
   const newAppID = parseInt($("#AppID").val())
   const newServer = $("#Server").val()
-  setAppIDAndServer(newAppID, newServer)
+  const result = setAppIDAndServer(newAppID, newServer)
+  if(result) {
+    const isLink = confirm("Set successfully! Link to function page.")
+    if(isLink) {
+      window.location.href = `${window.location.origin}/Examples/QuickStart/VideoTalk/index.html`
+    }
+  }
 })

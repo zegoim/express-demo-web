@@ -46,8 +46,9 @@ $("#submit").click(() => {
   const result = setAppIDAndServer(newAppID, newServer)
   if(result) {
     const isLink = confirm("Set successfully! Link to function page.")
+    var baseURL = window.location.href.match(/.*\/Examples/)[0]
     if(isLink) {
-      window.location.href = `${window.location.origin}/Examples/QuickStart/VideoTalk/index.html`
+      window.location.href = `${baseURL}/QuickStart/VideoTalk/index.html`
     }
   }
 })

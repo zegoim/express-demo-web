@@ -100,13 +100,7 @@
                       <div>Video Send FPS: <span id="sendFPS"></span></div>
                       <div>Packet Loss: <span id="sendPacket"></span></div>
                     </div>
-                    <div class="preview-video-action">
-                      <div class="m-t-10 m-b-5">
-                        Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
-                      </div>
-                      <button id="startPublishing" class="m-b-5 configBtn play-pause-button"
-                        title="createStream() / startPublishingStream()">Start Publishing</button>
-                    </div>
+
                   </div>
                   <video controls id="publishVideo" autoplay muted playsinline></video>
                 </div>
@@ -120,13 +114,6 @@
                       <div>Video Recv FPS: <span id="receiveFPS"></span></div>
                       <div>Packet Loss: <span id="receivePacket"></span></div>
                     </div>
-                    <div class="preview-video-action">
-                      <div class="m-t-10 m-b-5">
-                        Playing StreamID <input class="m-l-10" type="text" id="PlayID" />
-                      </div>
-                      <button id="startPlaying" class="m-b-5 configBtn play-pause-button"
-                        title="startPlayingStream()">Start Playing</button>
-                    </div>
                   </div>
                   <video controls id="playVideo" autoplay playsinline></video>
                 </div>
@@ -134,6 +121,19 @@
             </div>
           </div>
           <div class="col-12 col-lg-6 action-wrapper">
+            <div>
+              <div class="m-t-10 m-b-5">
+                Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
+              </div>
+              <button id="startPublishing" class="m-b-5 configBtn play-pause-button"
+                title="createStream() / startPublishingStream()">Start Publishing</button>
+
+              <div class="m-t-10 m-b-5">
+                Playing StreamID <input class="m-l-10" type="text" id="PlayID" />
+              </div>
+              <button id="startPlaying" class="m-b-5 configBtn play-pause-button"
+                title="startPlayingStream()">Start Playing</button>
+            </div>
             <div data-lang="OpenTheConsole"></div>
           </div>
         </div>

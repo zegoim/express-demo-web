@@ -13,7 +13,7 @@ let streamID = parseInt(Math.random() * 999999) + '';
 
 let zg = null;
 let isChecked = false;
-let isLogin = false; 
+let isLogin = false;
 let localStream = null;
 let published = false;
 let playMultipleStreamList = [];
@@ -101,7 +101,7 @@ function initEvent() {
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
-		
+
 		if (state === 'DISCONNECTED' && !isLogin) {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');

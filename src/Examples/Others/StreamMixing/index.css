@@ -18,13 +18,13 @@
 
 .preview-content > video {
   width: 100%;
-  height: 100%;
+  height: 80%;
 }
 
 .preview-action {
   position: absolute;
   width: 100%;
-  height: 100%;
+  height: 0%;
   background-color: rgba(0,0,0,.1);
   z-index: 1;
 }

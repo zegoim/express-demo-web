@@ -100,38 +100,10 @@
                       <div>Packet Loss: <span id="sendPacket"></span></div>
                     </div>
                     <div class="preview-video-action">
-                      <div class="flex-c">
-                        <div class="select-wrapper">
-                          <span data-lang="Mirror">Mirror</span>
-                          <select class="form-control form-control-sm m-l-5" id="Mirror">
-                            <option value="none">none</option>
-                            <option value="onlyPreview">onlyPreview</option>
-                            <option value="onlyPlay">onlyPlay</option>
-                            <option value="both">both</option>
-                          </select>
-                        </div>
-                        <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Camera" data-lang="Camera">Camera</label>
-                          <input class="check-input" type="checkbox" id="Camera" checked>
-                        </div>
-                      </div>
-                      <div class="flex-c">
-                        <div class="select-wrapper">
-                          <span data-lang="Camera">Camera</span>
-                          <select class="form-control form-control-sm m-l-5" id="CameraDevices">
-                          </select>
-                        </div>
-                        <div class="check-wrappre">
-                          <label class="form-check-label m-r-5" for="Microphone"
-                            data-lang="Microphone">Microphone</label>
-                          <input class="check-input" type="checkbox" id="Microphone" checked>
-                        </div>
-                      </div>
-                      <button id="startPublishing" class="m-b-5 play-pause-button"
-                        title="createStream()/ startPublishingStream()">Start Publishing</button>
                     </div>
                   </div>
                   <video controls id="publishVideo" autoplay muted playsinline></video>
+
                 </div>
                 <div class="font-12 flex-b">
                   <div>
@@ -145,6 +117,11 @@
                         p-id="2174"></path>
                     </svg>
                   </div>
+                </div>
+                <div class="preview-video-action">
+
+                  <button id="startPublishing" class="m-b-5 play-pause-button"
+                    title="createStream()/ startPublishingStream()">Start Publishing</button>
                 </div>
               </div>
             </div>
@@ -167,6 +144,34 @@
                   <div class="font-14 f-b-5">
                     <span data-lang="Bitrate">Bitrate</span> <input type="text" class="t-a-r" id="Bitrate"
                       value="300" /> kbps
+                  </div>
+                </div>
+
+                <div class="flex-c">
+                  <div class="select-wrapper">
+                    <span data-lang="Mirror">Mirror</span>
+                    <select class="form-control form-control-sm m-l-5" id="Mirror">
+                      <option value="none">none</option>
+                      <option value="onlyPreview">onlyPreview</option>
+                      <option value="onlyPlay">onlyPlay</option>
+                      <option value="both">both</option>
+                    </select>
+                  </div>
+                  <div class="check-wrappre">
+                    <label class="form-check-label m-r-5" for="Camera" data-lang="Camera">Camera</label>
+                    <input class="check-input" type="checkbox" id="Camera" checked>
+                  </div>
+                </div>
+                <div class="flex-c">
+                  <div class="select-wrapper">
+                    <span data-lang="Camera">Camera</span>
+                    <select class="form-control form-control-sm m-l-5" id="CameraDevices">
+                    </select>
+                  </div>
+                  <div class="check-wrappre">
+                    <label class="form-check-label m-r-5" for="Microphone"
+                      data-lang="Microphone">Microphone</label>
+                    <input class="check-input" type="checkbox" id="Microphone" checked>
                   </div>
                 </div>
                 <div class="dropdown-wrapper">

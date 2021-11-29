@@ -69,6 +69,13 @@
               </div>
               Login Room
             </button>
+            <div>
+              <div class="m-t-10 m-b-5">
+                Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
+              </div>
+              <button id="startPublishing" class="m-b-5 configBtn play-pause-button"
+                title="createStream() / startPublishingStream()">Start Publishing</button>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -106,15 +113,9 @@
                 </div>
                 <div class="preview-content">
                   <div class="preview-action">
-                    <div class="preview-video-action">
-                      <div class="m-t-10 m-b-5">
-                        Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
-                      </div>
-                      <button id="startPublishing" class="m-b-5 configBtn play-pause-button"
-                        title="createStream() / startPublishingStream()">Start Publishing</button>
-                    </div>
                   </div>
                   <video controls id="publishVideo" autoplay muted playsinline></video>
+
                 </div>
               </div>
             </div>

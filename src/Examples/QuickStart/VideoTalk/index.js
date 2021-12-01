@@ -7,8 +7,11 @@
 // This part of the code defines the default values and global values
 // ==============================================================
 
-let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0001';
+
+
+let userID = localStorage.getItem("userID") ? localStorage.getItem("userID") : Util.getBrow() + '_' + new Date().getTime() ;
+let roomID = localStorage.getItem("roomID") ? localStorage.getItem("roomID") :'0001';
+let token = localStorage.getItem("token") ? localStorage.getItem("token") :'';
 let streamID = 'web_' + new Date().getTime();
 let remoteStreamID = null;
 
@@ -144,9 +147,14 @@ function setLogConfig() {
 
 //  Login room
 function loginRoom(roomId, userId, userName) {
+
+
     return new Promise(async (resolve, reject) => {
         // Need to get the token before logging in to the room
         let token = $("#Token").val()
+        localStorage.setItem('roomID', roomID);
+        localStorage.setItem("userID", userID);
+        localStorage.setItem("token", token);
         try {
             await zg.loginRoom(roomId, token, {
                 userID: userId,
@@ -277,6 +285,7 @@ async function render() {
     $('#RoomID').val(roomID);
     $('#UserID').val(userID);
     $('#UserID').val(userID);
+    $('#Token').val(token);
     $('#PublishID').val(streamID);
     createZegoExpressEngine();
     await checkSystemRequirements();

@@ -7,8 +7,9 @@
 // This part of the code defines the default values and global values
 // ==============================================================
 
-let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0001';
+let userID = localStorage.getItem("userID") ? localStorage.getItem("userID") : Util.getBrow() + '_' + new Date().getTime() ;
+let roomID = localStorage.getItem("roomID") ? localStorage.getItem("roomID") :'0001';
+let token = localStorage.getItem("token") ? localStorage.getItem("token") :'';
 let streamID = '0001';
 
 let zg = null;
@@ -210,6 +211,11 @@ $('#LoginRoom').on('click', async function () {
 	const userID = $('#UserID').val();
 	const id = $('#RoomID').val();
 	const token = $('#Token').val();
+
+  localStorage.setItem('roomID', roomID);
+  localStorage.setItem("userID", userID);
+  localStorage.setItem("token", token);
+
 	try {
 		isLogin = true;
 		await loginRoom(id, userID, userID, token);
@@ -327,6 +333,7 @@ function changeVideo(flag) {
 function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
+  $('#Token').val(token);
 	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);

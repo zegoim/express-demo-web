@@ -146,7 +146,7 @@ function setLogConfig() {
 }
 
 //  Login room
-function loginRoom(roomId, userId, userName) {
+async function loginRoom(roomId, userId, userName) {
 
 
     return new Promise(async (resolve, reject) => {

@@ -135,8 +135,8 @@ class CommonUsageReact extends React.Component {
         }
     }
     // Step3 Login room
-    loginRoom(roomId, userId, userName, token) {
-        return zg.loginRoom(roomId, token, {
+    async loginRoom(roomId, userId, userName, token) {
+        return await zg.loginRoom(roomId, token, {
             userID: userId,
             userName
         });

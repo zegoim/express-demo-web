@@ -166,8 +166,8 @@ function setLogConfig() {
   }
   zg.setDebugVerbose(DebugVerbose);
 }
-function loginRoom(roomId, userId, userName, token) {
-	return zg.loginRoom(roomId, token, {
+async function loginRoom(roomId, userId, userName, token) {
+	return await zg.loginRoom(roomId, token, {
 		userID: userId,
 		userName
 	});

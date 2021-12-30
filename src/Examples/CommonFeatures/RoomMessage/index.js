@@ -163,8 +163,8 @@ function setLogConfig() {
   zg.setDebugVerbose(DebugVerbose);
 }
 
-function loginRoom(roomId, userId, userName, token) {
-  return zg.loginRoom(roomId, token, {
+async function loginRoom(roomId, userId, userName, token) {
+  return await zg.loginRoom(roomId, token, {
     userID: userId,
     userName
   });
@@ -263,6 +263,7 @@ $('#LoginRoom').on(
       try {
         isLogin = true;
         await loginRoom(id, userID, userID, token);
+        updateLogger(`[action] LoginRoom RoomID: ${id}`)
         updateButton(this, 'Login Room', 'Logout Room');
         $('#UserID')[0].disabled = true;
         $('#RoomID')[0].disabled = true;
@@ -272,6 +273,7 @@ $('#LoginRoom').on(
         this.classList.remove('border-primary');
         this.classList.add('border-error');
         this.innerText = 'Login Fail Try Again';
+        throw err
       }
     } else {
       if (localStream) {
@@ -408,6 +410,9 @@ $('#RoomExtraInfoBtn').on('click', util.throttle(async function () {
   }
 }, 500))
 
+$('#RoomID').on('change',()=>{
+  roomID = $('#RoomID').val()
+})
 // bind event end
 
 
@@ -493,7 +498,6 @@ async function render() {
   await checkSystemRequirements()
   initEvent()
   setLogConfig()
-  updateLogger(`[action] LoginRoom RoomID: ${roomID}`)
 
 }
 

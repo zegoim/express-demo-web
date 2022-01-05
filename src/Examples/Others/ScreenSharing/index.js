@@ -187,7 +187,6 @@ async function stopPublishingStream(streamId) {
 	if (remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
 		stopPlayingStream(streamId);
 	}
-	clearStream();
 }
 
 async function startPlayingStream(streamId, options = {}) {

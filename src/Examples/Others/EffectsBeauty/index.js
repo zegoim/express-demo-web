@@ -188,7 +188,6 @@ async function stopPublishingStream(streamId) {
 	if (remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
 		stopPlayingStream(streamId);
 	}
-	clearStream();
 }
 
 async function startPlayingStream(streamId, options = {}) {
@@ -276,7 +275,7 @@ $('#startPublishing').on(
 		if (!published) {
 			const flag = await startPublishingStream(id);
 			if (flag) {
-				updateButton(this, 'Start Screen Capture', 'Stop Screen Capture');
+				updateButton(this, 'Start Publishing', 'Stop Publishing');
 				published = true;
 				$('#PublishID')[0].disabled = true;
 				changeVideo();
@@ -288,7 +287,7 @@ $('#startPublishing').on(
 				reSetVideoInfo();
 			}
 			stopPublishingStream(id);
-			updateButton(this, 'Start Screen Capture', 'Stop Screen Capture');
+			updateButton(this, 'Start Publishing', 'Stop Publishing');
 			published = false;
 			$('#PublishID')[0].disabled = false;
 			reSetVideoInfo('publish');

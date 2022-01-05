@@ -102,7 +102,7 @@
                       Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
                     </div>
                     <button id="startPublishing" class="m-b-5 configBtn play-pause-button" title="createStream()">Start
-                      Screen Capture</button>
+                      Publish Stream</button>
                   </div>
                 </div>
               </div>
@@ -124,13 +124,15 @@
             </div>
             <div class="beauty-options">
               <hr>
-              <button type="button" id="openVideoEffect" class="btn btn-info btn-sm" title="setBeauty">开启美颜</button>
-              <button type="button" id="closeVideoEffect" class="btn btn-info btn-sm"
+              <button type="button" id="openVideoEffect" class="btn btn-info btn-sm" data-lang="EnableBeauty"
+                title="setBeauty">开启美颜</button>
+              <button type="button" id="closeVideoEffect" class="btn btn-info btn-sm" data-lang="DisableBeauty"
                 title="setBeauty">关闭美颜</button><br>
-              磨皮: <input type="range" min="0" max="100" value="50" id="range-blur"><br>
-              美白: <input type="range" min="0" max="100" value="50" id="range-light"><br>
-              红润: <input type="range" min="0" max="100" value="50" id="range-red"><br>
-              锐化: <input type="range" min="0" max="100" value="50" id="range-sharp"><br>
+              <span data-lang="Smooth">磨皮</span>: <input type="range" min="0" max="100" value="50" id="range-blur"><br>
+              <span data-lang="White">美白</span>: <input type="range" min="0" max="100" value="50" id="range-light"><br>
+              <span data-lang="Rosy">红润</span>: <input type="range" min="0" max="100" value="50" id="range-red"><br>
+              <span data-lang="Sharpen">锐化</span>: <input type="range" min="0" max="100" value="50"
+                id="range-sharp"><br>
             </div>
           </div>
         </div>

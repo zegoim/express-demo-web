@@ -14,7 +14,7 @@ if (!appID || !server) {
   }
   if (!appInfo.appID || !appInfo.server) {
     alert("Need to set appID and server url!")
-    window.location.href = `${baseURL}/DebugAndConfig/InitSettings/index.html`
+    window.location.href = `${baseURL}/DebugAndConfig/InitSettings/index.html${location.search}`
   }
 } else {
   localStorage.setItem("app_info", JSON.stringify({

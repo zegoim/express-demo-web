@@ -48,7 +48,7 @@ $("#submit").click(() => {
     const isLink = confirm("Set successfully! Link to function page.")
     var baseURL = window.location.href.match(/.*\/Examples/)[0]
     if(isLink) {
-      window.location.href = `${baseURL}/QuickStart/VideoTalk/index.html`
+      window.location.href = `${baseURL}/QuickStart/VideoTalk/index.html${location.search}`
     }
   }
 })

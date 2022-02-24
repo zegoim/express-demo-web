@@ -117,8 +117,7 @@ const menu = `
 
 setTimeout(() => {
   const wrapper = document.querySelector(".container.main-wrapper")
-  
   const div = document.createElement("div")
   div.innerHTML = menu
   wrapper.appendChild(div)
-}, 200);
+}, 1000);

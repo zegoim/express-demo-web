@@ -1,4 +1,4 @@
-const baseURL =  window.location.href.match(/.*\/Examples/)[0]
+var baseURL = window.location.href.match(/.*\/Examples/)[0]
 const menu = `
 <aside class="left-sidebar">
 <div class="scroll-sidebar">

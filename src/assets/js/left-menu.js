@@ -88,6 +88,9 @@ const menu = `
       </li>
       <span class="sidebar-title" data-lang="Others">其他功能</span>
       <li>
+        <a href="${baseURL}/Others/DeviceDetection/index.html" class="waves-effect" data-lang="DeviceDetection">设备检测</a>
+      </li>
+      <li>
         <a href="${baseURL}/Others/StreamMixing/index.html" class="waves-effect" data-lang="StreamMixing">混流</a>
       </li>
       <li>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lang="DeviceDetection">Device Detection</title>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../assets/css/style.css">
+  <link rel="stylesheet" href="./index.css">
+  <script src="../../../assets/js/express_sdk/ZegoExpressWebRTC.js"></script>
+</head>
+
+<body class="fix-sidebar card-no-border">
+  <div class="preloader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+    </svg>
+  </div>
+
+  <div class="container main-wrapper">
+    <div class="page-wrapper">
+      <div class="container-fluid">
+
+        <div class="col-12 col-lg-12 preview-wrapper">
+          <div class="preview-roomInfo" data-lang="DeviceDetection">
+            设备检测
+          </div>
+          <div class="action-step">
+            <div class="action-title">
+              <span class="action-info" data-lang="DeviceList">设备列表</span>
+            </div>
+            <div class="action-content">
+              <!-- <div id="devices-checking" style="text-align:center;"  class="action-form font-14">Connecting...</div> -->
+              <div id="devices" class="action-form font-14">
+                <div class="action-item col-12">
+                  <span data-lang="Microphone">麦克风</span>
+                  <span id="conn-mic" class="span-off">NO FOUND</span>
+                  <select class="form-control form-control-sm" id="select-mic"></select>
+
+                  <button class="button play-pause-button" data-lang="Detect" onclick="detectDevice('microphone')">
+                    检测
+                  </button>
+
+                </div>
+                <div class="action-item col-12">
+                  <span data-lang="Camera">摄像头</span>
+                  <span id="conn-camera" class="span-off">NO FOUND</span>
+
+                  <select class="form-control form-control-sm" id="select-camera"></select>
+
+                  <button class="button play-pause-button" data-lang="Detect" onclick="detectDevice('camera')">
+                    检测
+                  </button>
+                </div>
+                <div class="action-item col-12">
+                  <span data-lang="Speaker">扬声器</span>
+                  <span id="conn-speaker" class="span-off">NO FOUND</span>
+
+                  <select class="form-control form-control-sm" id="select-speaker"></select>
+                  <button class="button play-pause-button" data-lang="Detect" onclick="detectDevice('speaker')">
+                    检测
+                  </button>
+                </div>
+              </div>
+              <button class="play-pause-button" title="reset"  onclick="checkDeviceConnection()">
+                <span data-lang="GetDevices">获取设备</span>
+              </button>
+            </div>
+          </div>
+          <div class="action-step">
+            <div class="action-title">
+              <span class="action-info" data-lang="DetectionResult">检测结果</span>
+            </div>
+            <div class="action-content font-14">
+              <div id="result-microphone" class="action-item col-12">
+                <span data-lang="MicrophoneCheckResult">对着麦克风说话，检查进度条是否波动</span>
+                <br>
+                <progress id="mic-progress" value="0" max="100" min="0"></progress>
+              </div>
+              <div id="result-camera" class="action-item col-12">
+                <span data-lang="CameraCheckResult">检测摄像头画面是否正常</span>
+                <br>
+                <video id="camera-view" width="240" height="180" playsinline autoplay muted></video>
+              </div>
+              <div id="result-speaker" class="action-item col-12">
+                <span data-lang="SpeakerCheckResult">在系统设置中调大对应扬声器音量，检查对应扬声器是否正常播放歌曲</span>
+                <br>
+                <audio controls id="mic-player"
+                  src="http://zego-public.oss-cn-shanghai.aliyuncs.com/sdk-doc/assets/bike.mp3" loop></audio>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../../assets/js/left-menu.js"></script>
+  <script src="../../../assets/js/jquery.min.js"></script>
+  <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
+  <script src="../../../assets/js/metisMenu.min.js"></script>
+  <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
+  <script src="../../../assets/js/bootstrap.min.js"></script>
+  <script src="../../../assets/js/vconsole.min.js"></script>
+  <script src="../../../assets/js/custom.js"></script>
+  <script src="../../../KeyCenter.js"></script>
+  <script src="index.js"></script>
+</body>
+
+</html>

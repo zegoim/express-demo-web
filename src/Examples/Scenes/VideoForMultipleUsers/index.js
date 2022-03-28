@@ -578,7 +578,7 @@ async function render() {
 	$('#UserID').val(userID);
 	createZegoExpressEngine();
 	await checkSystemRequirements();
-	// enumDevices();
+	enumDevices();
 	playMultipleEvent();
 	initEvent();
 	setLogConfig();

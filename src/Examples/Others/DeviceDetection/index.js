@@ -202,7 +202,7 @@ const detectCamera = (() => {
 })()
 
 function detectSpeaker(detect = true) {
-  const player = document.querySelector("#mic-player")
+  const player = document.querySelector("#music-player")
   detect ? $("#result-speaker").show() : $("#result-speaker").hide()
   if (!detect) {
     player?.pause()

@@ -91,6 +91,9 @@ const menu = `
         <a href="${baseURL}/Others/DeviceDetection/index.html" class="waves-effect" data-lang="DeviceDetection">设备检测</a>
       </li>
       <li>
+        <a href="${baseURL}/Others/NetworkDetection/index.html" class="waves-effect" data-lang="NetworkDetection">网络检测</a>
+      </li>
+      <li>
         <a href="${baseURL}/Others/StreamMixing/index.html" class="waves-effect" data-lang="StreamMixing">混流</a>
       </li>
       <li>

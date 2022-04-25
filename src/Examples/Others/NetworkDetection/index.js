@@ -9,7 +9,7 @@ let userID = 'user' + Date.now();
 let roomID = '0001'
 
 const netQualityTextMap = {
-  "-1": "unknown",
+  "-1": "☆☆☆☆☆",
   "0": "★★★★★",
   "1": "★★★★☆",
   "2": "★★★☆☆",
@@ -151,8 +151,8 @@ async function render() {
       alert("Detection Finish")
     }).catch(err => {
       $("#LoginRoom").attr("disabled", false)
-      $("#uplink").text("unknown")
-      $("#downlink").text("unknown")
+      $("#uplink").text(netQualityTextMap[-1])
+      $("#downlink").text(netQualityTextMap[-1])
       alert(err)
     })
   })

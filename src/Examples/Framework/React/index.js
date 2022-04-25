@@ -66,18 +66,15 @@ class CommonUsageReact extends React.Component {
     }
     initEvent() {
         this.state.zg.on('roomStateUpdate', (roomId, state) => {
-            if (state === 'CONNECTED' && this.state.isLogin) {
+            if (state === 'CONNECTED') {
                 this.setState({
                     connectStatus: 'CONNECTED'
                 })
             }
-            if (state === 'DISCONNECTED' && !this.state.isLogin) {
+            if (state === 'DISCONNECTED') {
                 this.setState({
                     connectStatus: 'DISCONNECTED'
                 })
-            }
-            if (state === 'DISCONNECTED' && this.state.isLogin) {
-                location.reload()
             }
         })
 

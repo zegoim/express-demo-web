@@ -7,10 +7,10 @@
 // This part of the code defines the default values and global values
 // ==============================================================
 
+
 let userID = Util.getBrow() + '_' + new Date().getTime();
 let roomID = '0033';
-let streamID = '0033';
-
+let streamID = userID;
 let zg = null;
 let isChecked = false;
 let isLogin = false;
@@ -103,19 +103,15 @@ async function loginRoom(roomId, userId, userName, token) {
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if (state === 'CONNECTED' && isLogin) {
+		if (state === 'CONNECTED') {
 			console.log(111);
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
 
-		if (state === 'DISCONNECTED' && !isLogin) {
+		if (state === 'DISCONNECTED') {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
-		}
-
-		if (state === 'DISCONNECTED' && isLogin) {
-			location.reload()
 		}
 	})
 
@@ -243,8 +239,8 @@ $('#LoginRoom').on(
 		this.classList.add('border-primary');
 		if (!isLogin) {
 			try {
-				isLogin = true;
-				await loginRoom(id, userID, userID, token);
+				isLogin = true
+				await loginRoom(id, userID, userID, token)
 				updateButton(this, 'Login Room', 'Logout Room');
 				$('#UserID')[0].disabled = true;
 				$('#RoomID')[0].disabled = true;

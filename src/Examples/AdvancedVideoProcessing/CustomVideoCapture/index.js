@@ -93,19 +93,15 @@ async function enumDevices() {
 
 function initEvent() {
   zg.on('roomStateUpdate', (roomId, state) => {
-    if (state === 'CONNECTED' && isLogin) {
+    if (state === 'CONNECTED') {
       console.log(111);
       $('#roomStateSuccessSvg').css('display', 'inline-block');
       $('#roomStateErrorSvg').css('display', 'none');
     }
 
-    if (state === 'DISCONNECTED' && !isLogin) {
+    if (state === 'DISCONNECTED') {
       $('#roomStateSuccessSvg').css('display', 'none');
       $('#roomStateErrorSvg').css('display', 'inline-block');
-    }
-
-    if (state === 'DISCONNECTED' && isLogin) {
-      location.reload()
     }
   })
 
@@ -254,6 +250,7 @@ $('#LoginRoom').on(
         this.classList.remove('border-primary');
         this.classList.add('border-error');
         this.innerText = 'Login Fail Try Again';
+        throw err;
       }
     } else {
       if (localStream) {

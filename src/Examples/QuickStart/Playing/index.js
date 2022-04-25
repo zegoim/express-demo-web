@@ -25,19 +25,15 @@ let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if (state === 'CONNECTED' && isLogin) {
+		if (state === 'CONNECTED') {
 			console.log(111);
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
 
-		if (state === 'DISCONNECTED' && !isLogin) {
+		if (state === 'DISCONNECTED') {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
-		}
-
-		if (state === 'DISCONNECTED' && isLogin) {
-			location.reload()
 		}
 	})
 
@@ -158,8 +154,7 @@ $('#LoginRoom').on(
 		this.classList.add('border-primary');
 		if (!isLogin) {
 			try {
-				isLogin = true;
-				await loginRoom(id, userID, userID, token);
+				isLogin = await loginRoom(id, userID, userID, token);
 				updateButton(this, 'Login Room', 'Logout Room');
 				$('#UserID')[0].disabled = true;
 				$('#RoomID')[0].disabled = true;
@@ -168,6 +163,7 @@ $('#LoginRoom').on(
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Login Fail Try Again';
+        		throw err;
 			}
 		} else {
 			if (remoteStream) {

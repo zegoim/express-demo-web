@@ -56,14 +56,11 @@ $(function(){
             },
             initEvent() {
                 zg.on('roomStateUpdate', (roomId, state) => {
-                    if (state === 'CONNECTED' && this.isLogin) {
+                    if (state === 'CONNECTED') {
                         this.connectStatus = 'CONNECTED';
                     }
-                    if (state === 'DISCONNECTED' && !this.isLogin) {
+                    if (state === 'DISCONNECTED') {
                         this.connectStatus = 'DISCONNECTED';
-                    }
-                    if (state === 'DISCONNECTED' && this.isLogin) {
-                        location.reload()
                     }
                 })
 

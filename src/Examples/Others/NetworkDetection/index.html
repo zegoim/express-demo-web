@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lang="NetworkDetection">Network Detection</title>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../assets/css/style.css">
+  <link rel="stylesheet" href="./index.css">
+  <script src="../../../assets/js/express_sdk/ZegoExpressWebRTC.js"></script>
+</head>
+
+<body class="fix-sidebar card-no-border">
+  <div class="preloader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+    </svg>
+  </div>
+
+  <div class="container main-wrapper">
+    <div class="page-wrapper">
+      <div class="container-fluid">
+        <div class="col-12 col-lg-12 preview-wrapper">
+          <div class="row">
+            <div class="col-12 login-wrapper">
+              <h6 data-lang="Preconditions">前置条件</h6>
+              <div class="login-desc" data-lang="PreconditionsDesc">
+                体验该功能，需要模拟一个用户（UserID）登陆到对应的房间（RoomID）中，并且有权限（Token）时才可以登陆成功。
+              </div>
+              <div class="form-wrap font-14 row">
+                <div class="form-item col-12 col-lg-4">
+                  <span>RoomID</span>
+                  <div class="icon-question">?
+                    <div class="pop-box" data-lang="RoomIDDesc">Tooltip text</div>
+                  </div>
+                  <input type="text" id="RoomID" />
+                </div>
+                <div class="form-item col-12 col-lg-4">
+                  <span>UserID</span>
+                  <div class="icon-question">?
+                    <div class="pop-box">
+                      <span data-lang="UserIDDesc"></span>
+                    </div>
+                  </div>
+                  <input type="text" id="UserID" />
+                </div>
+                <div class="form-item col-12 col-lg-4">
+                  <span>Token</span>
+                  <div class="icon-question">?
+                    <div class="pop-box">
+                      <span data-lang="TokenDesc"></span>
+                      <a href="https://console.zego.im" data-lang="ApplyToken" target="_blank"></a>
+                    </div>
+                  </div>
+                  <input type="text" class="w-70" id="Token" />
+                </div>
+              </div>
+              <button id="LoginRoom" style="margin-top: 10px;" title="loginRoom()" style="width: 120px;">
+                <span data-lang="Detect">检测</span>
+              </button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 detection-wrapper">
+              <h6 data-lang="DetectionResult">前置条件</h6>
+              <div class="net-item">
+                <span class="item-key" data-lang="UplinkQuality">上行网络质量</span>：
+                <span class="item-value" id="uplink">unknown</span>
+              </div>
+              <div class="net-item">
+                <span class="item-key" data-lang="DownlinkQuality">下行网络质量</span>：
+                <span class="item-value" id="downlink">unknown</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../../assets/js/left-menu.js"></script>
+  <script src="../../../assets/js/jquery.min.js"></script>
+  <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
+  <script src="../../../assets/js/metisMenu.min.js"></script>
+  <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
+  <script src="../../../assets/js/bootstrap.min.js"></script>
+  <script src="../../../assets/js/vconsole.min.js"></script>
+  <script src="../../../assets/js/custom.js"></script>
+  <script src="../../../KeyCenter.js"></script>
+  <script src="index.js"></script>
+</body>
+
+</html>

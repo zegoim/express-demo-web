@@ -373,7 +373,6 @@ function syncPositionInfo() {
 (() => {
   // 创建实例
   // Create Instance
-  ZegoExpressEngine.use(RangeAudio)
   zg = new ZegoExpressEngine(appID, server)
   rangeAudio = zg.createRangeAudioInstance()
   syncPositionInfo()

@@ -145,6 +145,20 @@ async function loginRoom(roomId, userId, userName, token) {
 async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
+		if (zg.getVersion() < "2.17.0") {
+            $('#publishVideo')[0].srcObject = localStream;
+            $('#publishVideo').show()
+            $('#localVideo').hide()
+        } else {
+            const localView = zg.createLocalStreamView(localStream);
+            localView.play("localVideo", {
+                mirror: true,
+                objectFit: "cover",
+                enableAutoplayDialog: true,
+            })
+            $('#publishVideo').hide()
+            $('#localVideo').show()
+        }
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
 		$('#publishVideo')[0].srcObject = localStream;
 		return true;
@@ -340,6 +354,8 @@ async function render() {
 	$('#PlayID').val(streamID);
 	$('#Camera')[0].checked = true;
 	$('#Microphone')[0].checked = true;
+    $('#localVideo').hide()
+    $('#publishVideo').hide()
 	createZegoExpressEngine();
 	await checkSystemRequirements();
 	enumDevices();

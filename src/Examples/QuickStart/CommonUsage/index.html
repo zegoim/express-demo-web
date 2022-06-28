@@ -50,6 +50,7 @@
                 </div>
                 <div class="preview-content">
                   <video controls id="publishVideo" autoplay playsinline muted></video>
+                  <div id="localVideo"></div>
                 </div>
               </div>
               <div class="preview-playInfo m-t-10 col-lg-12 col-6">
@@ -58,6 +59,7 @@
                 </div>
                 <div class="preview-content">
                   <video controls id="playVideo" autoplay playsinline></video>
+                  <div id="remoteVideo"></div>
                 </div>
               </div>
             </div>
@@ -127,14 +129,14 @@
               <div class="action-content">
                 <div class="action-room font-14">
                   <div class="action-roomId ">
-                    RoomID 
+                    RoomID
                     <div class="icon-question">?
                       <div class="pop-box" data-lang="RoomIDDesc">Tooltip text</div>
                     </div>
                     <input type="text" class="w-70" id="RoomID" />
                   </div>
                   <div class="action-userName">
-                    UserID 
+                    UserID
                     <div class="icon-question">?
                       <div class="pop-box">
                         <span data-lang="UserIDDesc"></span>
@@ -143,11 +145,11 @@
                     <input type="text" class="w-70" id="UserID" />
                   </div>
                   <div class="action-token">
-                    Token 
+                    Token
                     <div class="icon-question">?
                       <div class="pop-box">
                         <span data-lang="TokenDesc"></span>
-                        <a href="https://console.zego.im"  data-lang="ApplyToken" target="_blank"></a>
+                        <a href="https://console.zego.im" data-lang="ApplyToken" target="_blank"></a>
                       </div>
                     </div>
                     <input type="text" class="w-70" id="Token" />

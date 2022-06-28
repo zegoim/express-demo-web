@@ -138,7 +138,6 @@ function clearStream(flag) {
 		$('#publishVideo')[0].srcObject = null;
 		localStream = null;
 		published = false;
-		remoteStream && zg.destroyStream(remoteStream);
 		$('#playVideo')[0].srcObject = null;
 		remoteStream = null;
 		played = false;
@@ -150,7 +149,6 @@ function clearStream(flag) {
 		localStream = null;
 		published = false;
 		if ($('#PublishID').val() === $('#PlayID').val()) {
-			remoteStream && zg.destroyStream(remoteStream);
 			$('#playVideo')[0].srcObject = null;
 			remoteStream = null;
 			played = false;
@@ -158,7 +156,6 @@ function clearStream(flag) {
 	}
 
 	if (flag === 'play') {
-		remoteStream && zg.destroyStream(remoteStream);
 		$('#playVideo')[0].srcObject = null;
 		remoteStream = null;
 		played = false;

@@ -8,7 +8,7 @@
   border: 1px solid #ccc;
 }
 
-.preview-content > video {
+.preview-content > video, #localVideo, #remoteVideo {
   width: 100%;
   height: 100%;
 }

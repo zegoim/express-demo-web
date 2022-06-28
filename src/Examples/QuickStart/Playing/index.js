@@ -6,11 +6,9 @@
 // ==============================================================
 // This part of the code defines the default values and global values
 // ==============================================================
-
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0003';
-let streamID = '0003';
-
+let roomID = '0001';
+let streamID = '0001';
 let zg = null;
 let remoteStream = null;
 let isLogin = false;
@@ -114,7 +112,20 @@ function logoutRoom(roomId) {
 async function startPlayingStream(streamId, options = {}) {
 	try {
 		remoteStream = await zg.startPlayingStream(streamId, options);
-		$('#playVideo')[0].srcObject = remoteStream;
+
+		if (zg.getVersion() < "2.17.0") {
+			$('#playVideo').srcObject = remoteStream;
+			$('#playVideo').show()
+			$('#remoteVideo').hide()
+		} else {
+			const remoteView = zg.createRemoteStreamView(remoteStream);
+			remoteView.play("remoteVideo", {
+				objectFit: "cover",
+				enableAutoplayDialog: true,
+			})
+			$('#playVideo').hide()
+			$('#remoteVideo').show()
+		}
 		return true;
 	} catch (err) {
 		return false;
@@ -128,7 +139,6 @@ async function stopPlayingStream(streamId) {
 }
 
 function clearStream() {
-	remoteStream && zg.destroyStream(remoteStream);
 	$('#playVideo')[0].pause()
 	$('#playVideo')[0].srcObject = null;
 	remoteStream = null;
@@ -163,7 +173,7 @@ $('#LoginRoom').on(
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Login Fail Try Again';
-        		throw err;
+				throw err;
 			}
 		} else {
 			if (remoteStream) {
@@ -191,7 +201,7 @@ $('#startPlaying').on(
 			const config = {
 				video: $('#Video')[0].checked ? undefined : false,
 				audio: $('#Audio')[0].checked ? undefined : false,
-				videoCodec: 'VP8'
+				videoCodec: localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8',
 			};
 			const flag = await startPlayingStream(id, config);
 			if (flag) {

@@ -9,9 +9,9 @@
 
 
 
-let userID = localStorage.getItem("userID") ? localStorage.getItem("userID") : Util.getBrow() + '_' + new Date().getTime() ;
-let roomID = localStorage.getItem("roomID") ? localStorage.getItem("roomID") :'0001';
-let token = localStorage.getItem("token") ? localStorage.getItem("token") :'';
+let userID = localStorage.getItem("userID") ? localStorage.getItem("userID") : Util.getBrow() + '_' + new Date().getTime();
+let roomID = localStorage.getItem("roomID") ? localStorage.getItem("roomID") : '0001';
+let token = localStorage.getItem("token") ? localStorage.getItem("token") : '';
 let streamID = 'web_' + new Date().getTime();
 let remoteStreamID = null;
 
@@ -108,8 +108,22 @@ function initEvent() {
                 remoteStreamID = addStream.streamID
                 $('#PlayUserID').text(addStream.user.userID)
                 remoteStream = await zg.startPlayingStream(remoteStreamID)
-                $('#playVideo')[0].srcObject = remoteStream;
-                playVideoEl.show();
+
+                if (zg.getVersion() < "2.17.0") {
+                    $('#playVideo').srcObject = remoteStream;
+                    playVideoEl.show();
+                    $('#playVideo').show()
+                    $('#remoteVideo').hide()
+                } else {
+                    const remoteView = zg.createRemoteStreamView(remoteStream);
+                    remoteView.play("remoteVideo", {
+                        objectFit: "cover",
+                        enableAutoplayDialog: true,
+                    })
+                    playVideoEl.show();
+                    $('#playVideo').hide()
+                    $('#remoteVideo').show()
+                }
             }
         } else if (updateType == 'DELETE') {
             //  del stream
@@ -176,7 +190,20 @@ async function startPublishingStream(streamId, config) {
     try {
         localStream = await zg.createStream(config);
         zg.startPublishingStream(streamId, localStream, { videoCodec });
-        $('#publishVideo')[0].srcObject = localStream;
+        if (zg.getVersion() < "2.17.0") {
+            $('#publishVideo')[0].srcObject = localStream;
+            $('#publishVideo').show()
+            $('#localVideo').hide()
+        } else {
+            const localView = zg.createLocalStreamView(localStream);
+            localView.play("localVideo", {
+                mirror: true,
+                objectFit: "cover",
+                enableAutoplayDialog: true,
+            })
+            $('#publishVideo').hide()
+            $('#localVideo').show()
+        }
         return true;
     } catch (err) {
         return false;
@@ -207,6 +234,7 @@ $('#LoginRoom').on(
         if (!userID) return alert('userID is Empty');
         if (!id) return alert('RoomID is Empty');
         if (!streamID) return alert('StreamID is Empty');
+
 
         this.classList.add('border-primary');
         if (!isLogin) {
@@ -283,6 +311,8 @@ async function render() {
     $('#UserID').val(userID);
     $('#Token').val(token);
     $('#PublishID').val(streamID);
+    $('#localVideo').hide()
+    $('#publishVideo').hide()
     createZegoExpressEngine();
     await checkSystemRequirements();
     initEvent();

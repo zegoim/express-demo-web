@@ -20,7 +20,7 @@ let playMultipleStreamList = [];
 let palyedObj = {};
 let playMultipleUserList = [];
 let playObj = {};
-let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 
 // part end
 
@@ -97,7 +97,7 @@ async function enumDevices() {
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED') {
+		if (state === 'CONNECTED') {
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
@@ -157,10 +157,10 @@ function playMultipleEvent() {
 				playMultipleStreamList.push(streamList[i]);
 
 				// add item to streamList
-				appednHtml(streamList[i].streamID, streamList[i].user);
+				appendHtml(streamList[i].streamID, streamList[i].user);
 				if (playObj[streamList[i].user.userID]) {
 					$(`#m-${streamList[i].user.userID}`).attr('data-id', streamList[i].streamID);
-					stopTostart(playObj[streamList[i].user.userID], streamList[i].streamID);
+					stopToStart(playObj[streamList[i].user.userID], streamList[i].streamID);
 					$(`#s-${streamList[i].user.userID}`).text(streamList[i].streamID);
 				}
 				playObj[streamList[i].user.userID] = streamList[i].streamID;
@@ -172,7 +172,8 @@ function playMultipleEvent() {
 					if (playMultipleStreamList[k].streamID === streamList[j].streamID) {
 						stopPlayingStream(playMultipleStreamList[k].streamID);
 						// remove item from streamList
-						removeHtml(playMultipleStreamList[k].streamID);
+						const { streamID, user } = playMultipleStreamList[k]
+						removeHtml(streamID, user);
 						const node = $(`[data-id=${streamList[j].streamID}]`)[0];
 						if (node) {
 							const id = node.id.split('-')[1];
@@ -187,7 +188,6 @@ function playMultipleEvent() {
 
 		$('#streamList').text(`StreamList (${playMultipleStreamList.length})`);
 	});
-
 	zg.on('roomUserUpdate', (roomID, updateType, userList) => {
 		if (updateType === 'ADD') { 	// users added
 
@@ -195,16 +195,14 @@ function playMultipleEvent() {
 				playMultipleUserList.push(userList[i]);
 				palyedObj[userList[i].userID] = false;
 				// add play cell to playList and add item to userList
-				appednHtml(null, userList[i]);
-				// bind event by userId
-				addMultiplePlayingEvent(userList[i].userID);
+				appendHtml(null, userList[i]);
 			}
 		} else if (updateType == 'DELETE') { // users deleted
 			for (let k = 0; k < playMultipleUserList.length; k++) {
 				for (let j = 0; j < userList.length; j++) {
 					if (playMultipleUserList[k].userID === userList[j].userID) {
 						// remove cell from playList and remove item from userList
-						removeHtml(null, playMultipleUserList[k]);
+						removeHtml(playObj[playMultipleUserList[k].userID], playMultipleUserList[k]);
 						playMultipleUserList.splice(k--, 1);
 						break;
 					}
@@ -216,10 +214,10 @@ function playMultipleEvent() {
 }
 
 function destroyStream() {
-		localStream && zg.destroyStream(localStream);
-		$('#publishVideo')[0].srcObject = null;
-		localStream = null;
-		published = false;
+	localStream && zg.destroyStream(localStream);
+	$('#publishVideo')[0].srcObject = null;
+	localStream = null;
+	published = false;
 }
 
 function setLogConfig() {
@@ -240,7 +238,7 @@ async function loginRoom(roomId, userId, userName, token) {
 	return await zg.loginRoom(roomId, token, {
 		userID: userId,
 		userName
-	});
+	}, { userUpdate: true });
 }
 
 function logoutRoom(roomId) {
@@ -314,7 +312,7 @@ $('#LoginRoom').on(
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Login Fail Try Again';
-        		throw err;
+				throw err;
 			}
 		} else {
 			if (localStream) {
@@ -331,7 +329,7 @@ $('#LoginRoom').on(
 
 $('#startPublishing').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		this.classList.add('border-primary');
 		if (!published) {
 			const flag = await startPublishingStream(streamID, getCreateStreamConfig());
@@ -422,77 +420,81 @@ function changeVideo(flag) {
 }
 
 // When users or streams added
-function appednHtml(streamId, user) {
+function appendHtml(streamId, user) {
 	if (streamId) {
 
 		// add new item to streamList
 		$('#streamListUl').append(`
-    <li id="l-${streamId}">
-    <div class="drop-item">
-      <span class="f-b-3 t-nowrap m-r-10">StreamID: ${streamId}</span>
-      <span class="f-b-3 t-nowrap m-r-5">UserID: ${user.userID}</span>
-      <span class="f-b-3 t-nowrap ">Name: ${user.userName}</span>
-    </div>
-    </li>
-    `);
+		<li id="l-${streamId}">
+		<div class="drop-item">
+		<span class="f-b-3 t-nowrap m-r-10">StreamID: ${streamId}</span>
+		<span class="f-b-3 t-nowrap m-r-5">UserID: ${user.userID}</span>
+		<span class="f-b-3 t-nowrap ">Name: ${user.userName}</span>
+		</div>
+		</li>
+		`);
 	}
 
-	if (!streamId && user) {
+	if (streamId && user) {
 		// add new item to PlayList
 		$('#videoList').append(
 			`<div class="preview-playInfo col-6" id="m-${user.userID}">
-        <div class="preview-content">
-        <div class="preview-action">
-          <div class="preview-info">
-            <div>Resolution: <span></span></div>
-            <div>Video Send Bitrate: <span></span></div>
-            <div>Video Send FPS: <span></span></div>
-            <div>Packet Loss: <span></span></div>
-          </div>
-          <div class="preview-video-action">
-            <div class="font-12 publish-check m-b-5 m-t-5">
-              <div class="check-wrappre m-r-5">
-                <label class="form-check-label m-r-5">Video</label>
-                <input class="check-input" type="checkbox" checked>
-              </div>
-              <div class="check-wrappre">
-                <label class="form-check-label m-r-5">Audio</label>
-                <input class="check-input" type="checkbox" checked>
-              </div>
-            </div>
-            <button id='b-${user.userID}' class="m-b-5 play-pause-button">Start Playing</button>
-          </div>
-        </div>
-        <video controls autoplay playsinline></video>
-      </div>
-      <div class="font-12 t-nowrap">
-			StreamID: <span id="s-${user.userID}"></span>
-        <div>UserName: <span class="m-r-5">${user.userName}</span></div>
-      </div>
-    </div>`
+				<div class="preview-content">
+				<div class="preview-action">
+				<div class="preview-info">
+					<div>Resolution: <span></span></div>
+					<div>Video Send Bitrate: <span></span></div>
+					<div>Video Send FPS: <span></span></div>
+					<div>Packet Loss: <span></span></div>
+				</div>
+				</div>
+				<video controls autoplay playsinline></video>
+
+			</div>
+			<div class="font-12 t-nowrap">
+					StreamID: <span id="s-${user.userID}"></span>
+				<div>UserName: <span class="m-r-5">${user.userName}</span></div>
+			
+				<div class="preview-video-action">
+					<div class="font-12 publish-check m-b-5 m-t-5">
+					<div class="check-wrappre m-r-5">
+						<label class="form-check-label m-r-5">Video</label>
+						<input class="check-input" type="checkbox" checked>
+					</div>
+					<div class="check-wrappre">
+						<label class="form-check-label m-r-5">Audio</label>
+						<input class="check-input" type="checkbox" checked>
+					</div>
+					</div>
+					<button id='b-${user.userID}' class="m-b-5 play-pause-button">Start Playing</button>
+				</div>
+			</div>
+			</div>`
 		);
+
+		// bind event by userId
+		addMultiplePlayingEvent(user.userID);
 
 		// add new item to userList
 		$('#userListUl').append(`
-    <li id="u-${user.userID}">
-    <div class="drop-item">
-      <span class="f-b-5 t-nowrap m-r-5">UserID: ${user.userID}</span>
-      <span class="f-b-5 t-nowrap ">Name: ${user.userName}</span>
-    </div>
-    </li>
-    `);
+			<li id="u-${user.userID}">
+			<div class="drop-item">
+			<span class="f-b-5 t-nowrap m-r-5">UserID: ${user.userID}</span>
+			<span class="f-b-5 t-nowrap ">Name: ${user.userName}</span>
+			</div>
+			</li>
+		`);
 	}
 }
 
 // When users or streams deleted
 function removeHtml(streamId, user) {
 	if (streamId) {
-		document.getElementById(`l-${streamId}`).remove();
+		$(`#l-${streamId}`).remove();
 	}
-
-	if (!streamId && user) {
-		document.getElementById(`m-${user.userID}`).remove();
-		document.getElementById(`u-${user.userID}`).remove();
+	if (streamId && user) {
+		$(`#m-${user.userID}`).remove();
+		$(`#u-${user.userID}`).remove();
 	}
 }
 
@@ -500,7 +502,7 @@ function removeHtml(streamId, user) {
 function addMultiplePlayingEvent(userId) {
 	$(`#b-${userId}`).on(
 		'click',
-		util.throttle(async function() {
+		util.throttle(async function () {
 			const selectId = this.id.split('-')[1];
 			const configInput = $(`#m-${selectId} input`);
 			this.classList.add('border-primary');
@@ -557,7 +559,7 @@ function setDisabled(flag) {
 	$('#Microphone')[0].disabled = flag;
 }
 
-async function stopTostart(oldId, newId) {
+async function stopToStart(oldId, newId) {
 	await stopPlayingStream(oldId)
 	startPlayingMultipleStream(newId)
 }

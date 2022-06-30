@@ -9,7 +9,9 @@
   border: 1px solid #ccc;
 }
 
-.preview-content > video {
+.preview-content>video,
+#localVideo,
+.remote-video {
   width: 100%;
   height: 100%;
 }
@@ -108,6 +110,7 @@
   font-weight: 700px;
   color: black;
 }
+
 .action-info {
   font-size: 14px;
 }
@@ -128,12 +131,15 @@
   flex-wrap: wrap;
   padding-bottom: 10px;
 }
+
 .form-wrap {
   margin: 6px 0;
 }
+
 .form-wrap .form-item {
   display: flex;
 }
+
 .form-wrap .form-item input {
   flex: 1;
 }
@@ -142,9 +148,11 @@
   padding: 15px;
   background-color: #fff;
 }
+
 .login-desc {
   font-size: 14px;
 }
+
 .icon-question {
   display: inline-block;
   text-align: center;
@@ -157,6 +165,7 @@
   cursor: pointer;
   font-weight: bold;
 }
+
 /* Tooltip text */
 .icon-question .pop-box {
   visibility: hidden;
@@ -173,6 +182,7 @@
   font-weight: 100;
   font-size: 12px;
 }
+
 /* Show the tooltip text when you mouse over the tooltip container */
 .icon-question:hover .pop-box {
   visibility: visible;
@@ -181,24 +191,30 @@
 .f-b-8 {
   flex-basis: 80%;
 }
+
 .f-b-5 {
   flex-basis: 50%;
 }
+
 .f-b-7 {
   flex-basis: 70%;
 }
+
 .f-b-3 {
   flex-basis: 30%;
 }
+
 .t-a-r {
   text-align: right;
 }
+
 .drop-item {
   display: flex;
   align-items: center;
   font-size: 12px;
   padding: 5px 5px;
 }
+
 .t-nowrap {
   overflow: hidden;
   text-overflow: ellipsis;

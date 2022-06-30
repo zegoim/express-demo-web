@@ -253,7 +253,20 @@ async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		$('#publishVideo')[0].srcObject = localStream;
+		if (zg.getVersion() < "2.17.0") {
+			$('#publishVideo')[0].srcObject = localStream;
+			$('#publishVideo').show()
+			$('#localVideo').hide()
+		} else {
+			const localView = zg.createLocalStreamView(localStream);
+			localView.play("localVideo", {
+				mirror: true,
+				objectFit: "cover",
+				enableAutoplayDialog: true,
+			})
+			$('#publishVideo').hide()
+			$('#localVideo').show()
+		}
 		return true;
 	} catch (err) {
 		return false;
@@ -267,10 +280,24 @@ async function stopPublishingStream(streamId) {
 
 async function startPlayingMultipleStream(streamId, options = {}) {
 	try {
-		const stream = await zg.startPlayingStream(streamId, options);
-		$(`[data-id=${streamId}] video`)[0].srcObject = stream;
+		const remoteStream = await zg.startPlayingStream(streamId, options);
+		if (zg.getVersion() < "2.17.0") {
+			$(`[data-id=${streamId}] .playVideo`)[0].srcObject = remoteStream;
+			$(`[data-id=${streamId}] .playVideo`).show()
+			$(`#v-${streamId}`).hide()
+		} else {
+			const remoteView = zg.createRemoteStreamView(remoteStream);
+			remoteView.play(`v-${streamId}`, {
+				objectFit: "cover",
+				enableAutoplayDialog: true,
+			})
+			$(`[data-id=${streamId}] .playVideo`).hide()
+			$(`#v-${streamId}`).show()
+		}
+		// $(`[data-id=${streamId}] video`)[0].srcObject = stream;
 		return true;
 	} catch (err) {
+		console.error('startPlayingStream', err);
 		return false;
 	}
 }
@@ -436,7 +463,6 @@ function appendHtml(streamId, user) {
 	}
 
 	if (streamId && user) {
-		// add new item to PlayList
 		$('#videoList').append(
 			`<div class="preview-playInfo col-6" id="m-${user.userID}">
 				<div class="preview-content">
@@ -448,8 +474,8 @@ function appendHtml(streamId, user) {
 					<div>Packet Loss: <span></span></div>
 				</div>
 				</div>
-				<video controls autoplay playsinline></video>
-
+				<video class="playVideo" controls autoplay playsinline></video>
+				<div id="v-${streamId}" class="remote-video" ></div>
 			</div>
 			<div class="font-12 t-nowrap">
 					StreamID: <span id="s-${user.userID}"></span>

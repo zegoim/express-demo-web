@@ -169,7 +169,20 @@ async function startPublishingStream(streamId, config) {
   try {
     localStream = await zg.createStream(config);
     zg.startPublishingStream(streamId, localStream, { videoCodec });
-    $('#publishVideo')[0].srcObject = localStream;
+    if (zg.getVersion() < "2.17.0") {
+      $('#publishVideo')[0].srcObject = localStream;
+      $('#publishVideo').show()
+      $('#localVideo').hide()
+    } else {
+      const localView = zg.createLocalStreamView(localStream);
+      localView.play("localVideo", {
+        mirror: true,
+        objectFit: "cover",
+        enableAutoplayDialog: true,
+      })
+      $('#publishVideo').hide()
+      $('#localVideo').show()
+    }
     return true
   } catch (err) {
     return false
@@ -188,7 +201,19 @@ async function stopPublishingStream(streamId) {
 async function startPlayingStream(streamId, options = {}) {
   try {
     remoteStream = await zg.startPlayingStream(streamId, options)
-    $('#playVideo')[0].srcObject = remoteStream;
+    if (zg.getVersion() < "2.17.0") {
+      $('#playVideo').srcObject = remoteStream;
+      $('#playVideo').show()
+      $('#remoteVideo').hide()
+    } else {
+      const remoteView = zg.createRemoteStreamView(remoteStream);
+      remoteView.play("remoteVideo", {
+        objectFit: "cover",
+        enableAutoplayDialog: true,
+      })
+      $('#playVideo').hide()
+      $('#remoteVideo').show()
+    }
     return true
   } catch (err) {
     return false
@@ -405,7 +430,7 @@ $('#RoomExtraInfoBtn').on('click', util.throttle(async function () {
   }
 }, 500))
 
-$('#RoomID').on('change',()=>{
+$('#RoomID').on('change', () => {
   roomID = $('#RoomID').val()
 })
 // bind event end
@@ -487,6 +512,10 @@ async function render() {
   $('#UserID').val(userID)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
+  $('#localVideo').hide()
+  $('#publishVideo').hide()
+  $('#remoteVideo').hide()
+  $('#playVideo').hide()
   updateLogger(`[action] create ExpressEngine`)
   createZegoExpressEngine()
   updateLogger(`[action] checkSystemRequirements`)

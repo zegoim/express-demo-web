@@ -9,7 +9,9 @@
   border: 1px solid #ccc;
 }
 
-.preview-content > video {
+.preview-content>video,
+#localVideo,
+#remoteVideo {
   width: 100%;
   height: 100%;
 }
@@ -18,7 +20,7 @@
   position: absolute;
   width: 100%;
   height: 0%;
-  background-color: rgba(0,0,0,.1);
+  background-color: rgba(0, 0, 0, .1);
   z-index: 1;
 }
 
@@ -42,7 +44,7 @@
   /* font-weight: 400; */
   font-size: 10px;
   /* height: 100%; */
-  background-color: rgba(0,0,0,.5);
+  background-color: rgba(0, 0, 0, .5);
 }
 
 .col-6 {
@@ -99,12 +101,13 @@
   font-weight: 700px;
   color: black;
 }
+
 .action-info {
   font-size: 14px;
 }
 
 .action-item {
-  border-top: 1px solid rgba(0,0,0,.2);
+  border-top: 1px solid rgba(0, 0, 0, .2);
   margin-bottom: 15px;
 }
 
@@ -129,9 +132,11 @@
 .form-wrap {
   margin: 6px 0;
 }
+
 .form-wrap .form-item {
   display: flex;
 }
+
 .form-wrap .form-item input {
   flex: 1;
 }
@@ -140,9 +145,11 @@
   padding: 15px;
   background-color: #fff;
 }
+
 .login-desc {
   font-size: 14px;
 }
+
 .icon-question {
   display: inline-block;
   text-align: center;
@@ -155,6 +162,7 @@
   cursor: pointer;
   font-weight: bold;
 }
+
 /* Tooltip text */
 .icon-question .pop-box {
   visibility: hidden;
@@ -171,6 +179,7 @@
   font-weight: 100;
   font-size: 12px;
 }
+
 /* Show the tooltip text when you mouse over the tooltip container */
 .icon-question:hover .pop-box {
   visibility: visible;
@@ -179,27 +188,33 @@
 .f-b-5 {
   flex-basis: 50%;
 }
+
 .f-b-3 {
   flex-basis: 30%;
 }
+
 .f-b-7 {
   flex-basis: 70%;
 }
+
 .t-a-r {
   text-align: right;
 }
+
 .w-70 {
   width: 70%;
 }
+
 .drop-item {
   display: flex;
   align-items: center;
   font-size: 12px;
   padding: 5px 5px;
 }
+
 .t-nowrap {
   overflow: hidden;
-  text-overflow:ellipsis;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -215,8 +230,8 @@
 }
 
 input {
-  width: 35% ;
-  height: 21px ;
+  width: 35%;
+  height: 21px;
   border: 1px solid #ced4da;
   border-radius: .25rem;
   color: #495057;
@@ -291,6 +306,7 @@ option {
   .preview-playInfo {
     margin-top: 0 !important;
   }
+
   .configBtn {
     width: 90%;
   }

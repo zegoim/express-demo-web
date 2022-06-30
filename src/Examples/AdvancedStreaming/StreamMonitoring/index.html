@@ -26,7 +26,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-12 login-wrapper">
-            <h6  data-lang="Preconditions">前置条件</h6>
+            <h6 data-lang="Preconditions">前置条件</h6>
             <div class="login-desc" data-lang="PreconditionsDesc">
               体验该功能，需要模拟一个用户（UserID）登陆到对应的房间（RoomID）中，并且有权限（Token）时才可以登陆成功。
             </div>
@@ -103,6 +103,7 @@
 
                   </div>
                   <video controls id="publishVideo" autoplay muted playsinline></video>
+                  <div id="localVideo"></div>
                 </div>
               </div>
               <div class="preview-playInfo col-lg-12 col-6">
@@ -116,6 +117,7 @@
                     </div>
                   </div>
                   <video controls id="playVideo" autoplay playsinline></video>
+                  <div id="remoteVideo"></div>
                 </div>
               </div>
             </div>
@@ -131,8 +133,8 @@
               <div class="m-t-10 m-b-5">
                 Playing StreamID <input class="m-l-10" type="text" id="PlayID" />
               </div>
-              <button id="startPlaying" class="m-b-5 configBtn play-pause-button"
-                title="startPlayingStream()">Start Playing</button>
+              <button id="startPlaying" class="m-b-5 configBtn play-pause-button" title="startPlayingStream()">Start
+                Playing</button>
             </div>
             <div data-lang="OpenTheConsole"></div>
           </div>

@@ -174,7 +174,20 @@ async function startPublishingStream (streamId, config) {
   try {
     localStream = await zg.createStream(config);
     zg.startPublishingStream(streamId, localStream);
-    $('#publishVideo')[0].srcObject = localStream;
+    if (zg.getVersion() < "2.17.0") {
+      $('#publishVideo')[0].srcObject = localStream;
+      $('#publishVideo').show()
+      $('#localVideo').hide()
+    } else {
+      const localView = zg.createLocalStreamView(localStream);
+      localView.play("localVideo", {
+          mirror: true,
+          objectFit: "cover",
+          enableAutoplayDialog: true,
+      })
+      $('#publishVideo').hide()
+      $('#localVideo').show()
+    }
     return true
   } catch(err) {
     return false
@@ -401,6 +414,8 @@ async function render() {
   $('#UserID').val(userID)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
+	$('#localVideo').hide()
+  $('#publishVideo').hide()
   createZegoExpressEngine()
   await checkSystemRequirements()
   enumDevices()

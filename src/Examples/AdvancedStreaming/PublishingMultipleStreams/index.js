@@ -181,6 +181,20 @@ async function startPublishingStream (streamId, config) {
     localStream = await zg.createStream(config);
     zg.startPublishingStream(streamId, localStream, { videoCodec });
     $('#publishVideo')[0].srcObject = localStream;
+    if (zg.getVersion() < "2.17.0") {
+      $('#publishVideo')[0].srcObject = localStream;
+      $('#publishVideo').show()
+      $('#localVideo1').hide()
+    } else {
+      const localView = zg.createLocalStreamView(localStream);
+      localView.play("localVideo1", {
+          mirror: true,
+          objectFit: "cover",
+          enableAutoplayDialog: true,
+      })
+      $('#publishVideo').hide()
+      $('#localVideo1').show()
+    }
     return true
   } catch(err) {
     return false
@@ -193,6 +207,20 @@ async function startPublishingSecondStream (streamId, config) {
     localSecondStream = await zg.createStream(config);
     zg.startPublishingStream(streamId, localSecondStream, { videoCodec });
     $('#publishSecondVideo')[0].srcObject = localSecondStream;
+    if (zg.getVersion() < "2.17.0") {
+      $('#publishSecondVideo')[0].srcObject = localSecondStream;
+      $('#publishSecondVideo').show()
+      $('#localVideo2').hide()
+    } else {
+      const localView = zg.createLocalStreamView(localSecondStream);
+      localView.play("localVideo2", {
+          mirror: false,
+          objectFit: "contain",
+          enableAutoplayDialog: true,
+      })
+      $('#publishSecondVideo').hide()
+      $('#localVideo2').show()
+    }
     return true
   } catch(err) {
     return false
@@ -208,9 +236,22 @@ async function stopPublishingStream(streamId, clearWay) {
 async function startPlayingStream(streamId, options = {}) {
   try {
     remoteStream = await zg.startPlayingStream(streamId, options)
-    $('#playVideo')[0].srcObject = remoteStream;
+    if (zg.getVersion() < "2.17.0") {
+      $('#playVideo').srcObject = remoteStream;
+      $('#playVideo').show()
+      $('#remoteVideo1').hide()
+    } else {
+      const remoteView = zg.createRemoteStreamView(remoteStream);
+      remoteView.play("remoteVideo1", {
+          objectFit: "cover",
+          enableAutoplayDialog: true,
+      })
+      $('#playVideo').hide()
+      $('#remoteVideo1').show()
+    }
     return true
   } catch (err) {
+    console.error('startPlayingStream',err);
     return false
   }
 }
@@ -218,9 +259,22 @@ async function startPlayingStream(streamId, options = {}) {
 async function startPlayingSecondStream(streamId, options = {}) {
   try {
     remoteSecondStream = await zg.startPlayingStream(streamId, options)
-    $('#playSecondVideo')[0].srcObject = remoteSecondStream;
+    if (zg.getVersion() < "2.17.0") {
+      $('#playSecondVideo').srcObject = remoteSecondStream;
+      $('#playSecondVideo').show()
+      $('#remoteVideo2').hide()
+    } else {
+      const remoteView = zg.createRemoteStreamView(remoteSecondStream);
+      remoteView.play("remoteVideo2", {
+          objectFit: "contain",
+          enableAutoplayDialog: true,
+      })
+      $('#playSecondVideo').hide()
+      $('#remoteVideo2').show()
+    }
     return true
   } catch (err) {
+    console.error('startPlayingSecondStream',err);
     return false
   }
 }
@@ -431,6 +485,14 @@ async function render() {
   $('#PlayID').val(streamID)
   $('#PublishSecondID').val(secondStreamID)
   $('#PlaySecondID').val(secondStreamID)
+  $('#localVideo1').hide()
+  $('#publishVideo').hide()
+  $('#localVideo2').hide()
+  $('#publishSecondVideo').hide()
+  $('#remoteVideo1').hide()
+  $('#playVideo').hide()
+  $('#remoteVideo2').hide()
+  $('#playSecondVideo').hide()
   createZegoExpressEngine()
   await checkSystemRequirements()
   enumDevices()

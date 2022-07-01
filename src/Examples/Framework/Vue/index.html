@@ -53,8 +53,9 @@
                     id="pushlishInfo-id">{{publishInfoStreamID}}</span>
                 </div>
                 <div class="preview-content">
-                  <video controls id="publishVideo" ref="publishVideo" autoplay playsinline :muted="true"
+                  <video v-if="version<`2.17.0`" controls id="publishVideo" ref="publishVideo" autoplay playsinline :muted="true"
                     :class="(mirrorVal=='onlyPreview' || mirrorVal=='both')?'mirror':''"></video>
+                  <div v-else id="localVideo"></div>
                 </div>
               </div>
               <div class="preview-playInfo m-t-10 col-lg-12 col-6">
@@ -63,8 +64,9 @@
                     id="playInfo-id">{{playInfoStreamID}}</span>
                 </div>
                 <div class="preview-content">
-                  <video controls id="playVideo" ref="playVideo" autoplay playsinline
+                  <video v-if="version<`2.17.0`" controls id="playVideo" ref="playVideo" autoplay playsinline
                     :class="(mirrorVal=='onlyPlay' || mirrorVal=='both')?'mirror':''"></video>
+                  <div v-else id="remoteVideo"></div>
                 </div>
               </div>
             </div>

@@ -143,7 +143,17 @@ class CommonUsageReact extends React.Component {
         try {
             this.state.localStream = await zg.createStream(config);
             zg.startPublishingStream(streamId, this.state.localStream, { videoCodec: this.state.videoCodec });
-            this.refs.publishVideo.srcObject = this.state.localStream;
+          
+            if (zg.getVersion() < "2.17.0") { 
+                this.refs.publishVideo.srcObject = this.state.localStream;
+            } else {
+                const localView = zg.createLocalStreamView(this.state.localStream);
+                localView.play("localVideo", {
+                    mirror: true,
+                    objectFit: "cover",
+                    enableAutoplayDialog: true,
+                })
+            }
             return true;
         } catch (err) {
             return false;
@@ -153,7 +163,15 @@ class CommonUsageReact extends React.Component {
     async startPlayingStream(streamId, options = {}) {
         try {
             this.state.remoteStream = await zg.startPlayingStream(streamId, options);
-            this.refs.playVideo.srcObject = this.state.remoteStream;
+            if (zg.getVersion() < "2.17.0") {
+                this.refs.playVideo.srcObject = this.state.remoteStream;
+            } else {
+                const remoteView = zg.createRemoteStreamView(this.state.remoteStream);
+                remoteView.play("remoteVideo", {
+                    objectFit: "cover",
+                    enableAutoplayDialog: true,
+                })
+            }
             return true;
         } catch (err) {
             return false;
@@ -202,8 +220,11 @@ class CommonUsageReact extends React.Component {
     createZegoExpressEngineOption() {
         const zg = new ZegoExpressEngine(appID, server)
         window.zg = zg;
+
+        const version = zg.getVersion() || 0
         this.setState({
             zg: zg,
+            version,
             createSuccessSvgStatus: true
         }, () => {
             this.initEvent();
@@ -324,8 +345,10 @@ class CommonUsageReact extends React.Component {
                             <span data-lang="Preview">Preview</span>&emsp;Publish StreamID: <span id="pushlishInfo-id">{this.state.publishInfoStreamID}</span>
                         </div>
                         <div className="preview-content">
-                            <video controls ref="publishVideo" autoPlay playsInline muted
-                                className={ `${(this.state.mirrorVal=='onlyPreview' || this.state.mirrorVal=='both') ?'mirror':''}`}></video>
+                            {this.version < `2.17.0` ?
+                                (<video controls ref="publishVideo" autoPlay playsInline muted
+                                    className={`${(this.state.mirrorVal == 'onlyPreview' || this.state.mirrorVal == 'both') ? 'mirror' : ''}`}></video>) :
+                                (<div id="localVideo"></div>)}
                         </div>
                     </div>
                     <div className="preview-playInfo m-t-10 col-lg-12 col-6">
@@ -333,8 +356,11 @@ class CommonUsageReact extends React.Component {
                             <span data-lang="PlayStream">Play Stream</span>&emsp;StreamID: <span id="playInfo-id">{this.state.playInfoStreamID}</span>
                         </div>
                         <div className="preview-content">
-                            <video controls ref="playVideo" autoPlay playsInline 
-                                className={ `${(this.state.mirrorVal=='onlyPlay' || this.state.mirrorVal=='both') ?'mirror':''}`}></video>
+                            {this.version < `2.17.0` ?
+                                (<video controls ref="playVideo" autoPlay playsInline
+                                    className={`${(this.state.mirrorVal == 'onlyPlay' || this.state.mirrorVal == 'both') ? 'mirror' : ''}`}></video>) :
+                                (<div id="remoteVideo"></div>)}
+
                         </div>
                     </div>
                 </div>
@@ -387,7 +413,7 @@ class CommonUsageReact extends React.Component {
                                     xmlns="http://www.w3.org/2000/svg" p-id="8340" width="15" height="15">
                                     <circle className="circle" fill="#5bb543" cx="512" cy="512" r="510" />
                                     <path className="tick" fill="none" stroke="#FFF" strokeWidth="6" strokeLinecap="round"
-                                        d="M512 736.1m-63 0a63 63 0 1 0 126 0 63 63 0 1 0-126 0Z" fill="#FFFFFF" p-id="8344"></path>
+                                        d="M512 736.1m-63 0a63 63 0 1 0 126 0 63 63 0 1 0-126 0Z" p-id="8344"></path>
                                     <path className="tick" fill="none" stroke="#FFF" strokeWidth="6" strokeLinecap="round"
                                         strokeMiterlimit="10"
                                         d="M512 611.8s63-220.5 63-306.3S549.5 204 512 204s-63 15.8-63 101.5 63 306.3 63 306.3z"></path>

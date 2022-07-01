@@ -119,15 +119,25 @@ $(function(){
                     userID: userId,
                     userName
                 });
-            },
+            }, 
             // Step4 Start Publishing Stream
             async startPublishingStream(streamId, config) {
                 try {
                     this.localStream = await zg.createStream(config);
                     zg.startPublishingStream(streamId, this.localStream, { videoCodec:this.videoCodec });
-                    this.$refs['publishVideo'].srcObject = this.localStream;
+                    if (zg.getVersion()<"2.17.0") {
+                        this.$refs['publishVideo'].srcObject = this.localStream;
+                    } else {
+                        const localView = zg.createLocalStreamView(this.localStream)
+                        localView.play("localVideo", {
+                            mirror: true,
+                            objectFit: "cover",
+                            enableAutoplayDialog: true,
+                        })
+                    }
                     return true;
                 } catch (err) {
+                    console.error('error',err);
                     return false;
                 }
             },
@@ -135,7 +145,15 @@ $(function(){
             async startPlayingStream(streamId, options = {}) {
                 try {
                     this.remoteStream = await zg.startPlayingStream(streamId, options);
-                    this.$refs['playVideo'].srcObject = this.remoteStream;
+                    if (zg.getVersion() < "2.17.0") {
+                        this.$refs['playVideo'].srcObject = this.remoteStream;
+                    } else {
+                        const remoteView = zg.createRemoteStreamView(this.remoteStream);
+                        remoteView.play("remoteVideo", {
+                            objectFit: "cover",
+                            enableAutoplayDialog: true,
+                        })
+                    }
                     return true;
                 } catch (err) {
                     return false;
@@ -155,11 +173,13 @@ $(function(){
             },
             clearStream(){
                 this.localStream && zg.destroyStream(this.localStream);
-                this.$refs['publishVideo'].srcObject = null;
                 this.localStream = null;
                 this.remoteStream && zg.destroyStream(this.remoteStream);
-                this.$refs['playVideo'].srcObject = null;
                 this.remoteStream = null;
+                if(zg.getVersion() < "2.17.0"){
+                    this.$refs['publishVideo'].srcObject = null;
+                    this.$refs['playVideo'].srcObject = null;
+                }
             },
             changeAudioDevices(){
                 if(!zg || !this.localStream){
@@ -243,5 +263,10 @@ $(function(){
                 this.audioCheckStatus = false;
             }
         },
+        computed: {
+            version(){
+                return this.zg?.getVersion() || 0
+            }
+        }
     })
 })

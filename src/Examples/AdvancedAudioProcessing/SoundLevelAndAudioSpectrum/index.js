@@ -300,6 +300,7 @@ function updateButton(button, preText, afterText) {
 async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
+	$('#UserID').val(userID);
 	createZegoExpressEngine();
 	await checkSystemRequirements();
 	enumDevices();

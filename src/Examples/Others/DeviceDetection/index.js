@@ -211,8 +211,8 @@ function detectSpeaker(detect = true) {
   const deviceID = $("#select-speaker").val()
   if (deviceID !== undefined) {
     try {
-      // `setAudioOutputDevice`  is supported since version 2.15.0
-      zg.setAudioOutputDevice(player, deviceID)
+      // `useAudioOutputDevice`  is supported since version 2.15.0
+      zg.useAudioOutputDevice(player, deviceID)
       player?.play()
     } catch (error) {
       console.error("Detect speaker fail:", error);

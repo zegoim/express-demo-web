@@ -16,7 +16,7 @@
   border: 1px solid #ccc;
 }
 
-.preview-content > video {
+.preview-content > video, #localVideo1, #localVideo2 {
   width: 100%;
   height: 80%;
 }

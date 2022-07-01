@@ -15,6 +15,7 @@ let zg = null;
 let isChecked = false;
 let isLogin = false;
 let localStream = null;
+let localView = null;
 let remoteStream = null;
 let published = false;
 let played = false;
@@ -175,7 +176,21 @@ async function startPublishingStream (streamId, config) {
   try {
     localStream = await zg.createStream(config);
     zg.startPublishingStream(streamId, localStream, { videoCodec });
-    $('#publishVideo')[0].srcObject = localStream;
+    if (zg.getVersion() < "2.17.0") {
+      $('#publishVideo')[0].srcObject = localStream;
+      $('#publishVideo').show()
+      $('#localVideo').hide()
+    } else {
+      localView = zg.createLocalStreamView(localStream);
+      localView.play("localVideo", {
+          mirror: true,
+          objectFit: "cover",
+          enableAutoplayDialog: true,
+          muted: $('#HeadphoneMonitor').val() === 'off'
+      })
+      $('#publishVideo').hide()
+      $('#localVideo').show()
+    }
     return true
   } catch(err) {
     return false
@@ -194,7 +209,19 @@ async function stopPublishingStream(streamId) {
 async function startPlayingStream(streamId, options = {}) {
   try {
     remoteStream = await zg.startPlayingStream(streamId, options)
-    $('#playVideo')[0].srcObject = remoteStream;
+    if (zg.getVersion() < "2.17.0") {
+			$('#playVideo').srcObject = remoteStream;
+			$('#playVideo').show()
+			$('#remoteVideo').hide()
+		} else {
+			const remoteView = zg.createRemoteStreamView(remoteStream);
+			remoteView.play("remoteVideo", {
+				objectFit: "cover",
+				enableAutoplayDialog: true,
+			})
+			$('#playVideo').hide()
+			$('#remoteVideo').show()
+		}
     return true
   } catch (err) {
     return false
@@ -393,12 +420,12 @@ function reSetVideoInfo(flag) {
 }
 
 function setHeadphoneMonitor(flag) {
-  if(flag) {
+  if(zg.getVersion()<"2.17.0") {
     $('#publishVideo')[0].volume = $('#VolumeInput').val() / 100
-    $('#publishVideo')[0].muted = false
+    $('#publishVideo')[0].muted = !flag
   } else {
-    // $('#publishVideo').attr('muted', false)
-    $('#publishVideo')[0].volume = 0
+    localView?.setAudioMuted(!flag)
+    localView?.setVolume($('#VolumeInput').val())
   }
 }
 

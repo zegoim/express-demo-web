@@ -180,7 +180,20 @@ async function startPublishingStream(streamId, config) {
 	try {
 		firstStream = await zg.createStream(config);
 		zg.startPublishingStream(streamId, firstStream, { videoCodec });
-		$('#publishFirstVideo')[0].srcObject = firstStream;
+		if (zg.getVersion() < "2.17.0") {
+			$('#publishFirstVideo')[0].srcObject = firstStream;
+			$('#publishFirstVideo').show()
+			$('#localVideo1').hide()
+		} else {
+			const localView = zg.createLocalStreamView(firstStream);
+			localView.play("localVideo1", {
+				mirror: true,
+				objectFit: "contain",
+				enableAutoplayDialog: true,
+			})
+			$('#publishFirstVideo').hide()
+			$('#localVideo1').show()
+		}
 		return true;
 	} catch (err) {
 		return false;
@@ -190,8 +203,21 @@ async function startPublishingStream(streamId, config) {
 async function startPublishingSecondStream(streamId, config) {
 	try {
 		secondStream = await zg.createStream(config);
-		zg.startPublishingStream(streamId, secondStream);
-		$('#publishSecondVideo')[0].srcObject = secondStream;
+		zg.startPublishingStream(streamId, secondStream);	
+		if (zg.getVersion() < "2.17.0") {
+			$('#publishSecondVideo')[0].srcObject = secondStream;
+			$('#publishSecondVideo').show()
+			$('#localVideo2').hide()
+		} else {
+			const localView = zg.createLocalStreamView(secondStream);
+			localView.play("localVideo2", {
+				mirror: false,
+				objectFit: "contain",
+				enableAutoplayDialog: true,
+			})
+			$('#publishSecondVideo').hide()
+			$('#localVideo2').show()
+		}
 		return true;
 	} catch (err) {
 		return false;
@@ -211,7 +237,19 @@ async function startPlayingStream(streamId, options = {}) {
 		console.log('play 123123');
 		remoteStream = await zg.startPlayingStream(streamId, options);
 		console.log('play end');
-		$('#playVideo')[0].srcObject = remoteStream;
+		if (zg.getVersion() < "2.17.0") {
+			$('#playVideo').srcObject = remoteStream;
+			$('#playVideo').show()
+			$('#remoteVideo').hide()
+		} else {
+			const remoteView = zg.createRemoteStreamView(remoteStream);
+			remoteView.play("remoteVideo", {
+				objectFit: "contain",
+				enableAutoplayDialog: true,
+			})
+			$('#playVideo').hide()
+			$('#remoteVideo').show()
+		}
 		return true;
 	} catch (err) {
 		return false;

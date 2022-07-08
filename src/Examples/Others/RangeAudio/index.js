@@ -90,6 +90,31 @@ async function loginRoom() {
     data.isLogin = false
   }
 }
+async function showMicrophones() {
+  const micList = await zg.getMicrophones();
+  const audioInputList = []
+  micList.map((item, index) => {
+    if (!item.deviceName) {
+      item.deviceName = 'microphone' + index;
+    }
+    audioInputList.push(' <option value="' + item.deviceID + '">' + item.deviceName + '</option>');
+    console.log('microphone: ' + item.deviceName);
+    return item;
+  });
+  $('#MicDevices').html(audioInputList.join(''));
+}
+
+function changeMicrophone() {
+  if (zg.getVersion() < "2.16.0") return
+  rangeAudio.selectMicrophone($("#MicDevices").val()).then((res) => {
+    if (!res) {
+      alert("change microphone failed");
+    } else {
+      console.warn("selectMicrophone end", $("#MicDevices").val());
+    }
+  });
+}
+
 
 // 小队语音
 // Team Mode
@@ -264,7 +289,7 @@ data.userListMap = new Proxy({}, {
     //Monitor user information changes
     if (rangeAudio) {
       rangeAudio.updateAudioSource(prop, value.position)
-      console.log('updateAudioSource', value);
+      console.log('updateAudioSource', prop, value);
       renderUserList()
     }
     return Reflect.set(target, prop, value)
@@ -356,6 +381,8 @@ function syncPositionInfo() {
                 userID: userID,
                 position
               }
+            } else {
+              throw "message format error "
             }
           })
         }
@@ -375,14 +402,16 @@ function syncPositionInfo() {
   // Create Instance
   zg = new ZegoExpressEngine(appID, server)
   rangeAudio = zg.createRangeAudioInstance()
+  showMicrophones()
   syncPositionInfo()
   zg.setDebugVerbose(false)
-  zg.setLogConfig({ logLevel: "disable" })
   // 初始化房间信息
   // Initialize room information
   setLoginState(data.isLogin)
   setRoomID(data.roomID)
   setUserID(data.userID)
+  document.getElementById("receive-range").value = data.receiveRange
+  setReceiveRange(data.receiveRange)
   // 初始化小队信息
   // Initialization team information
   document.querySelector("#team-mode" + data.teamMode).checked = true

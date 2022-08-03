@@ -1,6 +1,6 @@
-$(function(){
+$(function () {
     new Vue({
-        el:'#page-wrapper',
+        el: '#page-wrapper',
         data: {
             userID: Util.getBrow() + '_' + new Date().getTime(),
             roomID: '0001',
@@ -13,26 +13,26 @@ $(function(){
             isLogin: false,
             videoCodec: localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8',
 
-            audioDeviceList:[],
-            videoDeviceList:[],
-            createSuccessSvgStatus:false,
-            checkSystemRequireStatus:'',
-            connectStatus:'DISCONNECTED',
-            microphoneDevicesVal:null,
-            cameraDevicesVal:'',
-            cameraCheckStatus:true,
-            microphoneCheckStatus:true,
+            audioDeviceList: [],
+            videoDeviceList: [],
+            createSuccessSvgStatus: false,
+            checkSystemRequireStatus: '',
+            connectStatus: 'DISCONNECTED',
+            microphoneDevicesVal: null,
+            cameraDevicesVal: '',
+            cameraCheckStatus: true,
+            microphoneCheckStatus: true,
             publishStreamStatus: false,
-            videoCheckStatus:true,
-            audioCheckStatus:false,
-            playStreamStatus:false,
-            mirrorVal:'none',
-            publishInfoStreamID:'',
-            playInfoStreamID:''
+            videoCheckStatus: true,
+            audioCheckStatus: false,
+            playStreamStatus: false,
+            mirrorVal: 'none',
+            publishInfoStreamID: '',
+            playInfoStreamID: ''
         },
-        methods:{
-            async enumDevices(){
-                const deviceInfo = await zg.enumDevices();
+        methods: {
+            async enumDevices() {
+                const deviceInfo = await this.zg.enumDevices();
                 this.audioDeviceList = deviceInfo &&
                     deviceInfo.microphones.map((item, index) => {
                         if (!item.deviceName) {
@@ -41,8 +41,8 @@ $(function(){
                         console.log('microphone: ' + item.deviceName);
                         return item;
                     });
-                    this.audioDeviceList.push({deviceID:0,deviceName: '禁止'});
-                    this.microphoneDevicesVal = this.audioDeviceList[0].deviceID;
+                this.audioDeviceList.push({ deviceID: 0, deviceName: '禁止' });
+                this.microphoneDevicesVal = this.audioDeviceList[0].deviceID;
                 this.videoDeviceList = deviceInfo &&
                     deviceInfo.cameras.map((item, index) => {
                         if (!item.deviceName) {
@@ -51,11 +51,11 @@ $(function(){
                         console.log('camera: ' + item.deviceName);
                         return item;
                     });
-                this.videoDeviceList.push({deviceID:0,deviceName: '禁止'});
+                this.videoDeviceList.push({ deviceID: 0, deviceName: '禁止' });
                 this.cameraDevicesVal = this.videoDeviceList[0].deviceID;
             },
             initEvent() {
-                zg.on('roomStateUpdate', (roomId, state) => {
+                this.zg.on('roomStateUpdate', (roomId, state) => {
                     if (state === 'CONNECTED') {
                         this.connectStatus = 'CONNECTED';
                     }
@@ -64,7 +64,7 @@ $(function(){
                     }
                 })
 
-                zg.on('publisherStateUpdate', (result) => {
+                this.zg.on('publisherStateUpdate', (result) => {
                     if (result.state === 'PUBLISHING') {
                         this.publishInfoStreamID = result.streamID;
                     } else if (result.state === 'NO_PUBLISH') {
@@ -72,7 +72,7 @@ $(function(){
                     }
                 });
 
-                zg.on('playerStateUpdate', (result) => {
+                this.zg.on('playerStateUpdate', (result) => {
                     if (result.state === 'PLAYING') {
                         this.playInfoStreamID = result.streamID;
                     } else if (result.state === 'NO_PLAY') {
@@ -87,9 +87,9 @@ $(function(){
             },
             // Step2 Check system requirements
             async checkSystemRequirements() {
-                console.log('sdk version is', zg.getVersion());
+                console.log('sdk version is', this.zg.getVersion());
                 try {
-                    const result = await zg.checkSystemRequirements();
+                    const result = await this.zg.checkSystemRequirements();
 
                     console.warn('checkSystemRequirements ', result);
 
@@ -115,20 +115,20 @@ $(function(){
             },
             // Step3 Login room
             async loginRoom(roomId, userId, userName, token) {
-                return await zg.loginRoom(roomId, token, {
+                return await this.zg.loginRoom(roomId, token, {
                     userID: userId,
                     userName
                 });
-            }, 
+            },
             // Step4 Start Publishing Stream
             async startPublishingStream(streamId, config) {
                 try {
-                    this.localStream = await zg.createStream(config);
-                    zg.startPublishingStream(streamId, this.localStream, { videoCodec:this.videoCodec });
-                    if (zg.getVersion()<"2.17.0") {
+                    this.localStream = await this.zg.createStream(config);
+                    this.zg.startPublishingStream(streamId, this.localStream, { videoCodec: this.videoCodec });
+                    if (this.zg.getVersion() < "2.17.0") {
                         this.$refs['publishVideo'].srcObject = this.localStream;
                     } else {
-                        const localView = zg.createLocalStreamView(this.localStream)
+                        const localView = this.zg.createLocalStreamView(this.localStream)
                         localView.play("localVideo", {
                             mirror: true,
                             objectFit: "cover",
@@ -137,18 +137,18 @@ $(function(){
                     }
                     return true;
                 } catch (err) {
-                    console.error('error',err);
+                    console.error('error', err);
                     return false;
                 }
             },
             // Step5 Start Play Stream
             async startPlayingStream(streamId, options = {}) {
                 try {
-                    this.remoteStream = await zg.startPlayingStream(streamId, options);
-                    if (zg.getVersion() < "2.17.0") {
+                    this.remoteStream = await this.zg.startPlayingStream(streamId, options);
+                    if (this.zg.getVersion() < "2.17.0") {
                         this.$refs['playVideo'].srcObject = this.remoteStream;
                     } else {
-                        const remoteView = zg.createRemoteStreamView(this.remoteStream);
+                        const remoteView = this.zg.createRemoteStreamView(this.remoteStream);
                         remoteView.play("remoteVideo", {
                             objectFit: "cover",
                             enableAutoplayDialog: true,
@@ -160,50 +160,50 @@ $(function(){
                 }
             },
             // Logout room
-            logoutRoom(roomId){
-                zg.logoutRoom(roomId);
+            logoutRoom(roomId) {
+                this.zg.logoutRoom(roomId);
             },
             // Stop Publishing Stream
             async stopPublishingStream(streamId) {
-                zg.stopPublishingStream(streamId);
+                this.zg.stopPublishingStream(streamId);
             },
             // Stop Play Stream
-            async stopPlayingStream(streamId){
-                zg.stopPlayingStream(streamId);
+            async stopPlayingStream(streamId) {
+                this.zg.stopPlayingStream(streamId);
             },
-            clearStream(){
-                this.localStream && zg.destroyStream(this.localStream);
+            clearStream() {
+                this.localStream && this.zg.destroyStream(this.localStream);
                 this.localStream = null;
-                this.remoteStream && zg.destroyStream(this.remoteStream);
+                this.remoteStream && this.zg.destroyStream(this.remoteStream);
                 this.remoteStream = null;
-                if(zg.getVersion() < "2.17.0"){
+                if (zg.getVersion() < "2.17.0") {
                     this.$refs['publishVideo'].srcObject = null;
                     this.$refs['playVideo'].srcObject = null;
                 }
             },
-            changeAudioDevices(){
-                if(!zg || !this.localStream){
+            changeAudioDevices() {
+                if (!this.zg || !this.localStream) {
                     return
                 }
-                const isMicrophoneMuted = zg.isMicrophoneMuted();
-                if(!isNaN(this.microphoneDevicesVal) && !isMicrophoneMuted){
-                    zg.muteMicrophone(true);
-                }else{
-                    zg.muteMicrophone(false);
-                    zg.useAudioDevice(this.localStream, this.microphoneDevicesVal);
+                const isMicrophoneMuted = this.zg.isMicrophoneMuted();
+                if (!isNaN(this.microphoneDevicesVal) && !isMicrophoneMuted) {
+                    this.zg.muteMicrophone(true);
+                } else {
+                    this.zg.muteMicrophone(false);
+                    this.zg.useAudioDevice(this.localStream, this.microphoneDevicesVal);
                 }
             },
             // ==============================================================
             // This part of the code binds the button click event
             // ==============================================================
-            createZegoExpressEngineOption(){
-                if(!this.createSuccessSvgStatu) {
+            createZegoExpressEngineOption() {
+                if (!this.createSuccessSvgStatu) {
                     this.createZegoExpressEngine();
                     this.createSuccessSvgStatus = true;
                     this.initEvent();
                 }
             },
-            async checkSystemRequire(){
+            async checkSystemRequire() {
                 if (!this.zg) return alert('you should create zegoExpressEngine');
                 const result = await this.checkSystemRequirements();
                 if (result) {
@@ -213,15 +213,15 @@ $(function(){
                     this.checkSystemRequireStatus = 'ERROR';
                 }
             },
-            async loginRoomOption(){
+            async loginRoomOption() {
                 try {
-                    this.isLogin =  await this.loginRoom(this.roomID, this.userID, this.userID, this.token);
+                    this.isLogin = await this.loginRoom(this.roomID, this.userID, this.userID, this.token);
                 } catch (err) {
                     this.isLogin = false;
                     console.log(err);
                 }
             },
-            async startPublishing(){
+            async startPublishing() {
                 const flag = await this.startPublishingStream(this.streamID, {
                     camera: {
                         audioInput: this.microphoneDevicesVal,
@@ -234,7 +234,7 @@ $(function(){
                     this.publishStreamStatus = true;
                 }
             },
-            async startPlaying(){
+            async startPlaying() {
                 const flag = await this.startPlayingStream(this.playStreamID, {
                     video: this.videoCheckStatus,
                     audio: this.audioCheckStatus
@@ -243,8 +243,8 @@ $(function(){
                     this.playStreamStatus = true;
                 }
             },
-            async reset(){
-                if(!this.zg){
+            async reset() {
+                if (!this.zg) {
                     return
                 }
                 await this.stopPublishingStream(this.streamID);
@@ -264,7 +264,7 @@ $(function(){
             }
         },
         computed: {
-            version(){
+            version() {
                 return this.zg?.getVersion() || 0
             }
         }

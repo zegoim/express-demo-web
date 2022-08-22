@@ -46,7 +46,7 @@ async function checkSystemRequirements() {
 		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
 			console.error('browser is not support H264 and VP8');
 			return false;
-		} else if (!result.camera && !result.microphones) {
+		} else if (!result.camera && !result.microphone) {
 			console.error('camera and microphones not allowed to use');
 			return false;
 		} else if (result.videoCodec.VP8) {

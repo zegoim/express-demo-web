@@ -68,8 +68,17 @@ function setLoginState(val) {
   }
 
 }
+async function getToken(userID, roomId, expireTime) {
+  let token = await $.get('https://wsliveroom-alpha.zego.im:8282/token', {
+    app_id: appID,
+    id_name: userID,
+  });
+  return token;
+}
+
 async function loginRoom() {
-  const { userID, roomID, token } = data
+  const { userID, roomID } = data
+  const token = await getToken(userID, roomID)
   if (!data.isLogin) {
     document.querySelector("#LoginRoom").disabled = true
     try {
@@ -405,6 +414,8 @@ function syncPositionInfo() {
   showMicrophones()
   syncPositionInfo()
   zg.setDebugVerbose(false)
+  zg.setSoundLevelDelegate(true,500,{enableInBackground: false})
+
   // 初始化房间信息
   // Initialize room information
   setLoginState(data.isLogin)
@@ -422,6 +433,7 @@ function syncPositionInfo() {
     console.log("microphoneStateUpdate", state);
     updateMicState(state !== 0);
   })
+  rangeAudio.zegoAudioListener.setAudioVolume(200);
   // 初始化 3D 音效
   // Initialize 3D sound
   updateSpatializerState(data.isSpatializer);

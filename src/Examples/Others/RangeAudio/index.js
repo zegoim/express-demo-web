@@ -61,6 +61,7 @@ function setLoginState(val) {
     // 初始化 3D 音效
     // Initialize 3D sound
     rangeAudio.enableSpatializer(data.isSpatializer);
+    rangeAudio.enableAiDenoise(data.isAiDenoise);
     // 开启更新自身位置
     enableUpdatePositionTimer(true)
     // 设置队伍 ID
@@ -200,6 +201,22 @@ function updateSpatializerState(enable) {
   document.querySelector("#text-3d-off").style.display = !enable ? "inline-block" : "none"
 }
 updateMicState(data.isSpatializer)
+
+
+// AI 降噪
+// AI Denoise
+data.isAiDenoise = false
+function enableAiDenoise() {
+  rangeAudio.enableAiDenoise(!data.isAiDenoise);
+  updateAiDenoiseState(!data.isAiDenoise)
+}
+function updateAiDenoiseState(enable) {
+  data.isAiDenoise = enable
+  document.querySelector("#text-ai-enable").style.display = !enable ? "inline-block" : "none"
+  document.querySelector("#text-ai-disable").style.display = enable ? "inline-block" : "none"
+  document.querySelector("#text-ai-on").style.display = enable ? "inline-block" : "none"
+  document.querySelector("#text-ai-off").style.display = !enable ? "inline-block" : "none"
+}
 
 // 自身方位
 // Self Position
@@ -359,7 +376,11 @@ function syncPositionInfo() {
       if (roomID === data.roomID) {
         console.log("roomStateUpdate", state);
         if (state === "CONNECTED") {
+        console.log('sendPosition when login');
           await sendSelfPositionByMessage()
+          setTimeout(async () => {
+             sendSelfPositionByMessage()
+          }, 3000);
         }
       }
     })
@@ -367,6 +388,7 @@ function syncPositionInfo() {
       console.log('roomUserUpdate', roomID, state, userList);
       if (roomID = data.roomID) {
         if (state === "ADD") {
+          console.log('sendPosition when others login');
           await sendSelfPositionByMessage()
         } else {
           userList.forEach(item => {
@@ -410,11 +432,12 @@ function syncPositionInfo() {
   // 创建实例
   // Create Instance
   zg = new ZegoExpressEngine(appID, server)
+  // zg.zegoWebRTC.setGWNode('119.23.246.255:8123')
   rangeAudio = zg.createRangeAudioInstance()
   showMicrophones()
   syncPositionInfo()
   zg.setDebugVerbose(false)
-  zg.setSoundLevelDelegate(true,500,{enableInBackground: false})
+  zg.setSoundLevelDelegate(true, 1000, {enableInBackground: false})
 
   // 初始化房间信息
   // Initialize room information
@@ -433,10 +456,23 @@ function syncPositionInfo() {
     console.log("microphoneStateUpdate", state);
     updateMicState(state !== 0);
   })
+  rangeAudio.on("aiDenoiseError", (code, msg) => {
+    console.warn("aiDenoiseError", code, msg);
+    if (code === 1101003) {
+      alert("未使用带 AI 降噪 SDK 包");
+    } else if (code === 1103080) {
+      alert("AI 降噪运行失败");
+    } else if (code === 1103081) {
+      alert("浏览器不支持 AI 降噪");
+    } else if (code === 1103082) {
+      alert("AI 降噪性能消耗过载");
+    }
+  });
   rangeAudio.zegoAudioListener.setAudioVolume(200);
   // 初始化 3D 音效
   // Initialize 3D sound
   updateSpatializerState(data.isSpatializer);
+  updateAiDenoiseState(data.isAiDenoise)
   // 初始化自身方位
   // Initialize self orientation
   setSelfPosition()

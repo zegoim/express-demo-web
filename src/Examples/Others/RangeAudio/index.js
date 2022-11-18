@@ -61,9 +61,7 @@ function setLoginState(val) {
     // 初始化 3D 音效
     // Initialize 3D sound
     rangeAudio.enableSpatializer(data.isSpatializer);
-    rangeAudio.enableAiDenoise(data.isAiDenoise);
-    // 开启更新自身位置
-    enableUpdatePositionTimer(true)
+    rangeAudio.enableAiDenoise && rangeAudio.enableAiDenoise(data.isAiDenoise);
     // 设置队伍 ID
     setTeamID(data.teamID)
   }
@@ -92,7 +90,10 @@ async function loginRoom() {
       document.querySelector("#LoginRoom").disabled = false
     } catch (error) {
       document.querySelector("#LoginRoom").disabled = false
-      alert(JSON.stringify(error))
+      let errorContent = JSON.stringify(error)
+      errorContent === "{}" ? error + "" : errorContent
+      alert(errorContent)
+      console.error(errorContent)
     }
   } else {
     zg.logoutRoom()
@@ -143,7 +144,7 @@ function setTeamID(val) {
   } else {
     data.teamID = document.getElementById("team-id").value || undefined
   }
-  rangeAudio.setTeamID(data.teamID)
+  rangeAudio.setTeamID(data.teamID);
   console.log('setTeamID', data.teamID);
 }
 
@@ -180,7 +181,7 @@ function setReceiveRange() {
   data.receiveRange = document.querySelector("#receive-range").value
   if (data.receiveRange < 0) {
     document.querySelector("#receive-range").value = 0
-  } else {
+  } else if (data.receiveRange !== "") {
     rangeAudio.setAudioReceiveRange(data.receiveRange);
   }
 }
@@ -189,7 +190,10 @@ function setReceiveRange() {
 // Spatializer
 data.isSpatializer = true
 
-function enableSpatializer() {
+function enableSpatializer(enable) {
+  if (typeof enable === "boolean") {
+    data.isSpatializer = !enable
+  }
   rangeAudio.enableSpatializer(!data.isSpatializer);
   updateSpatializerState(!data.isSpatializer)
 }
@@ -283,6 +287,49 @@ function getMatrixFromCss(el) {
   return [[]];
 }
 
+// 自定义音源
+data.onlineHasChangedPosition = false
+data.onlineSrcPosition = [0, 0, 0]
+data.onlineSrcRange = 100
+data.localHasChangedPosition = false
+data.localSrcPosition = [0, 0, 0]
+data.localSrcRange = 100
+data.streamHasChangedPosition = false
+data.streamSrcPosition = [0, 0, 0]
+data.streamSrcRange = 100
+data.streamView = null
+function updateSrcPosition(type) {
+  data.hasChangedPosition = true
+  data[`${type}SrcPosition`][0] = document.querySelector(`#${type}-position-forward`).value
+  data[`${type}SrcPosition`][1] = document.querySelector(`#${type}-position-right`).value
+  data[`${type}SrcPosition`][2] = document.querySelector(`#${type}-position-up`).value
+  document.querySelector(`#${type}-position-forward-text`).innerText = data[`${type}SrcPosition`][0]
+  document.querySelector(`#${type}-position-right-text`).innerText = data[`${type}SrcPosition`][1]
+  document.querySelector(`#${type}-position-up-text`).innerText = data[`${type}SrcPosition`][2]
+  data[`${type}HasChangedPosition`] = true
+}
+function updateSrcRange(type) {
+  data[`${type}SrcRange`] = document.querySelector(`#${type}-range`).value
+  if (type === "stream") {
+    data.streamView &&
+      rangeAudio.setCustomSourceVocalRange(
+        data.streamView,
+        data[`${type}SrcRange`]
+      );
+  } else {
+    rangeAudio.setStreamVocalRange(
+      document.querySelector(`#${type}-src-audio`),
+      data[`${type}SrcRange`]
+    );
+  }
+}
+document.querySelector("#local-file").onchange = (file) => {
+  var url = window.URL.createObjectURL(file.target.files[0]);
+  document.querySelector("#local-src-audio").src = url
+
+}
+
+
 data.updatePositionInfoTimer = null
 function enableUpdatePositionTimer(enable) {
   clearInterval(data.updatePositionInfoTimer)
@@ -298,6 +345,22 @@ function enableUpdatePositionTimer(enable) {
         );
         await sendSelfPositionByMessage()
       }
+      ["online", "local", "stream"].forEach(type => {
+        if (data[`${type}HasChangedPosition`]) {
+          data[`${type}HasChangedPosition`] = false;
+          if (type === "stream") {
+            data.streamView && rangeAudio.updateStreamPosition(
+              data.streamView,
+              data[`${type}SrcPosition`]
+            );
+          } else {
+            rangeAudio.updateCustomSourcePosition(
+              document.querySelector(`#${type}-src-audio`),
+              data[`${type}SrcPosition`]
+            );
+          }
+        }
+      })
     }, 1000);
   } else {
     data.updatePositionInfoTimer = null
@@ -376,10 +439,10 @@ function syncPositionInfo() {
       if (roomID === data.roomID) {
         console.log("roomStateUpdate", state);
         if (state === "CONNECTED") {
-        console.log('sendPosition when login');
+          console.log('sendPosition when login');
           await sendSelfPositionByMessage()
           setTimeout(async () => {
-             sendSelfPositionByMessage()
+            sendSelfPositionByMessage()
           }, 3000);
         }
       }
@@ -424,6 +487,30 @@ function syncPositionInfo() {
   }
 }
 
+async function customPlayStream() {
+  if (!data.isLogin) {
+    alert("not login")
+    return
+  }
+  if (data.streamView) {
+    alert("already playing")
+    return
+  }
+  const stream = await zg.startPlayingStream(document.querySelector("#stream-custom-id").value)
+  data.streamView = zg.createRemoteStreamView(stream);
+  data.streamView.play("stream-src-audio");
+}
+function customStopStream() {
+  document.querySelector(`#stream-position-forward`).value = 0
+  document.querySelector(`#stream-position-right`).value = 0
+  document.querySelector(`#stream-position-up`).value = 0
+  document.querySelector(`#stream-range`).value = 0
+  updateSrcRange("stream")
+  updateSrcPosition("stream")
+  zg.stopPlayingStream(document.querySelector("#stream-custom-id").value)
+  data.streamView.stop()
+  data.streamView = null
+}
 
 
 // 主入口函数
@@ -437,7 +524,7 @@ function syncPositionInfo() {
   showMicrophones()
   syncPositionInfo()
   zg.setDebugVerbose(false)
-  zg.setSoundLevelDelegate(true, 1000, {enableInBackground: false})
+  zg.setSoundLevelDelegate(true, 1000, { enableInBackground: false })
 
   // 初始化房间信息
   // Initialize room information
@@ -471,12 +558,14 @@ function syncPositionInfo() {
   rangeAudio.zegoAudioListener.setAudioVolume(200);
   // 初始化 3D 音效
   // Initialize 3D sound
-  updateSpatializerState(data.isSpatializer);
+  enableSpatializer(true);
   updateAiDenoiseState(data.isAiDenoise)
   // 初始化自身方位
   // Initialize self orientation
   setSelfPosition()
   setSelfRotate()
+  // 开启更新自身位置
+  enableUpdatePositionTimer(true)
   // 授权浏览器自动播放声音
   // Authorize the browser to automatically play sound
   const allowAutoPlay = rangeAudio.isAudioContextRunning()

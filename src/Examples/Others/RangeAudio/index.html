@@ -61,7 +61,7 @@
                         <span data-lang="UserIDDesc"></span>
                       </div>
                     </div>
-                    
+
                     <input type="text" id="user-id" onchange="setUserID()" />
                   </div>
                   <div class="action-item col-12 col-lg-4">
@@ -258,6 +258,115 @@
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div class="action-step">
+              <div class="action-title">
+                <span class="action-info" data-lang="CustomVocalSource">自定义发声源</span>
+              </div>
+
+              <div class="action-content">
+                <!-- 在线文件 -->
+                <details>
+                  <summary>在线文件发声源</summary>
+                  <div class="action-form font-14">
+                    <span class="action-subtitle" data-lang="VocalSourcePosition">在线文件发声源</span>
+                    <audio id="online-src-audio" ref="customSrc" src="../../../assets/Eluveitie-Isara.mp3" controls
+                      loop></audio>
+                    <div class="action-item">
+                      <span data-lang="Range">发声范围</span>&emsp;
+                      <input id="online-range" type="number" value="100" onchange="updateSrcRange('online')">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Forward">前</span>&emsp;
+                      <span id="online-position-forward-text"></span>&emsp;
+                      <input id="online-position-forward" type="range" step="1" min="-100" max="100"
+                        onchange="updateSrcPosition('online')">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Right">右</span>&emsp;
+                      <span id="online-position-right-text"></span>&emsp;
+                      <input id="online-position-right" type="range" step="1" min="-100" max="100"
+                        onchange="updateSrcPosition('online')">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Up">上</span>&emsp;
+                      <span id="online-position-up-text"></span>&emsp;
+                      <input id="online-position-up" type="range" step="1" min="-100" max="100"
+                        onchange="updateSrcPosition('online')">
+                    </div>
+                  </div>
+                </details>
+                <!-- 本地文件 -->
+                <details>
+                  <summary>本地文件发声源</summary>
+                  <div class="action-form font-14">
+                    <span class="action-subtitle" data-lang="VocalSourcePosition">本地文件发声源</span>
+                    <video id="local-src-audio" ref="customSrc" controls loop></video>
+                    <div class="action-item">
+                      <input id="local-file" type="file" value="100" onchange="selectMediaFile()">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Range">发声范围</span>&emsp;
+                      <input id="local-range" type="number" value="100" onchange="updateSrcRange('local')">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Forward">前</span>&emsp;
+                      <span id="local-position-forward-text"></span>&emsp;
+                      <input id="local-position-forward" type="range" step="1" min="-100" max="100"
+                        onchange="updateSrcPosition('local')">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Right">右</span>&emsp;
+                      <span id="local-position-right-text"></span>&emsp;
+                      <input id="local-position-right" type="range" step="1" min="-100" max="100"
+                        onchange="updateSrcPosition('local')">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Up">上</span>&emsp;
+                      <span id="local-position-up-text"></span>&emsp;
+                      <input id="local-position-up" type="range" step="1" min="-100" max="100"
+                        onchange="updateSrcPosition('local')">
+                    </div>
+                  </div>
+                </details>
+                <!-- 拉流发声源 -->
+                <details>
+                  <summary>拉流发声源</summary>
+
+                  <div class="action-form font-14">
+                    <span class="action-subtitle" data-lang="VocalSourcePosition">拉流发声源</span>
+                    <div id="stream-src-audio" style="height:100px;width:100px;"></div>
+                    <div class="action-item">
+                      <span data-lang="Range">streamID</span>&emsp;
+                      <input id="stream-custom-id" type="text" value="">
+                    </div>
+                    <button onclick="customPlayStream()">开始拉流</button>
+                    <button onclick="customStopStream()">停止拉流</button>
+                    <div class="action-item">
+                      <span data-lang="Range">发声范围</span>&emsp;
+                      <input id="stream-range" type="number" value="100" onchange="updateSrcRange('stream')">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Forward">前</span>&emsp;
+                      <span id="stream-position-forward-text"></span>&emsp;
+                      <input id="stream-position-forward" type="range" step="1" min="-100" max="100"
+                        onchange="updateSrcPosition('stream')">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Right">右</span>&emsp;
+                      <span id="stream-position-right-text"></span>&emsp;
+                      <input id="stream-position-right" type="range" step="1" min="-100" max="100"
+                        onchange="updateSrcPosition('stream')">
+                    </div>
+                    <div class="action-item">
+                      <span data-lang="Up">上</span>&emsp;
+                      <span id="stream-position-up-text"></span>&emsp;
+                      <input id="stream-position-up" type="range" step="1" min="-100" max="100"
+                        onchange="updateSrcPosition('stream')">
+                    </div>
+                  </div>
+                </details>
               </div>
             </div>
           </div>

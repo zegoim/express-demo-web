@@ -12,7 +12,7 @@ let roomID = '0025';
 let streamFirstID = '00251';
 let streamSecondID = '00252';
 let taskID = streamFirstID + streamSecondID;
-let mixStreamID = 'mix_0025';
+let mixStreamID = 'mix_' + Date.now();
 
 let zg = null;
 let isChecked = false;
@@ -99,6 +99,7 @@ async function enumDevices() {
 	$('#MirrorDevices').html(audioInputList.join(''));
 	$('#CameraDevices').html(videoInputList.join(''));
 }
+
 async function loginRoom(roomId, userId, userName, token) {
 	return await zg.loginRoom(roomId, token, {
 		userID: userId,
@@ -383,7 +384,7 @@ $('#startMixTask').on(
 	util.throttle(async function() {
 		const firstId = $('#FirstStreamID').val();
 		const secondId = $('#SecondStreamID').val();
-		const mixTask = $('#MixedStreamID').val();
+		mixStreamID = $('#MixedStreamID').val();
 
 		const streamList = [
 			{
@@ -408,7 +409,7 @@ $('#startMixTask').on(
 
 		this.classList.add('border-primary');
 		if (!mixed) {
-			const flag = await startMixerTask(mixTask, streamList, mixStreamID);
+			const flag = await startMixerTask(mixStreamID, streamList, mixStreamID);
 			if (flag === 0) {
 				updateButton(this, 'Start Mix Task', 'Stop Mix Task');
 				mixed = true;
@@ -419,7 +420,7 @@ $('#startMixTask').on(
 				this.innerText = 'Publishing Fail';
 			}
 		} else {
-			stopMixerTask(mixTask);
+			stopMixerTask(mixStreamID);
 			updateButton(this, 'Start Mix Task', 'Stop Mix Task');
 			mixed = false;
 			$('#MixedStreamID')[0].disabled = false;
@@ -432,27 +433,18 @@ $('#StartPlayingMixedStream').on(
 	util.throttle(async function() {
 		if (!firstStream) return alert('no first stream');
 		if (!secondStream) return alert('no second stream');
-		if (!mixerOutputList) return alert('no mixed Stream');
-		const videoEle = $('#playVideo')[0];
+		if (!mixerOutputList || !mixerOutputList.length) return alert('no mixed Stream');
 		if (!played) {
-			if (navigator.userAgent.indexOf('iPhone') !== -1 && getBrowser() == 'Safari' && mixerOutputList[0].hlsURL) {
-				const hlsUrl = mixerOutputList[0].hlsURL.replace('http', 'https');
-				videoEle.src = hlsUrl;
-			} else if (mixerOutputList[0].flvURL) {
-				const flvUrl = mixerOutputList[0].flvURL.replace('http', 'https');
-				if (flvjs.isSupported()) {
-					flvPlayer = flvjs.createPlayer({
-						type: 'flv',
-						url: flvUrl
-					});
-					flvPlayer.attachMediaElement(videoEle);
-					flvPlayer.load();
-				}
-			}
+			const streamID = mixerOutputList[0].streamID;
+			const stream = await zg.startPlayingStream(streamID)
+			const streamView = zg.createRemoteStreamView(stream);
+			streamView.play("playVideo")
 			updateButton(this, 'Start Playing Mixed Stream', 'Stop Playing Mixed Stream');
 			played = true;
 		} else {
-			clearStream('play');
+			zg.stopPlayingStream($('#PlayID').val());
+			updateButton(this, 'Stop Playing Mixed Stream', 'Start Playing Mixed Stream');
+			played = false;
 		}
 	}, 500)
 );

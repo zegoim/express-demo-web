@@ -521,6 +521,7 @@ function customStopStream() {
   zg = new ZegoExpressEngine(appID, server)
   // zg.zegoWebRTC.setGWNode('119.23.246.255:8123')
   rangeAudio = zg.createRangeAudioInstance()
+  rangeAudio.enableAudioSourceUpdateChecker(true);
   showMicrophones()
   syncPositionInfo()
   zg.setDebugVerbose(false)
@@ -556,6 +557,12 @@ function customStopStream() {
     }
   });
   rangeAudio.zegoAudioListener.setAudioVolume(200);
+  rangeAudio.on(
+    "audioSourceWithinRangeUpdate",
+    (audioSourceList) => {
+      console.log("audioSourceList", audioSourceList);
+    }
+  );
   // 初始化 3D 音效
   // Initialize 3D sound
   enableSpatializer(true);

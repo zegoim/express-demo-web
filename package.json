@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "upload": "scp -r ./src root@192.168.100.30:/opt/dev/express_webrtc/docs/sample/"
   },
   "keywords": [],
   "author": "",

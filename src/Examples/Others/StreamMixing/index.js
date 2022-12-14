@@ -26,7 +26,7 @@ let mixed = false;
 let played = false;
 let mixerOutputList = null;
 let flvPlayer = null;
-let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
+let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 // part end
 
@@ -99,7 +99,6 @@ async function enumDevices() {
 	$('#MirrorDevices').html(audioInputList.join(''));
 	$('#CameraDevices').html(videoInputList.join(''));
 }
-
 async function loginRoom(roomId, userId, userName, token) {
 	return await zg.loginRoom(roomId, token, {
 		userID: userId,
@@ -109,11 +108,11 @@ async function loginRoom(roomId, userId, userName, token) {
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED') {
+		if (state === 'CONNECTED') {
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
 		}
-		
+
 		if (state === 'DISCONNECTED') {
 			$('#roomStateSuccessSvg').css('display', 'none');
 			$('#roomStateErrorSvg').css('display', 'inline-block');
@@ -204,7 +203,7 @@ async function startPublishingStream(streamId, config) {
 async function startPublishingSecondStream(streamId, config) {
 	try {
 		secondStream = await zg.createStream(config);
-		zg.startPublishingStream(streamId, secondStream);	
+		zg.startPublishingStream(streamId, secondStream);
 		if (zg.getVersion() < "2.17.0") {
 			$('#publishSecondVideo')[0].srcObject = secondStream;
 			$('#publishSecondVideo').show()
@@ -266,7 +265,7 @@ async function startMixerTask(taskID, streamList, mixStreamId) {
 		const res = await zg.startMixerTask({
 			taskID,
 			inputList: streamList,
-			outputList: [ mixStreamId ],
+			outputList: [mixStreamId],
 			outputConfig: {
 				outputBitrate: 300,
 				outputFPS: 15,
@@ -305,6 +304,7 @@ $('#LoginRoom').on(
 		this.classList.add('border-primary');
 		if (!isLogin) {
 			try {
+				
 				isLogin = await loginRoom(id, userID, userID, token);
 				updateButton(this, 'Login Room', 'Logout Room');
 				$('#UserID')[0].disabled = true;
@@ -315,7 +315,7 @@ $('#LoginRoom').on(
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Login Fail Try Again';
-        throw err;
+				throw err;
 			}
 		} else {
 			if (localStream) {
@@ -331,7 +331,7 @@ $('#LoginRoom').on(
 );
 $('#startFirstPublishing').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		const id = streamFirstID;
 		this.classList.add('border-primary');
 		if (!firstPublished) {
@@ -356,7 +356,7 @@ $('#startFirstPublishing').on(
 
 $('#startSecondPublishing').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		const id = streamSecondID;
 		this.classList.add('border-primary');
 		if (!secondPublished) {
@@ -381,7 +381,7 @@ $('#startSecondPublishing').on(
 
 $('#startMixTask').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		const firstId = $('#FirstStreamID').val();
 		const secondId = $('#SecondStreamID').val();
 		mixStreamID = $('#MixedStreamID').val();
@@ -430,19 +430,49 @@ $('#startMixTask').on(
 
 $('#StartPlayingMixedStream').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		if (!firstStream) return alert('no first stream');
 		if (!secondStream) return alert('no second stream');
 		if (!mixerOutputList || !mixerOutputList.length) return alert('no mixed Stream');
+		const useCDN = $("#useCDN").prop("checked")
+		const streamID = mixerOutputList[0].streamID;
 		if (!played) {
-			const streamID = mixerOutputList[0].streamID;
-			const stream = await zg.startPlayingStream(streamID)
-			const streamView = zg.createRemoteStreamView(stream);
-			streamView.play("playVideo")
-			updateButton(this, 'Start Playing Mixed Stream', 'Stop Playing Mixed Stream');
+			if (useCDN) {
+				// Play stream from CDN server.
+				$("#cdnVideo").show()
+				const videoEle = $("#cdnVideo").get(0)
+				if (navigator.userAgent.indexOf('iPhone') !== -1 && getBrowser() == 'Safari' && mixerOutputList[0].hlsURL) {
+					const hlsUrl = mixerOutputList[0].hlsURL.replace('http', 'https');
+					videoEle.src = hlsUrl;
+				} else if (mixerOutputList[0].flvURL) {
+					const flvUrl = mixerOutputList[0].flvURL.replace('http', 'https');
+					if (flvjs.isSupported()) {
+						flvPlayer = flvjs.createPlayer({
+							type: 'flv',
+							url: flvUrl
+						});
+						flvPlayer.attachMediaElement(videoEle);
+						flvPlayer.load();
+					}
+				}
+			} else {
+				// Play stream from RTC server.
+				$("#cdnVideo").hide()
+				const stream = await zg.startPlayingStream(streamID)
+				const streamView = zg.createRemoteStreamView(stream);
+				streamView.play("playVideo")
+				updateButton(this, 'Start Playing Mixed Stream', 'Stop Playing Mixed Stream');
+			}
 			played = true;
 		} else {
-			zg.stopPlayingStream($('#PlayID').val());
+			!useCDN && zg.stopPlayingStream(streamID);
+			if(flvPlayer) {
+				flvPlayer.pause();
+				flvPlayer.unload();
+				flvPlayer.detachMediaElement();
+				flvPlayer.destroy();
+				flvPlayer= null;
+			}
 			updateButton(this, 'Stop Playing Mixed Stream', 'Start Playing Mixed Stream');
 			played = false;
 		}

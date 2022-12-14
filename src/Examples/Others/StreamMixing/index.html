@@ -156,11 +156,12 @@
             <h4>Step3 <span data-lang="PlayMixedStream">Play Mixed Stream</span></h4>
             <div class="preview-content-playmix">
               <div id="playVideo"></div>
-              <div id="remoteVideo"></div>
+              <video controls id="cdnVideo" autoplay playsinline></video>
               <div class="preview-video-action">
-                <!-- <div class="m-t-10 m-b-5">
-                  Mixed StreamID <input class="m-l-10" type="text" id="PlayID" />
-                </div> -->
+                <div class="check-wrappre m-b-5">
+                  <label class="form-check-label m-r-5" for="useCDN" style="color: #54667a">Use CDN</label>
+                  <input class="check-input" type="checkbox" id="useCDN">
+                </div>
                 <button id="StartPlayingMixedStream" class="m-t-10 m-b-5 configBtn play-pause-button"
                   title="startPlayingStream()">
                   Start Playing Mixed Stream</button>

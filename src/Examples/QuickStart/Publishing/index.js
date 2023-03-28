@@ -54,10 +54,12 @@ async function enumDevices() {
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
+		$('#roomInfo-id').text(roomID);
 		if (state === 'CONNECTED') {
 			console.log(111);
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
+			
 		}
 
 		if (state === 'DISCONNECTED') {
@@ -211,6 +213,7 @@ $('#LoginRoom').on(
 
 		if (!userID) return alert('userID is Empty');
 		if (!id) return alert('RoomID is Empty');
+		roomID = id;
 		this.classList.add('border-primary');
 		if (!isLogin) {
 			try {

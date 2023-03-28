@@ -13,7 +13,6 @@ let zg = null;
 let remoteStream = null;
 let isLogin = false;
 let played = false;
-let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 // part end
 
@@ -23,10 +22,12 @@ let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 function initEvent() {
 	zg.on('roomStateUpdate', (roomId, state) => {
+		$('#roomInfo-id').text(roomID);
 		if (state === 'CONNECTED') {
 			console.log(111);
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
+			
 		}
 
 		if (state === 'DISCONNECTED') {
@@ -161,6 +162,7 @@ $('#LoginRoom').on(
 
 		if (!userID) return alert('userID is Empty');
 		if (!id) return alert('RoomID is Empty');
+		roomID = id;
 		this.classList.add('border-primary');
 		if (!isLogin) {
 			try {
@@ -201,7 +203,6 @@ $('#startPlaying').on(
 			const config = {
 				video: $('#Video')[0].checked ? undefined : false,
 				audio: $('#Audio')[0].checked ? undefined : false,
-				videoCodec: localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8',
 			};
 			const flag = await startPlayingStream(id, config);
 			if (flag) {
@@ -262,6 +263,7 @@ async function render() {
 	$('#UserID').val(userID);
 	$('#PlayID').val(streamID);
 	$('#Video')[0].checked = true;
+	$('#Audio')[0].checked = true;
 	createZegoExpressEngine();
 	await checkSystemRequirements();
 	initEvent();

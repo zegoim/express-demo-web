@@ -107,6 +107,9 @@ const menu = `
         <a href="${baseURL}/Others/RangeAudio/index.html" class="waves-effect" data-lang="RangeAudio">范围语音</a>
       </li>
       <li>
+        <a href="${baseURL}/Others/VirtualBackground/index.html" class="waves-effect" data-lang="VirtualBackground">虚拟背景</a>
+      </li>
+      <li>
         <a href="${baseURL}/Others/EffectsBeauty/index.html" class="waves-effect" data-lang="BaseBeauty">基础美颜</a>
       </li>
       <span class="sidebar-title" data-lang="DebugAndConfig">调试与配置</span>

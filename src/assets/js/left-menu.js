@@ -79,6 +79,14 @@ const menu = `
           data-lang="AEC_ANS_AGC">音频3A处理</a>
       </li>
       <li>
+        <a href="${baseURL}/AdvancedAudioProcessing/VoiceChanger/index.html" class="waves-effect"
+          data-lang="VoiceChanger">变声</a>
+      </li>
+      <li>
+        <a href="${baseURL}/AdvancedAudioProcessing/AiDenoise/index.html" class="waves-effect"
+          data-lang="AiDenoise">AI 降噪</a>
+      </li>
+      <li>
         <a href="${baseURL}/AdvancedAudioProcessing/AudioMixing/index.html" class="waves-effect"
           data-lang="AudioMixing">混音</a>
       </li>

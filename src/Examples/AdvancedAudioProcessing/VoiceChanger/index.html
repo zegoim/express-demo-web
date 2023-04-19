@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lang="VoiceChanger">变声</title>
+  <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../assets/css/style.css">
+  <link rel="stylesheet" href="./index.css">
+  <script src="../../../assets/js/express_sdk/ZegoExpressWebRTC.js"></script>
+</head>
+
+<body class="fix-sidebar card-no-border">
+  <div class="preloader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+    </svg>
+  </div>
+
+  <div class="container main-wrapper">
+    <!-- <div class="row"> -->
+
+    <div class="page-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 login-wrapper">
+            <h6  data-lang="Preconditions">前置条件</h6>
+            <div class="login-desc" data-lang="PreconditionsDesc">
+              体验该功能，需要模拟一个用户（UserID）登陆到对应的房间（RoomID）中，并且有权限（Token）时才可以登陆成功。
+            </div>
+            <div class="form-wrap font-14 row">
+              <div class="form-item col-12 col-lg-4">
+                <span>RoomID</span>
+                <div class="icon-question">?
+                  <div class="pop-box" data-lang="RoomIDDesc">Tooltip text</div>
+                </div>
+                <input type="text" id="RoomID" />
+              </div>
+              <div class="form-item col-12 col-lg-4">
+                <span>UserID</span>
+                <div class="icon-question">?
+                  <div class="pop-box">
+                    <span data-lang="UserIDDesc"></span>
+                  </div>
+                </div>
+                <input type="text" id="UserID" />
+              </div>
+              <div class="form-item col-12 col-lg-4">
+                <span>Token</span>
+                <div class="icon-question">?
+                  <div class="pop-box">
+                    <span data-lang="TokenDesc"></span>
+                    <a href="https://console.zego.im" data-lang="ApplyToken" target="_blank"></a>
+                  </div>
+                </div>
+                <input type="text" class="w-70" id="Token" />
+              </div>
+            </div>
+            <button id="LoginRoom" class="play-pause-button" title="loginRoom()" style="width: 120px;">
+              <div class="success-svg m-r-5" id="loginSuccessSvg" style="display: none;">
+                <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15" viewBox="0 0 48 48"
+                  aria-hidden="true">
+                  <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round"
+                    stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17" />
+                </svg>
+              </div>
+              Login Room
+            </button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 col-lg-6 preview-wrapper">
+            <div class="preview-roomInfo">
+              RoomID:&nbsp;<div id="roomInfo-id" class="m-r-10"></div>
+              RoomState:&nbsp;<div id="roomInfo-state">
+                <div class="success-svg" id="roomStateSuccessSvg" style="display: none;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+                <div class="error-svg" id="roomStateErrorSvg" style="display: inline-block;">
+                  <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="10" width="10"
+                    viewBox="0 0 48 48" aria-hidden="true">
+                    <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="row" id="videoList">
+              <div class="preview-pushlishInfo col-lg-12 col-6">
+                <div class="pushlishInfo-title" data-lang="Preview">
+                  Preview
+                </div>
+                <div class="preview-content">
+                  <div class="preview-action">
+                    <div class="preview-info">
+                      <div>Resolution: <span id="publishResolution"></span></div>
+                      <div>Video Send Bitrate: <span id="sendBitrate"></span></div>
+                      <div>Video Send FPS: <span id="sendFPS"></span></div>
+                      <div>Packet Loss: <span id="sendPacket"></span></div>
+                    </div>
+
+                  </div>
+                  <video controls id="publishVideo" autoplay muted playsinline></video>
+                  <div id="localVideo"></div>
+                </div>
+              </div>
+              <div class="preview-playInfo col-lg-12 col-6 m-t-10">
+                <div class="pushlishInfo-title" data-lang="PlayStream">
+                  Play Stream
+                </div>
+                <div class="preview-content">
+                  <div class="preview-action">
+                    <div class="preview-info">
+                      <div>Resolution: <span id="playResolution"></span></div>
+                      <div>Video Recv Bitrate: <span id="receiveBitrate"></span></div>
+                      <div>Video Recv FPS: <span id="receiveFPS"></span></div>
+                      <div>Packet Loss: <span id="receivePacket"></span></div>
+                    </div>
+
+                  </div>
+                  <video controls id="playVideo" autoplay playsinline></video>
+                  <div id="remoteVideo"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6 action-wrapper">
+            <div class="action-step">
+              <div class="action-content font-bold font-14">
+                <div class="font-12 select-wrapper">
+                  <span data-lang="VoicePreset">VoicePreset</span>
+                  <select class="form-control form-control-sm m-l-5" id="voicePreset" style="width: 50%">
+                    <option value="">空</option>
+                    <option value="0">none</option>
+                    <option value="1">men to child</option>
+                    <option value="2">men to women</option>
+                    <option value="3">women to child</option>
+                    <option value="4">women to men</option>
+                    <option value="5">foreigner</option>
+                    <option value="6">optimus prime</option>
+                    <option value="7">android</option>
+                    <option value="8">ethereal</option>
+                    <option value="9">male magnetic</option>
+                    <option value="10">female fresh</option>
+                    <option value="11">major c</option>
+                    <option value="12">minor a</option>
+                    <option value="13">harmonic minor</option>
+                    <option value="14">female energetic</option>
+                    <option value="15">richness</option>
+                    <option value="16">muffled</option>
+                    <option value="17">roundness</option>
+                    <option value="18">falsetto</option>
+                    <option value="19">fullness</option>
+                    <option value="20">clear</option>
+                    <option value="21">highly resonant</option>
+                    <option value="22">loud clear</option>
+                  </select>
+                </div>
+                <button id="setVoiceChanger" class="m-b-5 configBtn play-pause-button"
+                title="setVoiceChanger()">set voice changer</button>
+                <div>
+                  <div class="m-t-10 m-b-5">
+                    Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
+                  </div>
+                  <button id="startPublishing" class="m-b-5 configBtn play-pause-button"
+                    title="createStream() / startPublishingStream()">Start Publishing</button>
+                </div>
+                <div>
+                  <div class="m-t-10 m-b-5">
+                    Playing StreamID <input class="m-l-10" type="text" id="PlayID" />
+                  </div>
+                  <button id="startPlaying" class="m-b-5 configBtn play-pause-button"
+                    title="startPlayingStream()">Start Playing</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- </div> -->
+      <ul class="goToDoc">
+        <li>
+          <span data-lang="HelpDocsVideoCodec"> Web 端视频编码默认使用 VP8。如果需要体验和其他端互通或者转推 CDN 功能，请在调试与配置页面修改为 H.264。</span>
+          &nbsp;
+          <a href="../../DebugAndConfig/LogAndVersionAndDebug/index.html" data-lang="HelpSettingsPage" target="_blank">
+            点击修改 </a>
+        </li>
+        <li>
+          <span data-lang="MoreDocs">更多文档，请跳转至即构 </span> &nbsp;
+          <a href="https://doc-zh.zego.im/article/9673" data-lang="HelpDocs" target="_blank"> 帮助文档 </a>
+        </li>
+      </ul>
+    </div>
+
+    <script src="../../../assets/js/left-menu.js"></script>
+    <script src="../../../assets/js/jquery.min.js"></script>
+    <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
+    <script src="../../../assets/js/metisMenu.min.js"></script>
+    <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
+    <script src="../../../assets/js/bootstrap.min.js"></script>
+    <script src="../../../assets/js/vconsole.min.js"></script>
+    <script src="../../../assets/js/custom.js"></script>
+    <script src="../../../KeyCenter.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>

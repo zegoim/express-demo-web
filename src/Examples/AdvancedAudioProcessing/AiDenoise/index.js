@@ -27,7 +27,7 @@ let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8
 // ============================================================== 
 // This part of the code uses the SDK
 // ==============================================================  
-
+ZegoExpressEngine.use(AiDenoise);
 function createZegoExpressEngine() {
   zg = new ZegoExpressEngine(appID, server);
   window.zg = zg

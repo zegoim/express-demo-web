@@ -26,7 +26,7 @@ let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8
 // ============================================================== 
 // This part of the code uses the SDK
 // ==============================================================  
-
+ZegoExpressEngine.use(VoiceChanger);
 function createZegoExpressEngine() {
   zg = new ZegoExpressEngine(appID, server);
   window.zg = zg
@@ -166,9 +166,9 @@ async function loginRoom(roomId, userId, userName, token) {
 	});
 }
 
-async function startPublishingStream(streamId, config) {
+async function startPublishingStream(streamId) {
   try {
-    localStream = await zg.createStream(config);
+    localStream = await zg.createStream();
     zg.startPublishingStream(streamId, localStream, { videoCodec });
     if (zg.getVersion() < "2.17.0") {
       $('#publishVideo')[0].srcObject = localStream;
@@ -238,11 +238,11 @@ async function stopPlayingStream(streamId) {
 $('#LoginRoom').on(
 	'click',
 	util.throttle(async function () {
-
+    
 		const userID = $('#UserID').val();
 		const id = $('#RoomID').val();
 		const token = $('#Token').val();
-		$("#roomInfo-id").text(id)
+    $("#roomInfo-id").text(id)
 
 		if (!userID) return alert('userID is Empty');
 		if (!id) return alert('RoomID is Empty');
@@ -280,14 +280,11 @@ $('#startPublishing').on('click', util.throttle( async function () {
   if(!id) return alert('PublishID is empty')
   this.classList.add('border-primary')
   if(!published) {
-      const flag =  await startPublishingStream(id, getCreateStreamConfig());
+      const flag =  await startPublishingStream(id);
       if(flag) {
         updateButton(this, 'Start Publishing', 'Stop Publishing');
         published = true
         $('#PublishID')[0].disabled = true
-        $('#AEC')[0].disabled = true
-        $('#AGC')[0].disabled = true
-        $('#ANS')[0].disabled = true
       } else {
         this.classList.remove('border-primary');
         this.classList.add('border-error')
@@ -304,9 +301,6 @@ $('#startPublishing').on('click', util.throttle( async function () {
       updateButton(this, 'Start Publishing', 'Stop Publishing')
       published = false
       $('#PublishID')[0].disabled = false
-      $('#AEC')[0].disabled = false
-      $('#AGC')[0].disabled = false
-      $('#ANS')[0].disabled = false
       reSetVideoInfo('publish')
   }
 }, 500))
@@ -343,19 +337,7 @@ $('#startPlaying').on('click', util.throttle( async function () {
 // This part of the code bias tool
 // ============================================================== 
 
-function getCreateStreamConfig() {
-  const aec = $('#AEC')[0].checked
-  const agc = $('#AGC')[0].checked
-  const ans = $('#ANS')[0].checked
-  const config = {
-    camera: {
-      AEC: aec,
-      AGC: agc,
-      ANS: ans
-    }
-  }
-  return config
-}
+
 
 function updateButton(button, preText, afterText) {
   if (button.classList.contains('playing')) {

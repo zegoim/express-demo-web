@@ -53,6 +53,10 @@ const menu = `
           data-lang="StreamByCDN">通过CDN推流、拉流</a>
       </li>
       <li>
+        <a href="${baseURL}/AdvancedStreaming/StreamByH265CDN/index.html" class="waves-effect"
+          data-lang="StreamByH265CDN">拉取H.265 CDN直播流</a>
+      </li>
+      <li>
         <a href="${baseURL}/AdvancedStreaming/LowLatencyLive/index.html" class="waves-effect"
           data-lang="LowLatencyLive">低延迟直播</a>
       </li>

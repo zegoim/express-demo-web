@@ -13,12 +13,6 @@ let streamID = '0010'
 
 let zg = null;
 let isLogin = false;
-let localStream = null;
-let remoteStream = null;
-let published = false;
-let played = false;
-let isTurnCdn = false;
-let cdnFlvPlayer = null;
 let zegoExpressPlayer = null;
 let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 
@@ -141,18 +135,6 @@ function initEvent() {
 }
 
 
-function destroyStream() {
-  localStream && zg.destroyStream(localStream);
-  $('#publishVideo')[0].srcObject = null;
-  localStream = null;
-  published = false
-  if($('#PublishID').val() === $('#PlayID').val()) {
-    $('#playVideo')[0].srcObject = null;
-    remoteStream = null;
-    played = false
-  }
-}
-
 function setLogConfig() {
   let config = localStorage.getItem('logConfig')
   const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
@@ -172,62 +154,6 @@ async function loginRoom(roomId, userId, userName, token) {
 		userName
 	});
 }
-
-async function startPublishingStream (streamId, config) {
-  try {
-    localStream = await zg.createStream(config);
-    zg.startPublishingStream(streamId, localStream);
-    if (zg.getVersion() < "2.17.0") {
-      $('#publishVideo')[0].srcObject = localStream;
-      $('#publishVideo').show()
-      $('#localVideo').hide()
-    } else {
-      const localView = zg.createLocalStreamView(localStream);
-      localView.play("localVideo", {
-          mirror: true,
-          objectFit: "cover",
-          enableAutoplayDialog: true,
-      })
-      $('#publishVideo').hide()
-      $('#localVideo').show()
-    }
-    return true
-  } catch(err) {
-    return false
-  }
-  
-}
-
-async function stopPublishingStream(streamId, url) {
-    // before stopPublishingStream remove cdn url
-  if(isTurnCdn) {
-      removePublishCdnUrl(streamId, url)
-  }
-  zg.stopPublishingStream(streamId)
-  if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
-    stopPlayingStream(streamId)
-  }
-  destroyStream()
-}
-
-async function addPublishCdnUrl(streamId, url) {
-  try {
-    const { errorCode  } = await zg.addPublishCdnUrl(streamId, url)
-    return errorCode
-  } catch (err) {
-    return 1
-  }
-}
-
-async function removePublishCdnUrl(streamId, url) {
-  try {
-    const { errorCode  } = await zg.removePublishCdnUrl(streamId, url)
-    return errorCode
-  } catch (err) {
-    return 1
-  }
-}
-
 // uses SDK end
 
 
@@ -261,9 +187,6 @@ $('#LoginRoom').on(
         throw err;
 			}
 		} else {
-			if (localStream) {
-				updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
-			}
 			isLogin = false;
 			updateButton(this, 'Login Room', 'Logout Room');
 			$('#UserID')[0].disabled = false;
@@ -271,95 +194,6 @@ $('#LoginRoom').on(
 		}
 	}, 500)
 );
-$('#startPublishing').on('click', util.throttle( async function () {
-  const id = $('#PublishID').val();
-  if(!id) return alert('PublishID is empty')
-  this.classList.add('border-primary')
-  if(!published) {
-      const flag =  await startPublishingStream(id);
-      if(flag) {
-        updateButton(this, 'Start Publishing', 'Stop Publishing');
-        published = true
-        changeVideo()
-      } else {
-        changeVideo(true)
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Publishing Fail'
-      }
-
-  } else {
-      if(remoteStream && id === $('#PlayID').val()) {
-        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
-      }
-      stopPublishingStream(id);
-      $('#PublishCdnUrl')[0].disabled = false
-      updateButton(this, 'Start Publishing', 'Stop Publishing')
-      published = false
-      $('#PublishID')[0].disabled = false
-  }
-}, 500))
-
-$('#AddPublishCdnUrl').on('click', util.throttle(async function() {
-  if(!published) return alert('must Publishing Stream before addPublishCdnUrl')
-  const url = $('#PublishCdnUrl').val()
-  if(!url) return alert('url is empty')
-  $('#AddPublishCdnUrlErrorSvg').css('display', 'none')
-  $('#AddPublishCdnUrlSuccessSvg').css('display', 'none')
-
-  const flag = await addPublishCdnUrl(streamID, url)
-  if(flag === 0) {
-    $('#AddPublishCdnUrlErrorSvg').css('display', 'none')
-    $('#AddPublishCdnUrlSuccessSvg').css('display', 'inline-block')
-    $('#PublishCdnUrl')[0].disabled = true
-  } else {
-    $('#AddPublishCdnUrlSuccessSvg').css('display', 'none')
-    $('#AddPublishCdnUrlErrorSvg').css('display', 'inline-block')
-  }
-}, 500))
-
-$('#PlayStreamFromURL').on('click', util.throttle( async function () {
-  const url = $('#CdnUrl').val()
-  if(!url) alert('url is empty')
-  const cdnVideoElement = $('#playVideo')[0] || 
-  $('CdnPlay').append(
-    `
-    <video controls id="playVideo" autoplay muted preload="auto"
-    x-webkit-airplay="true"
-    x5-video-player-type="h5-page"
-    webkit-playsinline="true"
-    playsinline></video>
-    `
-  )
-  let hasVideo = true;
-  let hasAudio = true;
-  if (flvjs.isSupported()) {
-      //若支持flv.js
-      if (cdnFlvPlayer != null) {
-        cdnFlvPlayer.pause();
-        cdnFlvPlayer.unload();
-        cdnFlvPlayer.detachMediaElement();
-        cdnFlvPlayer.destroy();
-        cdnFlvPlayer = null;
-      }
-      cdnFlvPlayer = flvjs.createPlayer({
-          type: 'flv',
-          isLive: true,
-          url,
-          hasAudio: hasAudio,
-          hasVideo: hasVideo,
-      });
-      cdnFlvPlayer.on(flvjs.Events.LOADING_COMPLETE, function () {
-          console.error('LOADING_COMPLETE');
-          cdnFlvPlayer.play();
-      });
-      cdnFlvPlayer.attachMediaElement(cdnVideoElement);
-      cdnFlvPlayer.load();
-      cdnVideoElement.muted = false;
-      cdnVideoElement.controls = true;
-      cdnFlvPlayer.play();
-  }
-}, 500))
 
 $('#PlayStreamFromURL-exp').on('click', util.throttle(async function () {
   const url = $('#CdnUrl-exp').val()

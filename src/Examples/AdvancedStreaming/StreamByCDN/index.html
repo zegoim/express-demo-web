@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../../../assets/css/style.css">
   <link rel="stylesheet" href="./index.css">
   <script src="../../../assets/js/express_sdk/ZegoExpressWebRTC.js"></script>
+  <script src="../../../assets/js/express_player/ZegoExpressPlayer-1.0.0.js"></script>
 </head>
 
 <body class="fix-sidebar card-no-border">
@@ -90,6 +91,7 @@
                 </div>
               </div>
             </div>
+
             <div class="row" id="videoList">
               <div class="preview-pushlishInfo col-lg-12 col-6 m-b-15">
                 <div class="pushlishInfo-title">
@@ -101,9 +103,26 @@
                   <div id="localVideo"></div>
                 </div>
               </div>
+
+              <!-- 拉流方式1 express player 预览窗-->
               <div class="preview-playInfo col-lg-12 col-6">
                 <div class="pushlishInfo-title">
-                  <span data-lang="PlayStream">Play Stream</span>&emsp; PlayStreamID: <span id="playInfo-id"></span>
+                  <span data-lang="PlayStreamCDNEXP">Play Stream</span>&emsp; PlayStreamID: <span id="playInfo-id-exp"></span>
+                </div>
+                <div class="preview-content" id="CdnPlay-exp">
+                  <input class="m-l-10" type="hidden" id="PlayID-exp" value="0010" />
+                  <div id="expressPlayerContainer" zg-height="200" class="express-player-container">
+                  </div>
+                  <!-- <video controls id="playVideo" autoplay muted playsinline></video> -->
+                  <!-- <video controls id="playVideo-exp" autoplay preload="auto" x-webkit-airplay="true" x5-video-player-type="h5-page"
+                    webkit-playsinline="true" playsinline></video> -->
+                </div>
+              </div>
+
+              <!-- 拉流方式2 for h5 video 预览窗-->
+              <div class="preview-playInfo col-lg-12 col-6">
+                <div class="pushlishInfo-title">
+                  <span data-lang="PlayStreamCDLFlvJs">Play Stream</span>&emsp; PlayStreamID: <span id="playInfo-id"></span>
                 </div>
                 <div class="preview-content" id="CdnPlay">
                   <input class="m-l-10" type="hidden" id="PlayID" value="0010" />
@@ -112,6 +131,7 @@
                     webkit-playsinline="true" playsinline></video>
                 </div>
               </div>
+
             </div>
           </div>
           <div class="col-12 col-lg-6 action-wrapper font-bold">
@@ -146,19 +166,38 @@
                     <span data-lang="AddPublishCdnUrl">AddPublishCdnUrl</span>
                   </button>
                 </div>
+
                 <div class="m-b-10">
                   <span data-lang="PublishCDNURL">Publish CDN URL</span>
                   <input id="PublishCdnUrl" type="text" class="font-medium m-l-10">
                 </div>
-                <div data-lang="StreamByUrl" class="b-t p-t-10 font-14 font-bold m-b-10" data-lang="PlayStreamFromURL">
-                  Play Stream From URL</div>
+
+                <!-- 拉流方式1: 播放器插件 控制-->
+                <div data-lang="StreamByExpressPlayer" class="b-t p-t-10 font-14 font-bold m-b-10">
+                  Play Stream By Zego Express Player
+                </div>
+                <div class="m-b-10">
+                  CDN URL
+                  <input id="CdnUrl-exp" type="text" class="font-medium m-l-10">
+                </div>
+                <button id="PlayStreamFromURL-exp" type="button" class="btn-info btn configBtn"
+                  data-lang="PlayStreamFromURL">Play Stream From
+                  URL
+                </button>
+
+                <!-- 拉流方式2: 浏览器 video 标签播放 控制-->
+                <div data-lang="StreamByUrl" class="b-t p-t-10 font-14 font-bold m-b-10 m-t-10" data-lang="PlayStreamFromURL">
+                  Play Stream From URL
+                </div>
                 <div class="m-b-10">
                   CDN URL
                   <input id="CdnUrl" type="text" class="font-medium m-l-10">
                 </div>
                 <button id="PlayStreamFromURL" type="button" class="btn-info btn configBtn"
                   data-lang="PlayStreamFromURL">Play Stream From
-                  URL</button>
+                  URL
+                </button>
+
               </div>
             </div>
           </div>

@@ -6,7 +6,8 @@
 // ==============================================================
 // This part of the code defines the default values and global values
 // ==============================================================
-
+ZegoExpressEngine.use(BackgroundProcess);
+ZegoExpressEngine.use(StreamCompositor);
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
 let roomID = '0033';
@@ -15,9 +16,15 @@ let zg = null;
 let isChecked = false;
 let isLogin = false;
 let localStream = null;
+let screenStream = null;
+let cameraStream = null;
+let customStream = null;
+let compositor = null;
+let localView = null;
 let remoteStream = null;
 let published = false;
 let played = false;
+let isTransparent = false;
 let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8'
 
 let isBeautyEnabled = false;
@@ -28,7 +35,7 @@ let isBeautyEnabled = false;
 // ==============================================================
 
 function createZegoExpressEngine() {
-	zg = new ZegoExpressEngine(appID, server);
+	zg = new ZegoExpressEngine(appID, server, { customDomain: "zegocloud.com" });
 	window.zg = zg;
 }
 
@@ -147,10 +154,14 @@ function initEvent() {
 
 
 function destroyStream() {
-	localStream && zg.destroyStream(localStream);
-	remoteStream = null;
-	$('#playVideo')[0].srcObject = null;
-	isStart = false;
+	compositor.stopComposingStream()
+	localView.stop();
+	screenStream && zg.destroyStream(screenStream)
+	cameraStream && zg.destroyStream(cameraStream)
+	customStream && zg.destroyStream(customStream)
+	screenStream = null;
+	cameraStream = null;
+	customStream = null;
 }
 
 function setLogConfig() {
@@ -167,25 +178,140 @@ function setLogConfig() {
 	zg.setDebugVerbose(DebugVerbose);
 }
 
+async function initBackground() {
+	if ((
+		navigator.userAgent.match(/Mobi/i) ||
+		navigator.userAgent.match(/Android/i) ||
+		navigator.userAgent.match(/iPhone/i)
+	)) {
+		return alert('Not support in Mobile, Please use in Desktop')
+	}
+	try {
+            zg.initBackgroundModule && await zg.initBackgroundModule(0, "./assets");
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function setBackgroundProcess(stream, enable) {
+	try {
+		await zg.enableBackgroundProcess(stream, enable, 0);
+	} catch (err) {
+		console.error(err)
+	}
+}
+
+async function setTransparentEffect(stream, isTransparent) {
+	
+	zg.setTransparentBackgroundOptions(stream);
+	await setBackgroundProcess(stream, isTransparent)
+}
+
+async function composingStream() {
+	compositor = zg.createStreamCompositor();
+
+	const width = 1280, height = 720;
+
+	screenStream = await zg.createStream({ screen: true });
+
+
+	await compositor.setInputEndpoint(screenStream, {
+		layout: {
+			x: 0,
+			y: 0,
+			width: 1280,
+			height: 720,
+			zOrder: 0
+		},
+		objectFit: "fill"
+	});
+
+	cameraStream = await zg.createStream({
+		camera: {
+		  videoQuality: 4,
+		  width: 640,
+		  height: 480,
+		  bitrate: 2000,
+		  frameRate: 15,
+		  video: true,
+		  audio: true,
+		  startBitrate: "target"
+		}
+	  })
+  
+	if (isTransparent) {
+		await setTransparentEffect(cameraStream, true);
+	}
+
+	await compositor.setInputEndpoint(cameraStream, {
+		layout: { x: 0, y: 0, width: 320, height: 180, zOrder: 1 },
+		objectFit: "fill",
+		volume: 100
+	});
+
+	const img1 = document.getElementById("compositorImg1");
+
+
+	compositor.addImage(img1, {
+		layout: {
+			x: 0,
+			y: 320,
+			width: 320,
+			height: 180,
+			zOrder: 2
+		},
+		objectFit: "cover"
+	});
+	compositor.setOutputConfig({
+		width: width,
+		height: height,
+		frameRate: 15
+	});
+
+	const img2 = document.getElementById("compositorImg2");
+
+
+	compositor.addImage(img2, {
+		layout: {
+			x: 0,
+			y: 540,
+			width: 320,
+			height: 180,
+			zOrder: 2
+		},
+		objectFit: "cover"
+	});
+	compositor.setOutputConfig({
+		width: width,
+		height: height,
+		frameRate: 15
+	});
+
+	const outputStream = await compositor.startComposingStream();
+
+	localView = zg.createLocalStreamView(outputStream);
+
+	localView.play("mixVideo", {
+		objectFit: "cover",
+		enableAutoplayDialog: true,
+	})
+	$('#mixVideo').show()
+
+	return outputStream
+}
+
+
+function logoutRoom(roomID) {
+	destroyStream()
+	zg.logoutRoom(roomID)
+}
+
 async function startPublishingStream(streamId) {
 	try {
-		localStream = await zg.createStream();
-		zg.zegoWebRTC.rtcModules.streamCenter.isPeer = false;
+		localStream = await composingStream();
+
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		if (zg.getVersion() < "2.17.0") {
-			$('#publishVideo')[0].srcObject = localStream;
-			$('#publishVideo').show()
-			$('#localVideo').hide()
-		} else {
-			const localView = zg.createLocalStreamView(localStream);
-			localView.play("localVideo", {
-				mirror: true,
-				objectFit: "cover",
-				enableAutoplayDialog: true,
-			})
-			$('#publishVideo').hide()
-			$('#localVideo').show()
-		}
+
 		return true;
 	} catch (err) {
 		return false;
@@ -202,20 +328,12 @@ async function stopPublishingStream(streamId) {
 async function startPlayingStream(streamId, options = {}) {
 	try {
 		remoteStream = await zg.startPlayingStream(streamId, options);
-		$('#playVideo')[0].controls = "true"
-		if (zg.getVersion() < "2.17.0") {
-			$('#playVideo').srcObject = remoteStream;
-			$('#playVideo').show()
-			$('#remoteVideo').hide()
-		} else {
-			const remoteView = zg.createRemoteStreamView(remoteStream);
-			remoteView.play("remoteVideo", {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
-			})
-			$('#playVideo').hide()
-			$('#remoteVideo').show()
-		}
+		const remoteView = zg.createRemoteStreamView(remoteStream);
+		remoteView.play("remoteVideo", {
+			objectFit: "cover",
+			enableAutoplayDialog: true,
+		})
+
 		return true;
 	} catch (err) {
 		return false;
@@ -226,24 +344,37 @@ async function stopPlayingStream(streamId) {
 	zg.stopPlayingStream(streamId);
 }
 
-async function setBeautyEffect(enable) {
-	if (enable === undefined) {
-		enable = isBeautyEnabled
-	} else {
-		isBeautyEnabled = enable
-	}
-	const beautyConfig = {
-		sharpenIntensity: parseInt($("#range-sharp").val()),
-		whitenIntensity: parseInt($("#range-light").val()),
-		rosyIntensity: parseInt($("#range-red").val()),
-		smoothIntensity: parseInt($("#range-blur").val())
-	}
-	const res = await zg.setEffectsBeauty(
-		localStream, enable, beautyConfig
-	);
-	console.warn("setBeautyEffect", res, beautyConfig);
-}
+// function changeVideo(flag) {
+// 	if (flag) {
+// 		$('#publishVideo').css('transform', 'none');
+// 		$('#playVideo').css('transform', 'none');
+// 		return;
+// 	}
+// 	const value = $('#Mirror').val();
+// 	if (value === 'onlyPreview') {
+// 		$('#publishVideo').css('transform', 'scale(-1, 1)');
+// 	} else if (value === 'onlyPlay') {
+// 		$('#playVideo').css('transform', 'scale(-1, 1)');
+// 	} else if (value === 'both') {
+// 		$('#publishVideo').css('transform', 'scale(-1, 1)');
+// 		$('#playVideo').css('transform', 'scale(-1, 1)');
+// 	}
+// }
 
+// function reSetVideoInfo(flag) {
+// 	if (flag === 'publish' || !flag) {
+// 		$('#publishResolution').text('');
+// 		$('#sendBitrate').text('');
+// 		$('#sendFPS').text('');
+// 		$('#sendPacket').text('');
+// 	}
+// 	if (flag === 'play' || !flag) {
+// 		$('#playResolution').text('');
+// 		$('#receiveBitrate').text('');
+// 		$('#receiveFPS').text('');
+// 		$('#receivePacket').text('');
+// 	}
+// }
 
 // uses SDK end
 
@@ -254,12 +385,12 @@ $('#LoginRoom').on(
 	'click',
 	util.throttle(async function () {
 
-		// const userID = $('#UserID').val();
-		// const id = $('#RoomID').val();
-		// const token = $('#Token').val();
-		const userID = '6680'
-		const id = '335'
-		const token = '04AAAAAGUk7xQAEHMwZ2xydGoxaHR5MG5odWgAwGSB7mxkZtyZp0eedqfrHTyutE8bakszFTn77+bvzvUYjUdMeXwdRt/8Q4C03pRe+0ZwvcG9x1vn9H4MXnv7hz43gibSUA82GipheGxI+V35zr3UKIvy+yNJ0QUwO6Oy1i+arKwY3HGooTOm2DM1SFjuKIFZYB3wXH/dLtkmkLjfYjSqWDvm8cZtUY863t6idk4DW6YI2/akDJ5203NeZmX1+ZqAL6dTuJMmo1coOt7jVNcaX2+V86c7QJlhFVqC/w=='
+		const userID = $('#UserID').val();
+		const id = $('#RoomID').val();
+		const token = $('#Token').val();
+		// const userID = '6680'
+		// const id = '335'
+		// const token = '04AAAAAGUk7xQAEHMwZ2xydGoxaHR5MG5odWgAwGSB7mxkZtyZp0eedqfrHTyutE8bakszFTn77+bvzvUYjUdMeXwdRt/8Q4C03pRe+0ZwvcG9x1vn9H4MXnv7hz43gibSUA82GipheGxI+V35zr3UKIvy+yNJ0QUwO6Oy1i+arKwY3HGooTOm2DM1SFjuKIFZYB3wXH/dLtkmkLjfYjSqWDvm8cZtUY863t6idk4DW6YI2/akDJ5203NeZmX1+ZqAL6dTuJMmo1coOt7jVNcaX2+V86c7QJlhFVqC/w=='
 		$("#roomInfo-id").text(id)
 
 		if (!userID) return alert('userID is Empty');
@@ -272,7 +403,8 @@ $('#LoginRoom').on(
 				updateButton(this, 'Login Room', 'Logout Room');
 				$('#UserID')[0].disabled = true;
 				$('#RoomID')[0].disabled = true;
-				$('#LoginRoom').hide()
+				// $('#LoginRoom').hide()
+				
 			} catch (err) {
 				isLogin = false;
 				this.classList.remove('border-primary');
@@ -280,9 +412,6 @@ $('#LoginRoom').on(
 				this.innerText = 'Login Fail Try Again';
 			}
 		} else {
-			if (localStream) {
-				updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
-			}
 			isLogin = false;
 			logoutRoom(id);
 			updateButton(this, 'Login Room', 'Logout Room');
@@ -291,6 +420,7 @@ $('#LoginRoom').on(
 		}
 	}, 500)
 );
+
 $('#startPublishing').on(
 	'click',
 	util.throttle(async function () {
@@ -302,19 +432,20 @@ $('#startPublishing').on(
 				updateButton(this, 'Start Publishing', 'Stop Publishing');
 				published = true;
 				$('#PublishID')[0].disabled = true;
-				changeVideo();
+				// changeVideo();
 			}
 		} else {
 			if (remoteStream && id === $('#PlayID').val()) {
 				$('#PlayID')[0].disabled = false;
 				updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing');
-				reSetVideoInfo();
+				// reSetVideoInfo();
 			}
 			stopPublishingStream(id);
+			destroyStream();
 			updateButton(this, 'Start Publishing', 'Stop Publishing');
 			published = false;
 			$('#PublishID')[0].disabled = false;
-			reSetVideoInfo('publish');
+			// reSetVideoInfo('publish');
 		}
 	}, 500)
 );
@@ -331,37 +462,77 @@ $('#startPlaying').on(
 				updateButton(this, 'Start Playing', 'Stop Playing');
 				played = true;
 				$('#PlayID')[0].disabled = true;
-				changeVideo();
+				
 			} else {
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Playing Fail';
-				changeVideo(true);
+
 			}
 		} else {
 			stopPlayingStream(id);
 			updateButton(this, 'Start Playing', 'Stop Playing');
 			played = false;
 			$('#PlayID')[0].disabled = false;
-			reSetVideoInfo('play');
+
 		}
 	}, 500)
 );
 
-$("#openVideoEffect").on("click", () => {
-	setBeautyEffect(true);
-	console.warn("openVideoEffect");
-});
-$("#closeVideoEffect").on("click", () => {
-	setBeautyEffect(false);
-	console.warn("closeVideoEffect");
-});
+$('#setTransparentEffect').on(
+	'click',
+	util.throttle(async function () {
 
-$("#range-sharp").on("change", () => { setBeautyEffect() })
-$("#range-light").on("change", () => { setBeautyEffect() })
-$("#range-red").on("change", () => { setBeautyEffect() })
-$("#range-blur").on("change", () => { setBeautyEffect() })
+		 
+		if (!isTransparent) {
+			try {
+				isTransparent = true
+				if (cameraStream) {
+					await setTransparentEffect(cameraStream, true)
+				}
+			} catch (err) {
+				isLogin = false;
+			}
+		} else {
+		// 	isTransparent = false;
+		// 	if (cameraStream) {
+		// 		await setTransparentEffect(cameraStream, false)
+		// 	}
+		}
+	}, 500)
+);
 
+$('#selectImg1').click(function() {
+	$('#inputImg1').click()
+})
+
+$('#inputImg1').change(function() {
+	const img = this.files[0];
+
+	if (!img.type.startsWith('image')) {
+		alert('只支持图片')
+	}
+	const backImg = document.getElementById("compositorImg1");
+	const url = URL.createObjectURL(img);
+	backImg.src = url;
+	
+})
+
+$('#selectImg2').click(function() {
+	$('#inputImg2').click()
+})
+
+$('#inputImg2').change(function() {
+	const img = this.files[0];
+
+	if (!img.type.startsWith('image')) {
+		alert('只支持图片')
+	}
+	const backImg = document.getElementById("compositorImg2");
+	const url = URL.createObjectURL(img);
+	backImg.src = url;
+	
+})
 // bind event end
 
 // ==============================================================
@@ -389,38 +560,6 @@ function updateButton(button, preText, afterText) {
 	}
 }
 
-function changeVideo(flag) {
-	if (flag) {
-		$('#publishVideo').css('transform', 'none');
-		$('#playVideo').css('transform', 'none');
-		return;
-	}
-	const value = $('#Mirror').val();
-	if (value === 'onlyPreview') {
-		$('#publishVideo').css('transform', 'scale(-1, 1)');
-	} else if (value === 'onlyPlay') {
-		$('#playVideo').css('transform', 'scale(-1, 1)');
-	} else if (value === 'both') {
-		$('#publishVideo').css('transform', 'scale(-1, 1)');
-		$('#playVideo').css('transform', 'scale(-1, 1)');
-	}
-}
-
-function reSetVideoInfo(flag) {
-	if (flag === 'publish' || !flag) {
-		$('#publishResolution').text('');
-		$('#sendBitrate').text('');
-		$('#sendFPS').text('');
-		$('#sendPacket').text('');
-	}
-	if (flag === 'play' || !flag) {
-		$('#playResolution').text('');
-		$('#receiveBitrate').text('');
-		$('#receiveFPS').text('');
-		$('#receivePacket').text('');
-	}
-}
-
 // tool end
 
 // ==============================================================
@@ -433,12 +572,12 @@ async function render() {
 	$('#UserName').val(userID);
 	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);
-	$('#PlayID').val(streamID);
 	createZegoExpressEngine();
 	await checkSystemRequirements();
 	enumDevices();
 	initEvent();
 	setLogConfig();
+	initBackground();
 }
 
 render();

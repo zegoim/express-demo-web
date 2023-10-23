@@ -123,18 +123,13 @@ $(function () {
             // Step4 Start Publishing Stream
             async startPublishingStream(streamId, config) {
                 try {
-                    this.localStream = await this.zg.createStream(config);
+                    this.localStream = await this.zg.createZegoStream(config);
                     this.zg.startPublishingStream(streamId, this.localStream, { videoCodec: this.videoCodec });
-                    if (this.zg.getVersion() < "2.17.0") {
-                        this.$refs['publishVideo'].srcObject = this.localStream;
-                    } else {
-                        const localView = this.zg.createLocalStreamView(this.localStream)
-                        localView.play("localVideo", {
-                            mirror: true,
-                            objectFit: "cover",
-                            enableAutoplayDialog: true,
-                        })
-                    }
+                    this.localStream.playVideo($('#localVideo')[0], {
+                        mirror: true,
+                        objectFit: "cover"
+                    })
+                    $('#localVideo').show()
                     return true;
                 } catch (err) {
                     console.error('error', err);
@@ -150,8 +145,7 @@ $(function () {
                     } else {
                         const remoteView = this.zg.createRemoteStreamView(this.remoteStream);
                         remoteView.play("remoteVideo", {
-                            objectFit: "cover",
-                            enableAutoplayDialog: true,
+                            objectFit: "cover"
                         })
                     }
                     return true;
@@ -224,10 +218,12 @@ $(function () {
             async startPublishing() {
                 const flag = await this.startPublishingStream(this.streamID, {
                     camera: {
-                        audioInput: this.microphoneDevicesVal,
-                        videoInput: this.cameraDevicesVal,
-                        video: this.cameraCheckStatus,
-                        audio: this.microphoneCheckStatus,
+                        video: this.cameraCheckStatus ? {
+                            input: this.cameraDevicesVal
+                        } : false,
+                        audio: this.microphoneCheckStatus ? {
+                            input: this.microphoneDevicesVal
+                        } : false,
                     }
                 })
                 if (flag) {

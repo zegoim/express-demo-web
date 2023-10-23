@@ -7,6 +7,10 @@
     height: 200px;
     border: 1px solid #ccc;
   }
+  #localVideo{
+    width: auto;
+    height: 100%;
+  }
   
   .preview-content > video {
     width: 100%;

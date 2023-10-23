@@ -10,12 +10,12 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AppComponent {
   constructor(public http: HttpClient) { }
-  appID: number = 0; // 请从官网控制台获取对应的appID
-  server: string = ''; // 请从官网控制台获取对应的server地址，否则可能登录失败
+  appID: number = 1739272706; // 请从官网控制台获取对应的appID
+  server: string = 'wss://webliveroom-test.zego.im/ws'; // 请从官网控制台获取对应的server地址，否则可能登录失败
   tokenUrl: string = 'https://wsliveroom-alpha.zego.im:8282/token';
   userID: string = getBrow() + '_' + new Date().getTime();
   roomID: string = '0001';
-  token: string = '';
+  token: string = '04AAAAAGU3Z08AEDY5NzBhN2hjaGNlajVrYXUA0HeXZRcsPF/WYAE7I1IHRswrlVwVo6j6wNYIAn60jupNLdSpjhzZo9KJLEYOf/I24tPNhFVJDqUS1YErV2QVrcewvOo+OON6XyJkhoNT7+WMNKhrQ+4NmCB0RUr1HdZ/HUaVeXCTF5yzidtrNybWuXBfH6xYNyuqedyA2wBZztvQl+1JKndynA5PnM9GdYyToTQ6lnpVvyBLvL2fH0luM2v8psw+Gd0JQ7bYm6tdqJInJZ+i2zSKUYIEFfcZNGH5ZewUBg17Zt7zvZdZ5z7BfCc=';
   streamID: string = '0001';
   playStreamID: string = '0001';
   zg: any = null;
@@ -91,11 +91,14 @@ export class AppComponent {
     });
   }
   getAppInfo() {
-    let appID; // 请从官网控制台获取对应的appID Please obtain the corresponding appid from the official website console
-    let server; // 请从官网控制台获取对应的server地址，否则可能登录失败 Please obtain the corresponding server address from the console on the official website, otherwise the login may fail
+    let appID = this.appID; // 请从官网控制台获取对应的appID Please obtain the corresponding appid from the official website console
+    let server = this.server; // 请从官网控制台获取对应的server地址，否则可能登录失败 Please obtain the corresponding server address from the console on the official website, otherwise the login may fail
     // var baseURL = window.location.href.match(/.*\/Examples/)[0]
     // get local appID and server
-    let appInfo: any = {}
+    let appInfo: any = {
+      appID,
+      server
+    }
     if (!appID || !server) {
       try {
         const appInfoStr = localStorage.getItem("app_info") as string;
@@ -160,10 +163,12 @@ export class AppComponent {
   // Step4 Start Publishing Stream
   async startPublishingStream(streamId: string, config: any) {
     try {
-      this.localStream = await this.zg.createStream(config);
+      this.localStream = await this.zg.createZegoStream(config);
       this.zg.startPublishingStream(streamId, this.localStream, { videoCodec: this.videoCodec });
+      this.localStream.playVideo(document.querySelector("#localVideo"))
       return true;
     } catch (err) {
+      console.error(err)
       return false;
     }
   }
@@ -237,12 +242,14 @@ export class AppComponent {
     }
   }
   async startPublishing() {
-    const flag = await this.startPublishingStream(this.streamID, {
+    const flag = await this.startPublishingStream.call(this, this.streamID, {
       camera: {
-        audioInput: this.microphoneDevicesVal,
-        videoInput: this.cameraDevicesVal,
-        video: this.cameraCheckStatus,
-        audio: this.microphoneCheckStatus,
+        video: this.cameraCheckStatus ? {
+          input: this.cameraDevicesVal
+        } : false,
+        audio: this.microphoneCheckStatus ? {
+          input: this.microphoneDevicesVal
+        } : false,
       }
     })
     if (flag) {

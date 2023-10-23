@@ -9,6 +9,7 @@
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
 let roomID = '0019'
+let token = ""
 let streamID = '0019'
 
 let zg = null;
@@ -141,7 +142,6 @@ function initEvent() {
 
 function destroyStream() {
   localStream && zg.destroyStream(localStream);
-  $('#publishVideo')[0].srcObject = null;
   localStream = null;
   published = false;
 }
@@ -169,22 +169,15 @@ async function loginRoom(roomId, userId, userName, token) {
 
 async function startPublishingStream(streamId, config) {
   try {
-    localStream = await zg.createStream(config);
+    localStream = await zg.createZegoStream(config);
     zg.startPublishingStream(streamId, localStream, { videoCodec });
-    if (zg.getVersion() < "2.17.0") {
-      $('#publishVideo')[0].srcObject = localStream;
-      $('#publishVideo').show()
-      $('#localVideo').hide()
-    } else {
-      const localView = zg.createLocalStreamView(localStream);
-      localView.play("localVideo", {
-          mirror: true,
-          objectFit: "cover",
-          enableAutoplayDialog: true,
-      })
-      $('#publishVideo').hide()
-      $('#localVideo').show()
-    }
+    localStream.playVideo($('#localVideo')[0], {
+        mirror: true,
+        objectFit: "cover",
+        
+    })
+    
+    $('#localVideo').show()
     return true;
   } catch (err) {
     return false;
@@ -218,7 +211,8 @@ async function startPlayingStream(streamId, options = {}) {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
 				objectFit: "cover",
-				enableAutoplayDialog: true,
+        muted: false,
+				
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -342,9 +336,7 @@ $('#startPlaying').on('click', util.throttle( async function () {
 // ============================================================== 
 
 function getCreateStreamConfig() {
-  const config = {
-    camera: {}
-  }
+  const config = {}
   return config
 }
 
@@ -393,6 +385,7 @@ async function render() {
   $('#RoomID').val(roomID)
   $('#UserName').val(userID)
   $('#UserID').val(userID)
+  $('#Token').val(token)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
   createZegoExpressEngine()

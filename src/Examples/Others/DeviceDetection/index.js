@@ -79,7 +79,7 @@ async function checkDeviceConnectionV2() {
   detectSpeaker(false)
   // get media device permissions
   try {
-    const stream = await zg.createStream({ camera: { video: true, audio: true } });
+    const stream = await zg.createZegoStream({ camera: { video: true, audio: true } });
     zg.destroyStream(stream);
   } catch (error) {
     microphoneList = []
@@ -157,11 +157,12 @@ const detectMicrophone = (() => {
     if (!detect) return
     const deviceID = $("#select-mic").val()
     if (deviceID !== undefined) {
-      micStream = await zg.createStream({
+      micStream = await zg.createZegoStream({
         camera: {
           video: false,
-          audio: true,
-          audioInput: deviceID
+          audio: {
+            input: deviceID
+          }
         }
       }).catch(
         error => {
@@ -180,15 +181,13 @@ const detectCamera = (() => {
     if (stream) {
       zg.destroyStream(stream)
       stream = null
-      document.querySelector("#camera-view").srcObject = undefined
     }
     if (!detect) return
     const deviceID = $("#select-camera").val()
     if (deviceID !== undefined) {
-      stream = await zg.createStream({
+      stream = await zg.createZegoStream({
         camera: {
-          video: true,
-          videoInput: deviceID,
+          video: { input: deviceID },
           audio: false
         }
       }).catch(
@@ -196,7 +195,7 @@ const detectCamera = (() => {
           console.error("Detect camera fail:", error);
         }
       )
-      document.querySelector("#camera-view").srcObject = stream
+      stream.playVideo($("#camera-view")[0])
     }
   }
 })()

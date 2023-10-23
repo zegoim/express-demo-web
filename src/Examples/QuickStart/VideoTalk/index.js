@@ -117,8 +117,7 @@ function initEvent() {
                 } else {
                     const remoteView = zg.createRemoteStreamView(remoteStream);
                     remoteView.play("remoteVideo", {
-                        objectFit: "cover",
-                        enableAutoplayDialog: true,
+                        objectFit: "cover"        
                     })
                     playVideoEl.show();
                     $('#playVideo').hide()
@@ -188,22 +187,14 @@ function logoutRoom(roomId) {
 //  Start Publishing Stream
 async function startPublishingStream(streamId, config) {
     try {
-        localStream = await zg.createStream(config);
+        localStream = await zg.createZegoStream(config);
         zg.startPublishingStream(streamId, localStream, { videoCodec });
-        if (zg.getVersion() < "2.17.0") {
-            $('#publishVideo')[0].srcObject = localStream;
-            $('#publishVideo').show()
-            $('#localVideo').hide()
-        } else {
-            const localView = zg.createLocalStreamView(localStream);
-            localView.play("localVideo", {
-                mirror: true,
-                objectFit: "cover",
-                enableAutoplayDialog: true,
-            })
-            $('#publishVideo').hide()
-            $('#localVideo').show()
-        }
+        localStream.playVideo($('#localVideo')[0], {
+            mirror: true,
+            objectFit: "cover"
+        })
+        
+        $('#localVideo').show()
         return true;
     } catch (err) {
         return false;
@@ -244,7 +235,7 @@ $('#LoginRoom').on(
                 updateButton(this, 'Login Room', 'Logout Room');
                 $('#UserID')[0].disabled = true;
                 $('#RoomID')[0].disabled = true;
-                const flag = await startPublishingStream(streamID, { camera: {} });
+                const flag = await startPublishingStream(streamID, {});
                 published = true;
                 $('#PublishID')[0].disabled = true;
             } catch (err) {
@@ -312,7 +303,7 @@ async function render() {
     $('#Token').val(token);
     $('#PublishID').val(streamID);
     $('#localVideo').hide()
-    $('#publishVideo').hide()
+    
     createZegoExpressEngine();
     await checkSystemRequirements();
     initEvent();

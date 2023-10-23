@@ -8,6 +8,7 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
 let roomID = '0036';
 let streamID = '0036';
 
@@ -15,12 +16,8 @@ let zg = null;
 let isChecked = false;
 let isLogin = false;
 let localStream = null;
-let screenStream = null;
-let cameraStream = null;
-let MicrophoneStream = null;
-let isMicrophone = false;
 let published = false;
-let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 
 // part end
 
@@ -152,18 +149,9 @@ function initEvent() {
 function clearStream(flag) {
 	if (flag === 'publish') {
 		localStream && zg.destroyStream(localStream);
-		$('#publishVideo')[0].srcObject = null;
 		localStream = null;
 		published = false;
-		if(screenStream) {
-			zg.destroyStream(screenStream);
-			screenStream = null;
-		}
-		if(cameraStream) {
-			zg.destroyStream(cameraStream);
-			cameraStream = null;
-		}
-		MicrophoneStream && zg.destroyStream(MicrophoneStream);
+
 		$('#radio-one')[0].checked = true;
 		$('#radio-two')[0].checked = false;
 		$('#Microphone')[0].checked = true;
@@ -187,22 +175,14 @@ function setLogConfig() {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream(config);
+		localStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		if (zg.getVersion() < "2.17.0") {
-			$('#publishVideo')[0].srcObject = localStream;
-			$('#publishVideo').show()
-			$('#localVideo').hide()
-		  } else {
-			const localView = zg.createLocalStreamView(localStream);
-			localView.play("localVideo", {
-				mirror: false,
-				objectFit: "contain",
-				enableAutoplayDialog: true,
-			})
-			$('#publishVideo').hide()
-			$('#localVideo').show()
-		  }
+		localStream.playVideo($('#localVideo')[0], {
+			mirror: false,
+			objectFit: "contain",
+			
+		})
+		$('#localVideo').show()
 		return true;
 	} catch (err) {
 		return false;
@@ -214,10 +194,6 @@ async function stopPublishingStream(streamId) {
 	clearStream('publish');
 }
 
-async function replaceTrack(track) {
-	const { errorCode } = await zg.replaceTrack(localStream, track);
-	return errorCode;
-}
 
 // uses SDK end
 
@@ -243,7 +219,6 @@ $('#LoginRoom').on(
 				$('#UserID')[0].disabled = true;
 				$('#RoomID')[0].disabled = true;
 				$('#LoginRoom').hide()
-				startPublishingStream(streamID, getCreateStreamConfig());
 			} catch (err) {
 				isLogin = false;
 				this.classList.remove('border-primary');
@@ -265,7 +240,7 @@ $('#LoginRoom').on(
 );
 $('#startPublishing').on(
 	'click',
-	util.throttle(async function() {
+	util.throttle(async function () {
 		const id = $('#PublishID').val();
 		if (!id) return alert('PublishID is empty');
 		this.classList.add('border-primary');
@@ -292,65 +267,55 @@ $('#startPublishing').on(
 	}, 500)
 );
 
-$('#radio-one').on('change', async function({ target }) {
+$('#radio-one').on('change', async function ({ target }) {
 	if (target.checked) {
 		try {
-			if (!cameraStream) {
-				cameraStream = await zg.createStream({
-					camera: {
-						audio: false
-					}
-				});
+			if (localStream) {
+				await localStream.startCaptureCamera();
 			}
-			replaceTrack(cameraStream.getVideoTracks()[0]);
+			zg.updatePublishingStream(localStream, 0)
 		} catch (err) {
-			cameraStream = null;
 			console.log(err);
 		}
 	}
 });
 
-$('#radio-two').on('change', async function({ target }) {
+$('#radio-two').on('change', async function ({ target }) {
 	if (target.checked) {
 		try {
-			if (!screenStream) {
-				screenStream = await zg.createStream({ screen:  true });
+			if (localStream) {
+				await localStream.startCaptureScreen();
 			}
-			replaceTrack(screenStream.getVideoTracks()[0]);
+			zg.updatePublishingStream(localStream, 0)
 		} catch (err) {
-			screenStream = null
 			$('#radio-one')[0].checked = true;
 			$('#radio-two')[0].checked = false;
 		}
 	}
 });
 
-$('#Microphone').on('change', async function({ target }) {
+$('#Microphone').on('change', async function ({ target }) {
 	if (target.checked) {
 		$('#customAudio')[0].pause()
 		try {
-			if (!isMicrophone) {
-				cameraStream = await zg.createStream({
-					camera: {
-						video: false
-					}
-				});
+			if (localStream) {
+				await localStream.startCaptureMicrophone();
 			}
-			replaceTrack(cameraStream.getAudioTracks()[0]);
-			isMicrophone = true;
+			zg.updatePublishingStream(localStream, 1);
 		} catch (err) {
-			isMicrophone = false;
 			console.log(err);
 		}
 	}
 });
 
-$('#CustomAudio').on('change', async function({ target }) {
+$('#CustomAudio').on('change', async function ({ target }) {
 	if (target.checked) {
 		$('#customAudio')[0].play()
 		try {
-			const track = $('#customAudio')[0].captureStream().getAudioTracks()[0]
-			replaceTrack(track);
+			await localStream.startCaptureCustomAudio({
+				source: $('#customAudio')[0]
+			});
+			zg.updatePublishingStream(localStream, 1);
 		} catch (err) {
 			console.log(err);
 		}
@@ -417,6 +382,7 @@ function setDisabled(flag, type) {
 async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
+	$('#Token').val(token);
 	$('#UserName').val(userID);
 	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);

@@ -8,8 +8,9 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0011';
-let streamID = '0011';
+let roomID = '0019'
+let token = ""
+let streamID = '0019'
 
 let zg = null;
 let isChecked = false;
@@ -135,7 +136,6 @@ function initEvent() {
 function clearStream(flag) {
 	if (flag === 'room') {
 		localStream && zg.destroyStream(localStream);
-		$('#publishVideo')[0].srcObject = null;
 		localStream = null;
 		published = false;
 		$('#playVideo')[0].srcObject = null;
@@ -145,7 +145,6 @@ function clearStream(flag) {
 
 	if (flag === 'publish') {
 		localStream && zg.destroyStream(localStream);
-		$('#publishVideo')[0].srcObject = null;
 		localStream = null;
 		published = false;
 		if ($('#PublishID').val() === $('#PlayID').val()) {
@@ -193,22 +192,14 @@ function logoutRoom(roomId) {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream(config);
+		localStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		if (zg.getVersion() < "2.17.0") {
-            $('#publishVideo')[0].srcObject = localStream;
-            $('#publishVideo').show()
-            $('#localVideo').hide()
-        } else {
-            const localView = zg.createLocalStreamView(localStream);
-            localView.play("localVideo", {
-                mirror: true,
-                objectFit: "cover",
-                enableAutoplayDialog: true,
-            })
-            $('#publishVideo').hide()
-            $('#localVideo').show()
-        }
+		localStream.playVideo($('#localVideo')[0], {
+				mirror: true,
+				objectFit: "cover",
+				
+		})
+		$('#localVideo').show()
 		return true;
 	} catch (err) {
 		return false;
@@ -235,8 +226,7 @@ async function startPlayingStream(streamId, options = {}) {
 		} else {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
+				objectFit: "cover"
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -438,11 +428,13 @@ function updateButton(button, preText, afterText) {
 function getCreateStreamConfig() {
 	const config = {
 		camera: {
-			audioInput: $('#MirrorDevices').val(),
-			videoInput: $('#CameraDevices').val(),
-			video: $('#Camera')[0].checked,
-			audio: $('#Microphone')[0].checked,
-			videoQuality: 3
+			video: $('#Camera')[0].checked ? {
+				input: $('#CameraDevices').val(),
+				quality: 3
+			} : false,
+			audio: $('#Microphone')[0].checked ? {
+				input: $('#MirrorDevices').val()
+			} : false
 		}
 	};
 	return config;
@@ -450,17 +442,14 @@ function getCreateStreamConfig() {
 
 function changeVideo(flag) {
 	if (flag) {
-		$('#publishVideo').css('transform', 'none');
 		$('#playVideo').css('transform', 'none');
 		return;
 	}
 	const value = $('#Mirror').val();
 	if (value === 'onlyPreview') {
-		$('#publishVideo').css('transform', 'scale(-1, 1)');
 	} else if (value === 'onlyPlay') {
 		$('#playVideo').css('transform', 'scale(-1, 1)');
 	} else if (value === 'both') {
-		$('#publishVideo').css('transform', 'scale(-1, 1)');
 		$('#playVideo').css('transform', 'scale(-1, 1)');
 	}
 }
@@ -475,10 +464,10 @@ function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
 	$('#UserID').val(userID);
+	$('#Token').val(token);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
     $('#localVideo').hide()
-    $('#publishVideo').hide()
     $('#remoteVideo').hide()
     $('#playVideo').hide()
 	$('#Camera')[0].checked = true;

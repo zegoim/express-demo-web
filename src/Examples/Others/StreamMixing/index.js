@@ -8,6 +8,7 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
 let roomID = '0025';
 let streamFirstID = '00251';
 let streamSecondID = '00252';
@@ -149,14 +150,12 @@ function initEvent() {
 function clearStream(flag) {
 	if (flag === 'first') {
 		firstStream && zg.destroyStream(firstStream);
-		$('#publishFirstVideo')[0].srcObject = null;
 		firstStream = null;
 		firstPublished = false;
 	}
 
 	if (flag === 'second') {
 		secondStream && zg.destroyStream(secondStream);
-		$('#publishSecondVideo')[0].srcObject = null;
 		secondStream = null;
 		secondPublished = false;
 	}
@@ -178,22 +177,13 @@ function setLogConfig() {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		firstStream = await zg.createStream(config);
+		firstStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, firstStream, { videoCodec });
-		if (zg.getVersion() < "2.17.0") {
-			$('#publishFirstVideo')[0].srcObject = firstStream;
-			$('#publishFirstVideo').show()
-			$('#localVideo1').hide()
-		} else {
-			const localView = zg.createLocalStreamView(firstStream);
-			localView.play("localVideo1", {
-				mirror: true,
-				objectFit: "contain",
-				enableAutoplayDialog: true,
-			})
-			$('#publishFirstVideo').hide()
-			$('#localVideo1').show()
-		}
+		firstStream.playVideo($('#localVideo1')[0], {
+      mirror: true,
+      objectFit: "contain"
+    })
+    $('#localVideo1').show()
 		return true;
 	} catch (err) {
 		return false;
@@ -202,22 +192,13 @@ async function startPublishingStream(streamId, config) {
 
 async function startPublishingSecondStream(streamId, config) {
 	try {
-		secondStream = await zg.createStream(config);
+		secondStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, secondStream);
-		if (zg.getVersion() < "2.17.0") {
-			$('#publishSecondVideo')[0].srcObject = secondStream;
-			$('#publishSecondVideo').show()
-			$('#localVideo2').hide()
-		} else {
-			const localView = zg.createLocalStreamView(secondStream);
-			localView.play("localVideo2", {
-				mirror: false,
-				objectFit: "contain",
-				enableAutoplayDialog: true,
-			})
-			$('#publishSecondVideo').hide()
-			$('#localVideo2').show()
-		}
+		secondStream.playVideo($('#localVideo2')[0], {
+      mirror: false,
+      objectFit: "contain"
+    })
+    $('#localVideo2').show()
 		return true;
 	} catch (err) {
 		return false;
@@ -245,7 +226,7 @@ async function startPlayingStream(streamId, options = {}) {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
 				objectFit: "contain",
-				enableAutoplayDialog: true,
+				
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -488,6 +469,7 @@ $('#StartPlayingMixedStream').on(
 function getCreateStreamConfig() {
 	const config = {
 		screen: {
+			video: true,
 			audio: true
 		}
 	};
@@ -523,6 +505,7 @@ async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
 	$('#UserID').val(userID);
+	$('#Token').val(token);
 	$('#PublishFirstID').text(streamFirstID);
 	$('#PublishSecondID').text(streamSecondID);
 	$('#PlayID').val(mixStreamID);

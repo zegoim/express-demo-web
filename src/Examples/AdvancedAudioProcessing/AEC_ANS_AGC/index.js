@@ -7,8 +7,9 @@
 // This part of the code defines the default values and global values 
 // ============================================================== 
 
-let userID = Util.getBrow() + '_' + new Date().getTime();
+let userID = "sample1697699278763" || Util.getBrow() + '_' + new Date().getTime();
 let roomID = '0019'
+let token = "04AAAAAGUyJ1gAEGp2YW5tMHFuaW9wZTBkY3kA0FdP/BusSLBtMo8NOrvIZzrQvhSjT6wjSZggMDPHxnDfw5VgZ0DlwR9Lfig67q1ultK8asyK13FZd2wZQ/pAywMWyplp7HRFSPrB60MJOaCxaTki5uzuqg8HWnzpSBBBN4RMo+Gk8BRScCneCnCjo4BLzPuJRCfPNWsHm2W291OgvtuQT98KV6eOw7ob0rx5fNnTrHKFWwayJfUubGRG1v36aTojIqmxEklJ0cFoiMy6fEKCUVbd36a5DsP12AJkcKM8hZPihFsKjyUIcgQj7oI="
 let streamID = '0019'
 
 let zg = null;
@@ -140,7 +141,6 @@ function initEvent() {
 
 function destroyStream() {
   localStream && zg.destroyStream(localStream);
-  $('#publishVideo')[0].srcObject = null;
   localStream = null;
   published = false;
 }
@@ -168,22 +168,14 @@ async function loginRoom(roomId, userId, userName, token) {
 
 async function startPublishingStream(streamId, config) {
   try {
-    localStream = await zg.createStream(config);
+    localStream = await zg.createZegoStream(config);
     zg.startPublishingStream(streamId, localStream, { videoCodec });
-    if (zg.getVersion() < "2.17.0") {
-      $('#publishVideo')[0].srcObject = localStream;
-      $('#publishVideo').show()
-      $('#localVideo').hide()
-    } else {
-      const localView = zg.createLocalStreamView(localStream);
-      localView.play("localVideo", {
-          mirror: true,
-          objectFit: "cover",
-          enableAutoplayDialog: true,
-      })
-      $('#publishVideo').hide()
-      $('#localVideo').show()
-    }
+    localStream.playVideo($('#localVideo')[0], {
+        mirror: true,
+        objectFit: "cover",
+        
+    })
+    $('#localVideo').show()
     return true;
   } catch (err) {
     return false;
@@ -209,7 +201,6 @@ async function startPlayingStream(streamId, options = {}) {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
 				objectFit: "cover",
-				enableAutoplayDialog: true,
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -344,9 +335,12 @@ function getCreateStreamConfig() {
   const ans = $('#ANS')[0].checked
   const config = {
     camera: {
-      AEC: aec,
-      AGC: agc,
-      ANS: ans
+      video: true,
+      audio: {
+        AEC: aec,
+        AGC: agc,
+        ANS: ans
+      }
     }
   }
   return config
@@ -396,6 +390,7 @@ async function render() {
   $('#roomInfo-id').text(roomID)
   $('#RoomID').val(roomID)
   $('#UserName').val(userID)
+  $('#Token').val(token)
   $('#UserID').val(userID)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)

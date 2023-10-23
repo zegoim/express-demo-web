@@ -4,7 +4,7 @@ class CommonUsageReact extends React.Component {
         this.state = {
             userID: Util.getBrow() + '_' + new Date().getTime(),
             roomID: '0001',
-            token: '',
+            token: "",
             streamID: '0001',
             playStreamID: '0001',
             zg: null,
@@ -141,19 +141,13 @@ class CommonUsageReact extends React.Component {
     // Step4 Start Publishing Stream
     async startPublishingStream(streamId, config) {
         try {
-            this.state.localStream = await zg.createStream(config);
+            this.state.localStream = await zg.createZegoStream(config);
             zg.startPublishingStream(streamId, this.state.localStream, { videoCodec: this.state.videoCodec });
-          
-            if (zg.getVersion() < "2.17.0") { 
-                this.refs.publishVideo.srcObject = this.state.localStream;
-            } else {
-                const localView = zg.createLocalStreamView(this.state.localStream);
-                localView.play("localVideo", {
-                    mirror: true,
-                    objectFit: "cover",
-                    enableAutoplayDialog: true,
-                })
-            }
+            this.state.localStream.playVideo($('#localVideo')[0], {
+                mirror: true,
+                objectFit: "cover"
+            })
+            $('#localVideo').show()
             return true;
         } catch (err) {
             return false;
@@ -168,8 +162,7 @@ class CommonUsageReact extends React.Component {
             } else {
                 const remoteView = zg.createRemoteStreamView(this.state.remoteStream);
                 remoteView.play("remoteVideo", {
-                    objectFit: "cover",
-                    enableAutoplayDialog: true,
+                    objectFit: "cover"    
                 })
             }
             return true;
@@ -260,10 +253,12 @@ class CommonUsageReact extends React.Component {
     async startPublishing() {
         const flag = await this.startPublishingStream(this.state.streamID, {
             camera: {
-                audioInput: this.state.microphoneDevicesVal,
-                videoInput: this.state.cameraDevicesVal,
-                video: this.state.cameraCheckStatus,
-                audio: this.state.microphoneCheckStatus,
+                video: this.state.cameraCheckStatus ? {
+                    input: this.state.cameraDevicesVal
+                } : false,
+                audio: this.state.microphoneCheckStatus ? {
+                    input: this.state.microphoneDevicesVal
+                } : false
             }
         })
         if (flag) {

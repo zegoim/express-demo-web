@@ -8,14 +8,14 @@
 // ============================================================== 
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0017'
+let roomID = '0019'
+let token = ""
 let streamID = '0017'
 
 let zg = null;
 let isChecked = false;
 let isLogin = false;
 let localStream = null;
-let localView = null;
 let remoteStream = null;
 let published = false;
 let played = false;
@@ -142,7 +142,6 @@ function initEvent() {
 
 function destroyStream() {
     localStream && zg.destroyStream(localStream);
-    $('#publishVideo')[0].srcObject = null;
     localStream = null;
     published = false
     if($('#PublishID').val() === $('#PlayID').val()) {
@@ -174,23 +173,19 @@ async function loginRoom(roomId, userId, userName, token) {
 
 async function startPublishingStream (streamId, config) {
   try {
-    localStream = await zg.createStream(config);
+    localStream = await zg.createZegoStream(config);
     zg.startPublishingStream(streamId, localStream, { videoCodec });
-    if (zg.getVersion() < "2.17.0") {
-      $('#publishVideo')[0].srcObject = localStream;
-      $('#publishVideo').show()
-      $('#localVideo').hide()
-    } else {
-      localView = zg.createLocalStreamView(localStream);
-      localView.play("localVideo", {
-          mirror: true,
-          objectFit: "cover",
-          enableAutoplayDialog: true,
-          muted: $('#HeadphoneMonitor').val() === 'off'
-      })
-      $('#publishVideo').hide()
-      $('#localVideo').show()
+
+    localStream.playVideo($('#localVideo')[0], {
+        mirror: true,
+        objectFit: "cover",
+        
+    })
+    const on = $('#HeadphoneMonitor')[0].checked;
+    if (on) {
+      localStream.playAudio()
     }
+    $('#localVideo').show()
     return true
   } catch(err) {
     return false
@@ -216,8 +211,7 @@ async function startPlayingStream(streamId, options = {}) {
 		} else {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
+				objectFit: "cover"
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -361,8 +355,9 @@ function getCreateStreamConfig() {
   const config = {
     camera: {
       video: true,
-      audio: true,
-      channelCount: $('#Channel').val() * 1 // Set Channel
+      audio: {
+        channelCount: $('#Channel').val() * 1 // Set Channel
+      },
     }
   }
   return config
@@ -389,17 +384,14 @@ function updateButton(button, preText, afterText) {
 
 function changeVideo(flag) {
   if(flag) {
-    $('#publishVideo').css('transform', 'none')
     $('#playVideo').css('transform', 'none')
     return
   }
   const value =  $('#Mirror').val()
   if(value === 'onlyPreview') {
-    $('#publishVideo').css('transform', 'scale(-1, 1)')
   } else if(value === 'onlyPlay'){
     $('#playVideo').css('transform', 'scale(-1, 1)')
   } else if(value === 'both') {
-    $('#publishVideo').css('transform', 'scale(-1, 1)')
     $('#playVideo').css('transform', 'scale(-1, 1)')
   }
 }
@@ -420,12 +412,12 @@ function reSetVideoInfo(flag) {
 }
 
 function setHeadphoneMonitor(flag) {
-  if(zg.getVersion()<"2.17.0") {
-    $('#publishVideo')[0].volume = $('#VolumeInput').val() / 100
-    $('#publishVideo')[0].muted = !flag
+
+  if(flag) {
+    localStream?.playAudio();
   } else {
-    localView?.setAudioMuted(!flag)
-    localView?.setVolume($('#VolumeInput').val())
+    localStream?.stopAudio();
+    localStream?.setVolume($('#VolumeInput').val())
   }
 }
 
@@ -440,6 +432,7 @@ async function render() {
   $('#RoomID').val(roomID)
   $('#UserName').val(userID)
   $('#UserID').val(userID)
+  $('#Token').val(token)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
   createZegoExpressEngine()

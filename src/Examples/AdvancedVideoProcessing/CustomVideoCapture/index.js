@@ -8,8 +8,9 @@
 // ============================================================== 
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0014'
-let streamID = '0014'
+let roomID = '0019'
+let token = ""
+let streamID = '0009'
 
 let zg = null;
 let isChecked = false;
@@ -18,6 +19,7 @@ let localStream = null;
 let remoteStream = null;
 let published = false;
 let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+let canvas;
 
 // part end
 
@@ -120,7 +122,6 @@ function initEvent() {
 
 function destroyStream(flag) {
   localStream && zg.destroyStream(localStream);
-  $('#publishVideo')[0].srcObject = null;
   localStream = null;
   published = false;
   if ($('#PublishID').val() === $('#PlayID').val()) {
@@ -128,6 +129,7 @@ function destroyStream(flag) {
     remoteStream = null;
     played = false;
   }
+  stopGetStreamByCanvas();
 }
 
 function setLogConfig() {
@@ -155,25 +157,23 @@ async function startPublishingStream(streamId) {
   try {
     const video = $('#customLocalVideo')[0];
     const customSource = $("#GetCanvasMediaStream").prop("checked") ? getStreamThroughCanvas(video) : video
-    localStream = await zg.createStream({
+    localStream = await zg.createZegoStream({
       custom: {
-        source: customSource
+        video: {
+          source: customSource
+        },
+        audio: {
+          source: customSource
+        }
       }
     });
     zg.startPublishingStream(streamId, localStream, { videoCodec });
-    if (zg.getVersion() < "2.17.0") {
-      $('#publishVideo')[0].srcObject = localStream;
-      $('#publishVideo').show()
-      $('#localVideo').hide()
-    } else {
-      const localView = zg.createLocalStreamView(localStream);
-      localView.play("localVideo", {
-          mirror: false,
-          objectFit: "contain"
-      })
-      $('#publishVideo').hide()
-      $('#localVideo').show()
-    }
+    localStream.playVideo($('#localVideo')[0], {
+      mirror: false,
+      objectFit: "contain"
+    })
+    // localStream.playAudio()
+    $('#localVideo').show()
     return true
   } catch (err) {
     console.error(err);
@@ -189,11 +189,11 @@ async function startPublishingStream(streamId) {
  */
 function getStreamThroughCanvas(video) {
 
-  let canvas = document.createElement("canvas");
+  canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
   const draw = function () {
-    if(!canvas) return
+    if (!canvas) return
     if (canvas.width !== video.videoWidth) canvas.width = video.videoWidth;
     if (canvas.height !== video.videoHeight) canvas.height = video.videoHeight;
     ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -201,19 +201,7 @@ function getStreamThroughCanvas(video) {
   };
 
   draw();
-
   const media = canvas.captureStream();
-
-  // overwrite stop track function
-  const track = media.getVideoTracks()[0];
-  const q = track.stop;
-  track.stop = () => {
-    q.call(track);
-    draw();
-    canvas.width = 0;
-    canvas.remove();
-    canvas = null
-  };
 
   // get audio track
   const stream = video.captureStream && video.captureStream()
@@ -222,6 +210,12 @@ function getStreamThroughCanvas(video) {
     media.addTrack(micro);
   }
   return media;
+}
+function stopGetStreamByCanvas() {
+  if(!canvas) return;
+  canvas.width = 0;
+  canvas.remove();
+  canvas = null
 }
 
 async function stopPublishingStream(streamId) {
@@ -353,6 +347,7 @@ async function render() {
   $('#RoomID').val(roomID)
   $('#UserName').val(userID)
   $('#UserID').val(userID)
+  $('#Token').val(token)
   $('#PublishID').val(streamID)
   createZegoExpressEngine()
   await checkSystemRequirements()

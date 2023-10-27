@@ -8,6 +8,7 @@
 // ============================================================== 
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
 let roomID = '0007'
 let streamID = '0007'
 
@@ -134,7 +135,6 @@ function initEvent() {
 
 function destroyStream() {
   localStream && zg.destroyStream(localStream);
-  $('#publishVideo')[0].srcObject = null;
   localStream = null;
   published = false
   if ($('#PublishID').val() === $('#PlayID').val()) {
@@ -167,22 +167,13 @@ async function loginRoom(roomId, userId, userName, token) {
 
 async function startPublishingStream(streamId, config) {
   try {
-    localStream = await zg.createStream(config);
+    localStream = await zg.createZegoStream(config);
     zg.startPublishingStream(streamId, localStream, { videoCodec });
-    if (zg.getVersion() < "2.17.0") {
-      $('#publishVideo')[0].srcObject = localStream;
-      $('#publishVideo').show()
-      $('#localVideo').hide()
-    } else {
-      const localView = zg.createLocalStreamView(localStream);
-      localView.play("localVideo", {
-        mirror: true,
-        objectFit: "cover",
-        enableAutoplayDialog: true,
-      })
-      $('#publishVideo').hide()
-      $('#localVideo').show()
-    }
+    localStream.playVideo($('#localVideo')[0], {
+      mirror: true,
+      objectFit: "cover"
+    })
+    $('#localVideo').show()
     return true
   } catch (err) {
     return false
@@ -209,7 +200,7 @@ async function startPlayingStream(streamId, options = {}) {
       const remoteView = zg.createRemoteStreamView(remoteStream);
       remoteView.play("remoteVideo", {
         objectFit: "cover",
-        enableAutoplayDialog: true,
+
       })
       $('#playVideo').hide()
       $('#remoteVideo').show()
@@ -510,10 +501,11 @@ async function render() {
   $('#RoomID').val(roomID)
   $('#UserName').val(userID)
   $('#UserID').val(userID)
+  $('#Token').val(token)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
   $('#localVideo').hide()
-  $('#publishVideo').hide()
+
   $('#remoteVideo').hide()
   $('#playVideo').hide()
   updateLogger(`[action] create ExpressEngine`)

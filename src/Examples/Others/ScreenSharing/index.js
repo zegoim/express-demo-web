@@ -8,6 +8,7 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
 let roomID = '0033';
 let streamID = '0033';
 
@@ -168,23 +169,29 @@ function setLogConfig() {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream(config);
+		localStream = await zg.createZegoStream(config);
 		zg.zegoWebRTC.rtcModules.streamCenter.isPeer = false;
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
 		if (zg.getVersion() < "2.17.0") {
 			$('#publishVideo')[0].srcObject = localStream;
 			$('#publishVideo').show()
 			$('#localVideo').hide()
-		  } else {
+		} else {
 			const localView = zg.createLocalStreamView(localStream);
 			localView.play("localVideo", {
 				mirror: false,
 				objectFit: "contain",
-				enableAutoplayDialog: true,
+
 			})
-			$('#publishVideo').hide()
+
 			$('#localVideo').show()
-		  }
+		}
+		localStream.playVideo($('#localVideo')[0], {
+			mirror: false,
+			objectFit: "contain",
+
+		})
+		$('#localVideo').show()
 		return true;
 	} catch (err) {
 		return false;
@@ -209,8 +216,7 @@ async function startPlayingStream(streamId, options = {}) {
 		} else {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
+				objectFit: "cover"
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -254,7 +260,7 @@ $('#LoginRoom').on(
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Login Fail Try Again';
-        throw err;
+				throw err;
 			}
 		} else {
 			if (localStream) {
@@ -333,14 +339,18 @@ $('#startPlaying').on(
 
 function getCreateStreamConfig() {
 	const config = {
+		videoBitrate: {
+			bitrate: 3000,
+			startBitrate: 'target'
+		},
 		screen: {
 			audio: true,
-			bitrate: 3000,
-			frameRate: 20,
-			width: 1080,
-			height: 720,
-			videoQuality: 4,
-			startBitrate: 'target'
+			video: {
+				frameRate: 20,
+				width: 1080,
+				height: 720,
+				quality: 4,
+			}
 		}
 	};
 	return config;
@@ -408,6 +418,7 @@ async function render() {
 	$('#RoomID').val(roomID);
 	$('#UserName').val(userID);
 	$('#UserID').val(userID);
+	$('#Token').val(token);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
 	createZegoExpressEngine();

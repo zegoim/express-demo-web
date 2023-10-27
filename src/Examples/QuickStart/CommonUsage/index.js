@@ -7,9 +7,9 @@
 // This part of the code defines the default values and global values
 // ==============================================================
 
-let userID = localStorage.getItem("userID") ? localStorage.getItem("userID") : Util.getBrow() + '_' + new Date().getTime() ;
-let roomID = localStorage.getItem("roomID") ? localStorage.getItem("roomID") :'0001';
-let token = localStorage.getItem("token") ? localStorage.getItem("token") :'';
+let userID = localStorage.getItem("userID") ? localStorage.getItem("userID") : Util.getBrow() + '_' + new Date().getTime();
+let roomID = localStorage.getItem("roomID") ? localStorage.getItem("roomID") : '0001';
+let token = localStorage.getItem("token") ? localStorage.getItem("token") : '';
 let streamID = '0001';
 
 let zg = null;
@@ -133,23 +133,14 @@ async function loginRoom(roomId, userId, userName, token) {
 // Step4 Start Publishing Stream
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream(config);
+		localStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		
-		if (zg.getVersion() < "2.17.0") {
-            $('#publishVideo')[0].srcObject = localStream;
-            $('#publishVideo').show()
-            $('#localVideo').hide()
-        } else {
-            const localView = zg.createLocalStreamView(localStream);
-            localView.play("localVideo", {
-                mirror: true,
-                objectFit: "cover",
-                enableAutoplayDialog: true,
-            })
-            $('#publishVideo').hide()
-            $('#localVideo').show()
-        }
+
+		localStream.playVideo($('#localVideo')[0], {
+			mirror: true,
+			objectFit: "cover",
+		})
+		$('#localVideo').show()
 		return true;
 	} catch (err) {
 		return false;
@@ -160,7 +151,7 @@ async function startPublishingStream(streamId, config) {
 async function startPlayingStream(streamId, options = {}) {
 	try {
 		remoteStream = await zg.startPlayingStream(streamId, options);
-		
+
 		if (zg.getVersion() < "2.17.0") {
 			$('#playVideo').srcObject = remoteStream;
 			$('#playVideo').show()
@@ -168,8 +159,7 @@ async function startPlayingStream(streamId, options = {}) {
 		} else {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
+				objectFit: "cover"
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -197,7 +187,7 @@ async function stopPlayingStream(streamId) {
 
 function clearStream() {
 	localStream && zg.destroyStream(localStream);
-	$('#publishVideo')[0].srcObject = null;
+
 	localStream = null;
 	$('#playVideo')[0].srcObject = null;
 	remoteStream = null;
@@ -234,9 +224,9 @@ $('#LoginRoom').on('click', async function () {
 	const id = $('#RoomID').val();
 	const token = $('#Token').val();
 
-  localStorage.setItem('roomID', roomID);
-  localStorage.setItem("userID", userID);
-  localStorage.setItem("token", token);
+	localStorage.setItem('roomID', roomID);
+	localStorage.setItem("userID", userID);
+	localStorage.setItem("token", token);
 
 	try {
 		isLogin = true;
@@ -319,10 +309,12 @@ $('#reset').on('click', async function () {
 function getCreateStreamConfig() {
 	const config = {
 		camera: {
-			audioInput: $('#MirrorDevices').val(),
-			videoInput: $('#CameraDevices').val(),
-			video: $('#Camera')[0].checked,
-			audio: $('#Microphone')[0].checked,
+			video: $('#Camera')[0].checked ? {
+				input: $('#CameraDevices').val()
+			} : false,
+			audio: $('#Microphone')[0].checked ? {
+				input: $('#MirrorDevices').val()
+			} : false,
 		}
 	};
 	return config;
@@ -355,7 +347,7 @@ function changeVideo(flag) {
 function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
-  $('#Token').val(token);
+	$('#Token').val(token);
 	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
@@ -363,10 +355,10 @@ function render() {
 	$('#Microphone')[0].checked = true;
 	$('#Video')[0].checked = true;
 
-    $('#localVideo').hide()
-    $('#publishVideo').hide()
-    $('#emoterVideo').hide()
-    $('#playVideo').hide()
+	$('#localVideo').hide()
+
+	$('#emoterVideo').hide()
+	$('#playVideo').hide()
 }
 
 render();

@@ -8,6 +8,7 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
 let roomID = '0005';
 let streamID = '0005';
 
@@ -146,7 +147,7 @@ function initEvent() {
 
 function destroyStream(flag) {
 	localStream && zg.destroyStream(localStream);
-	$('#publishVideo')[0].srcObject = null;
+	
 	localStream = null;
 	published = false;
 	if ($('#PublishID').val() === $('#PlayID').val()) {
@@ -172,22 +173,13 @@ function setLogConfig() {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream(config);
+		localStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		if (zg.getVersion() < "2.17.0") {
-            $('#publishVideo')[0].srcObject = localStream;
-            $('#publishVideo').show()
-            $('#localVideo').hide()
-        } else {
-            const localView = zg.createLocalStreamView(localStream);
-            localView.play("localVideo", {
-                mirror: true,
-                objectFit: "cover",
-                enableAutoplayDialog: true,
-            })
-            $('#publishVideo').hide()
-            $('#localVideo').show()
-        }
+		localStream.playVideo($('#localVideo')[0], {
+      mirror: true,
+      objectFit: "cover"
+    })
+    $('#localVideo').show()
 		return true;
 	} catch (err) {
 		return false;
@@ -213,8 +205,7 @@ async function startPlayingStream(streamId, options = {}) {
 		} else {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
+				objectFit: "cover"
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -350,12 +341,15 @@ $('#startPlaying').on(
 function getCreateStreamConfig() {
 	const resolution = $('#captureResolution').val().split('*');
 	const config = {
+		videoBitrate: $('#Bitrate').val() * 1,
 		camera: {
-			videoQuality: 4,
-			frameRate: $('#FPS').val() * 1,
-			width: resolution[0] * 1,
-			height: resolution[1] * 1,
-			bitRate: $('#Bitrate').val() * 1
+			video: {
+				quality: 4,
+				frameRate: $('#FPS').val() * 1,
+				width: resolution[0] * 1,
+				height: resolution[1] * 1, 
+			},
+			audio: true
 		}
 	};
 	return config;
@@ -433,10 +427,11 @@ async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
 	$('#UserID').val(userID);
+	$('#Token').val(token);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
 	$('#localVideo').hide()
-    $('#publishVideo').hide()
+    
 	$('#remoteVideo').hide()
     $('#playVideo').hide()
 	createZegoExpressEngine();

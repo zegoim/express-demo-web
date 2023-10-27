@@ -8,8 +8,9 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0022';
-let streamID = '0022';
+let roomID = '0019'
+let token = ""
+let streamID = '0019'
 
 let zg = null;
 let isLogin = false;
@@ -154,9 +155,11 @@ function logoutRoom(roomId) {
 async function startPublishingStream(streamId) {
 	try {
 		const audio = $('#customAudio')[0];
-		localStream = await zg.createStream({
+		localStream = await zg.createZegoStream({
 			custom: {
-				source: audio
+				audio: {
+					source: audio
+				}
 			}
 		});
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
@@ -316,6 +319,7 @@ function checkVideo() {
 async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
+	$('#Token').val(token);
 	$('#UserName').val(userID);
 	$('#UserID').val(userID);
 	$('#PublishID').val(streamID);

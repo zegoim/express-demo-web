@@ -7,8 +7,9 @@
 // This part of the code defines the default values and global values
 // ==============================================================
 
-let userID = util.queryObj['userID'] || util.getBrow() + '_' + new Date().getTime();
-let roomID = '0004';
+let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
+let roomID = '0001';
 let streamID = parseInt(Math.random() * 999999) + '';
 
 let zg = null;
@@ -215,7 +216,7 @@ function playMultipleEvent() {
 
 function destroyStream() {
 	localStream && zg.destroyStream(localStream);
-	$('#publishVideo')[0].srcObject = null;
+
 	localStream = null;
 	published = false;
 }
@@ -251,22 +252,15 @@ function logoutRoom(roomId) {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream(config);
+		localStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		if (zg.getVersion() < "2.17.0") {
-			$('#publishVideo')[0].srcObject = localStream;
-			$('#publishVideo').show()
-			$('#localVideo').hide()
-		} else {
-			const localView = zg.createLocalStreamView(localStream);
-			localView.play("localVideo", {
-				mirror: true,
-				objectFit: "cover",
-				enableAutoplayDialog: true,
-			})
-			$('#publishVideo').hide()
-			$('#localVideo').show()
-		}
+
+		localStream.playVideo($('#localVideo')[0], {
+			mirror: true,
+			objectFit: "cover"
+		})
+
+		$('#localVideo').show()
 		return true;
 	} catch (err) {
 		return false;
@@ -288,8 +282,7 @@ async function startPlayingMultipleStream(streamId, options = {}) {
 		} else {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play(`v-${streamId}`, {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
+				objectFit: "cover"
 			})
 			$(`[data-id=${streamId}] .playVideo`).hide()
 			$(`#v-${streamId}`).show()
@@ -391,16 +384,17 @@ $('#startPublishing').on(
 function getCreateStreamConfig() {
 	const resolution = $('#captureResolution').val().split('*');
 	const config = {
+		videoBtrate: $('#Bitrate').val() * 1,
 		camera: {
-			audioInput: 'default',
-			videoInput: $('#CameraDevices').val(),
-			video: $('#Camera')[0].checked,
-			audio: $('#Microphone')[0].checked,
-			videoQuality: 4,
-			frameRate: $('#FPS').val() * 1,
-			width: resolution[0] * 1,
-			height: resolution[1] * 1,
-			bitRate: $('#Bitrate').val() * 1
+			video: $('#Camera')[0].checked ? {
+				frameRate: $('#FPS').val() * 1,
+				width: resolution[0] * 1,
+				height: resolution[1] * 1,
+				input: $('#CameraDevices').val()
+			} : false,
+			audio: $('#Microphone')[0].checked ? {
+				input: 'default'
+			} : false,
 		}
 	};
 	return config;
@@ -599,6 +593,7 @@ async function stopToStart(oldId, newId) {
 async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
+	$('#Token').val(token);
 	$('#UserID').val(userID);
 	createZegoExpressEngine();
 	await checkSystemRequirements();

@@ -45,8 +45,7 @@
                   *ngIf="publishInfoStreamID">{{publishInfoStreamID}}</span>
               </div>
               <div class="preview-content">
-                <video controls id="publishVideo" *ngIf="localStream" [srcObject]="localStream" autoplay playsinline muted
-                  [class]="(mirrorVal=='onlyPreview' || mirrorVal=='both')?'mirror':''"></video>
+                <div id="localVideo"></div>
               </div>
             </div>
             <div class="preview-playInfo m-t-10 col-lg-12 col-6">

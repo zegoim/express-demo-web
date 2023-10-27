@@ -5,7 +5,8 @@
 let zg = null;
 let isDetecting = false;
 
-let userID = 'user' + Date.now();
+let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
 let roomID = '0001'
 
 const netQualityTextMap = {
@@ -119,11 +120,14 @@ function detectNetworkQuality(zg, seconds = 10) {
     if (!isLogin) {
       onDetectionEnd("Login failed")
     }
-    // 调用 createStream 接口创建摄像头相关的媒体流对象，在 createStream 接口参数中设置期望网络满足的视频质量参数和码率
-    // Call the createstream interface to create the media stream object related to the camera, and set the video quality parameters and bit rate expected to be met by the network in the createstream interface parameters
-    localStream = await zg.createStream({
+    // 调用 createZegoStream 接口创建摄像头相关的媒体流对象，在 createZegoStream 接口参数中设置期望网络满足的视频质量参数和码率
+    // Call the createZegoStream interface to create the media stream object related to the camera, and set the video quality parameters and bit rate expected to be met by the network in the createZegoStream interface parameters
+    localStream = await zg.createZegoStream({
       camera: {
-        videoQuality: 3
+        video: {
+          quality: 3
+        },
+        audio: true
       }
     }).catch(error => {
       onDetectionEnd(errMsg)
@@ -137,6 +141,7 @@ function detectNetworkQuality(zg, seconds = 10) {
 async function render() {
   $('#RoomID').val(roomID)
   $('#UserID').val(userID)
+  $('#Token').val(token)
 
   zg = new ZegoExpressEngine(appID, server)
 

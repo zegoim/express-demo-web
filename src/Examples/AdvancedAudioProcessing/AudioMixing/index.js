@@ -8,8 +8,9 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0020';
-let streamID = '0020';
+let roomID = '0019'
+let token = ""
+let streamID = '0019'
 
 let zg = null;
 let isLogin = false;
@@ -120,7 +121,7 @@ function destroyStream() {
 	localStream && zg.destroyStream(localStream);
 	remoteStream = null;
 	localStream = null;
-	$('#publishVideo')[0].srcObject = null;
+	
 	isStart = false;
 }
 
@@ -151,22 +152,15 @@ function logoutRoom(roomId) {
 
 async function startPublishingStream(streamId) {
 	try {
-		localStream = await zg.createStream();
-		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		if (zg.getVersion() < "2.17.0") {
-			$('#publishVideo')[0].srcObject = localStream;
-			$('#publishVideo').show()
-			$('#localVideo').hide()
-		  } else {
-			const localView = zg.createLocalStreamView(localStream);
-			localView.play("localVideo", {
-				mirror: true,
-				objectFit: "cover",
-				enableAutoplayDialog: true,
-			})
-			$('#publishVideo').hide()
-			$('#localVideo').show()
-		  }
+		localStream = await zg.createZegoStream();
+    zg.startPublishingStream(streamId, localStream, { videoCodec });
+    localStream.playVideo($('#localVideo')[0], {
+        mirror: true,
+        objectFit: "cover",
+        
+    })
+    
+    $('#localVideo').show()
 		return true;
 	} catch (err) {
 		console.error(err);
@@ -188,8 +182,7 @@ async function startPlayingStream(streamId, options = {}) {
 		} else {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
+				objectFit: "cover"
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -345,6 +338,7 @@ async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
 	$('#UserID').val(userID);
+	$('#Token').val(token);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
 	$('#AudioMixing')[0].disabled = true;

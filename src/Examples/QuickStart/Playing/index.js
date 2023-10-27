@@ -7,6 +7,7 @@
 // This part of the code defines the default values and global values
 // ==============================================================
 let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
 let roomID = '0001';
 let streamID = '0001';
 let zg = null;
@@ -121,8 +122,7 @@ async function startPlayingStream(streamId, options = {}) {
 		} else {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
+				objectFit: "cover"
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()
@@ -261,6 +261,7 @@ async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
 	$('#UserID').val(userID);
+	$('#Token').val(token);
 	$('#PlayID').val(streamID);
 	$('#Video')[0].checked = true;
 	$('#Audio')[0].checked = true;

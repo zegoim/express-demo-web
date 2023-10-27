@@ -8,8 +8,9 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0018';
-let streamID = '0018';
+let roomID = '0019'
+let token = ""
+let streamID = '0019'
 
 let zg = null;
 let isLogin = false;
@@ -154,9 +155,9 @@ async function loginRoom(roomId, userId, userName, token) {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream(config);
+		localStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		$('#publishVideo')[0].srcObject = localStream;
+		localStream.playAudio();
 		return true;
 	} catch (err) {
 		return false;
@@ -179,7 +180,7 @@ function stopSoundLevelDelegate() {
 
 $('#SoundLevelMonitor').on('change', function ({ target }) {
 	if (target.checked) {
-		startSoundLevelDelegate(100)
+		startSoundLevelDelegate(500)
 	} else {
 		stopSoundLevelDelegate()
 		$('#SoundLevelProgressbar').progressbar(0)
@@ -238,7 +239,7 @@ $('#LoginRoom').on(
 // ==============================================================
 
 function getCreateStreamConfig() {
-	const config = { camera: { video: false } };
+	const config = { camera: { video: false, audio: true } };
 	return config;
 }
 
@@ -301,6 +302,7 @@ async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
 	$('#UserID').val(userID);
+	$('#Token').val(token);
 	createZegoExpressEngine();
 	await checkSystemRequirements();
 	enumDevices();

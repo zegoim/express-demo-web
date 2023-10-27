@@ -8,8 +8,9 @@
 // ============================================================== 
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
-let roomID = '0012'
-let streamID = '0012'
+let token = ""
+let roomID = '0019'
+let streamID = '0009'
 
 let zg = null;
 let isChecked = false;
@@ -18,7 +19,7 @@ let localStream = null;
 let remoteStream = null;
 let published = false;
 let played = false;
-let videoCodec =  localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
+let videoCodec = localStorage.getItem('VideoCodec') === 'H.264' ? 'H264' : 'VP8';
 
 
 // part end
@@ -34,57 +35,57 @@ function createZegoExpressEngine() {
 
 // Step1 Check system requirements
 async function checkSystemRequirements() {
-	console.log('sdk version is', zg.getVersion());
-	try {
-		const result = await zg.checkSystemRequirements();
+  console.log('sdk version is', zg.getVersion());
+  try {
+    const result = await zg.checkSystemRequirements();
 
-		console.warn('checkSystemRequirements ', result);
+    console.warn('checkSystemRequirements ', result);
 
-		if (!result.webRTC) {
-			console.error('browser is not support webrtc!!');
-			return false;
-		} else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
-			console.error('browser is not support H264 and VP8');
-			return false;
-		} else if (!result.camera && !result.microphone) {
-			console.error('camera and microphones not allowed to use');
-			return false;
-		} else if (result.videoCodec.VP8) {
-			if (!result.screenSharing) console.warn('browser is not support screenSharing');
-		} else {
-			console.log('不支持VP8，请前往混流转码测试');
-		}
-		return true;
-	} catch (err) {
-		console.error('checkSystemRequirements', err);
-		return false;
-	}
+    if (!result.webRTC) {
+      console.error('browser is not support webrtc!!');
+      return false;
+    } else if (!result.videoCodec.H264 && !result.videoCodec.VP8) {
+      console.error('browser is not support H264 and VP8');
+      return false;
+    } else if (!result.camera && !result.microphone) {
+      console.error('camera and microphones not allowed to use');
+      return false;
+    } else if (result.videoCodec.VP8) {
+      if (!result.screenSharing) console.warn('browser is not support screenSharing');
+    } else {
+      console.log('不支持VP8，请前往混流转码测试');
+    }
+    return true;
+  } catch (err) {
+    console.error('checkSystemRequirements', err);
+    return false;
+  }
 }
 
 async function enumDevices() {
   const audioInputList = [],
-      videoInputList = [];
+    videoInputList = [];
   const deviceInfo = await zg.enumDevices();
 
   deviceInfo &&
-      deviceInfo.microphones.map((item, index) => {
-          if (!item.deviceName) {
-              item.deviceName = 'microphone' + index;
-          }
-          audioInputList.push(' <option value="' + item.deviceID + '">' + item.deviceName + '</option>');
-          console.log('microphone: ' + item.deviceName);
-          return item;
-      });
+    deviceInfo.microphones.map((item, index) => {
+      if (!item.deviceName) {
+        item.deviceName = 'microphone' + index;
+      }
+      audioInputList.push(' <option value="' + item.deviceID + '">' + item.deviceName + '</option>');
+      console.log('microphone: ' + item.deviceName);
+      return item;
+    });
 
   deviceInfo &&
-      deviceInfo.cameras.map((item, index) => {
-          if (!item.deviceName) {
-              item.deviceName = 'camera' + index;
-          }
-          videoInputList.push(' <option value="' + item.deviceID + '">' + item.deviceName + '</option>');
-          console.log('camera: ' + item.deviceName);
-          return item;
-      });
+    deviceInfo.cameras.map((item, index) => {
+      if (!item.deviceName) {
+        item.deviceName = 'camera' + index;
+      }
+      videoInputList.push(' <option value="' + item.deviceID + '">' + item.deviceName + '</option>');
+      console.log('camera: ' + item.deviceName);
+      return item;
+    });
 
   audioInputList.push('<option value="0">禁止</option>');
   videoInputList.push('<option value="0">禁止</option>');
@@ -95,28 +96,28 @@ async function enumDevices() {
 
 function initEvent() {
   zg.on('roomStateUpdate', (roomId, state) => {
-		if(state === 'CONNECTED') {
-			$('#roomStateSuccessSvg').css('display', 'inline-block');
-			$('#roomStateErrorSvg').css('display', 'none');
-		}
-		
-		if (state === 'DISCONNECTED') {
-			$('#roomStateSuccessSvg').css('display', 'none');
-			$('#roomStateErrorSvg').css('display', 'inline-block');
-		}
-	})
+    if (state === 'CONNECTED') {
+      $('#roomStateSuccessSvg').css('display', 'inline-block');
+      $('#roomStateErrorSvg').css('display', 'none');
+    }
+
+    if (state === 'DISCONNECTED') {
+      $('#roomStateSuccessSvg').css('display', 'none');
+      $('#roomStateErrorSvg').css('display', 'inline-block');
+    }
+  })
   zg.on('publisherStateUpdate', result => {
-    if(result.state === "PUBLISHING") {
+    if (result.state === "PUBLISHING") {
       $('#pushlishInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PUBLISH") {
+    } else if (result.state === "NO_PUBLISH") {
       $('#pushlishInfo-id').text('')
     }
   })
 
   zg.on('playerStateUpdate', result => {
-    if(result.state === "PLAYING") {
+    if (result.state === "PLAYING") {
       $('#playInfo-id').text(result.streamID)
-    } else if(result.state === "NO_PLAY") {
+    } else if (result.state === "NO_PLAY") {
       $('#playInfo-id').text('')
     }
   })
@@ -130,77 +131,69 @@ function initEvent() {
   })
 
   zg.on('playQualityUpdate', (streamId, stats) => {
-      $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`)
-      $('#receiveVideoCodec').text(stats.video.googCodecName)
-      $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
-      $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
-      $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
+    $('#playResolution').text(`${stats.video.frameWidth} * ${stats.video.frameHeight}`)
+    $('#receiveVideoCodec').text(stats.video.googCodecName)
+    $('#receiveBitrate').text(parseInt(stats.video.videoBitrate) + 'kbps')
+    $('#receiveFPS').text(parseInt(stats.video.videoFPS) + ' f/s')
+    $('#receivePacket').text(stats.video.videoPacketsLostRate.toFixed(1) + '%')
   })
 }
 
 
 function destroyStream(flag) {
-	localStream && zg.destroyStream(localStream);
-	$('#publishVideo')[0].srcObject = null;
-	localStream = null;
-	published = false;
-	if ($('#PublishID').val() === $('#PlayID').val()) {
-		$('#playVideo')[0].srcObject = null;
-		remoteStream = null;
-		played = false;
-	}
+  localStream && zg.destroyStream(localStream);
+
+  localStream = null;
+  published = false;
+  if ($('#PublishID').val() === $('#PlayID').val()) {
+    $('#playVideo')[0].srcObject = null;
+    remoteStream = null;
+    played = false;
+  }
 }
 
 
 function setLogConfig() {
   let config = localStorage.getItem('logConfig')
   const DebugVerbose = localStorage.getItem('DebugVerbose') === 'true' ? true : false
-  if(config) {
+  if (config) {
     config = JSON.parse(config)
     zg.setLogConfig({
       logLevel: config.logLevel,
       remoteLogLevel: config.remoteLogLevel,
       logURL: '',
-  });
+    });
   }
   zg.setDebugVerbose(DebugVerbose);
 }
 
 async function loginRoom(roomId, userId, userName, token) {
-	return await zg.loginRoom(roomId, token, {
-		userID: userId,
-		userName
-	});
+  return await zg.loginRoom(roomId, token, {
+    userID: userId,
+    userName
+  });
 }
 
-async function startPublishingStream (streamId, config = {}) {
+async function startPublishingStream(streamId, config = {}) {
   try {
-    localStream = await zg.createStream();
+    localStream = await zg.createZegoStream();
     zg.startPublishingStream(streamId, localStream, config);
-    if (zg.getVersion() < "2.17.0") {
-      $('#publishVideo')[0].srcObject = localStream;
-      $('#publishVideo').show()
-      $('#localVideo').hide()
-    } else {
-      const localView = zg.createLocalStreamView(localStream);
-      localView.play("localVideo", {
-          mirror: true,
-          objectFit: "cover",
-          enableAutoplayDialog: true,
-      })
-      $('#publishVideo').hide()
-      $('#localVideo').show()
-    }
+
+    localStream.playVideo($('#localVideo')[0], {
+      mirror: true,
+      objectFit: "cover"
+    })
+    $('#localVideo').show()
     return true
-  } catch(err) {
+  } catch (err) {
     return false
   }
-  
+
 }
 
 async function stopPublishingStream(streamId) {
   zg.stopPublishingStream(streamId)
-  if(remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
+  if (remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
     stopPlayingStream(streamId)
   }
   destroyStream()
@@ -210,18 +203,17 @@ async function startPlayingStream(streamId, options = {}) {
   try {
     remoteStream = await zg.startPlayingStream(streamId, options)
     if (zg.getVersion() < "2.17.0") {
-			$('#playVideo').srcObject = remoteStream;
-			$('#playVideo').show()
-			$('#remoteVideo').hide()
-		} else {
-			const remoteView = zg.createRemoteStreamView(remoteStream);
-			remoteView.play("remoteVideo", {
-				objectFit: "cover",
-				enableAutoplayDialog: true,
-			})
-			$('#playVideo').hide()
-			$('#remoteVideo').show()
-		}
+      $('#playVideo').srcObject = remoteStream;
+      $('#playVideo').show()
+      $('#remoteVideo').hide()
+    } else {
+      const remoteView = zg.createRemoteStreamView(remoteStream);
+      remoteView.play("remoteVideo", {
+        objectFit: "cover"
+      })
+      $('#playVideo').hide()
+      $('#remoteVideo').show()
+    }
     return true
   } catch (err) {
     return false
@@ -239,97 +231,97 @@ async function stopPlayingStream(streamId) {
 // This part of the code binds the button click event
 // ==============================================================  
 $('#LoginRoom').on(
-	'click',
-	util.throttle(async function () {
+  'click',
+  util.throttle(async function () {
 
-		const userID = $('#UserID').val();
-		const id = $('#RoomID').val();
-		const token = $('#Token').val();
-		$("#roomInfo-id").text(id)
+    const userID = $('#UserID').val();
+    const id = $('#RoomID').val();
+    const token = $('#Token').val();
+    $("#roomInfo-id").text(id)
 
-		if (!userID) return alert('userID is Empty');
-		if (!id) return alert('RoomID is Empty');
-		this.classList.add('border-primary');
-		if (!isLogin) {
-			try {
-				isLogin = await loginRoom(id, userID, userID, token);
-				updateButton(this, 'Login Room', 'Logout Room');
-				$('#UserID')[0].disabled = true;
-				$('#RoomID')[0].disabled = true;
-				$('#LoginRoom').hide()
-			} catch (err) {
-				isLogin = false;
-				this.classList.remove('border-primary');
-				this.classList.add('border-error');
-				this.innerText = 'Login Fail Try Again';
+    if (!userID) return alert('userID is Empty');
+    if (!id) return alert('RoomID is Empty');
+    this.classList.add('border-primary');
+    if (!isLogin) {
+      try {
+        isLogin = await loginRoom(id, userID, userID, token);
+        updateButton(this, 'Login Room', 'Logout Room');
+        $('#UserID')[0].disabled = true;
+        $('#RoomID')[0].disabled = true;
+        $('#LoginRoom').hide()
+      } catch (err) {
+        isLogin = false;
+        this.classList.remove('border-primary');
+        this.classList.add('border-error');
+        this.innerText = 'Login Fail Try Again';
         throw err;
-			}
-		} else {
-			if (localStream) {
-				updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
-			}
-			isLogin = false;
-			updateButton(this, 'Login Room', 'Logout Room');
-			$('#UserID')[0].disabled = false;
-			$('#RoomID')[0].disabled = false;
-		}
-	}, 500)
+      }
+    } else {
+      if (localStream) {
+        updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
+      }
+      isLogin = false;
+      updateButton(this, 'Login Room', 'Logout Room');
+      $('#UserID')[0].disabled = false;
+      $('#RoomID')[0].disabled = false;
+    }
+  }, 500)
 );
 
-$('#startPublishing').on('click', util.throttle( async function () {
+$('#startPublishing').on('click', util.throttle(async function () {
   const id = $('#PublishID').val();
-  if(!id) return alert('PublishID is empty')
+  if (!id) return alert('PublishID is empty')
   this.classList.add('border-primary')
-  if(!published) {
-      const flag =  await startPublishingStream(id, getCodecConfig());
-      if(flag) {
-        updateButton(this, 'Start Publishing', 'Stop Publishing');
-        published = true
-        $('#Codec')[0].disabled = true
-        $('#PublishID')[0].disabled = true
-      } else {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Publishing Fail'
-      }
+  if (!published) {
+    const flag = await startPublishingStream(id, getCodecConfig());
+    if (flag) {
+      updateButton(this, 'Start Publishing', 'Stop Publishing');
+      published = true
+      $('#Codec')[0].disabled = true
+      $('#PublishID')[0].disabled = true
+    } else {
+      this.classList.remove('border-primary');
+      this.classList.add('border-error')
+      this.innerText = 'Publishing Fail'
+    }
 
   } else {
-      if(remoteStream && id === $('#PlayID').val()) {
+    if (remoteStream && id === $('#PlayID').val()) {
       $('#PlayID')[0].disabled = false
-        updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
-        reSetVideoInfo()
-      }
-      stopPublishingStream(id);
-      updateButton(this, 'Start Publishing', 'Stop Publishing')
-      published = false
-      $('#PublishID')[0].disabled = false
-      $('#Codec')[0].disabled = false
-      reSetVideoInfo('publish')
+      updateButton($('#startPlaying')[0], 'Start Playing', 'Stop Playing')
+      reSetVideoInfo()
+    }
+    stopPublishingStream(id);
+    updateButton(this, 'Start Publishing', 'Stop Publishing')
+    published = false
+    $('#PublishID')[0].disabled = false
+    $('#Codec')[0].disabled = false
+    reSetVideoInfo('publish')
   }
 }, 500))
 
-$('#startPlaying').on('click', util.throttle( async function () {
+$('#startPlaying').on('click', util.throttle(async function () {
   const id = $('#PlayID').val();
-  if(!id) return alert('PublishID is empty')
+  if (!id) return alert('PublishID is empty')
   this.classList.add('border-primary')
-  if(!played) {
-      const flag =  await startPlayingStream(id, getCodecConfig());
-      if(flag) {
-        updateButton(this, 'Start Playing', 'Stop Playing');
-        played = true
+  if (!played) {
+    const flag = await startPlayingStream(id, getCodecConfig());
+    if (flag) {
+      updateButton(this, 'Start Playing', 'Stop Playing');
+      played = true
       $('#PlayID')[0].disabled = true
-      } else {
-        this.classList.remove('border-primary');
-        this.classList.add('border-error')
-        this.innerText = 'Playing Fail'
-      }
+    } else {
+      this.classList.remove('border-primary');
+      this.classList.add('border-error')
+      this.innerText = 'Playing Fail'
+    }
 
   } else {
-      stopPlayingStream(id);
-      updateButton(this, 'Start Playing', 'Stop Playing')
-      played = false
-      $('#PlayID')[0].disabled = false
-      reSetVideoInfo('play')
+    stopPlayingStream(id);
+    updateButton(this, 'Start Playing', 'Stop Playing')
+    played = false
+    $('#PlayID')[0].disabled = false
+    reSetVideoInfo('play')
   }
 }, 500))
 
@@ -342,7 +334,7 @@ $('#startPlaying').on('click', util.throttle( async function () {
 
 function getCodecConfig() {
   const data = $('#Codec').val()
-  if(data === 'default') return
+  if (data === 'default') return
   const config = {
     videoCodec: data
   }
@@ -369,14 +361,14 @@ function updateButton(button, preText, afterText) {
 }
 
 function reSetVideoInfo(flag) {
-  if(flag === 'publish' || !flag) {
-    $('#publishResolution').text('') 
+  if (flag === 'publish' || !flag) {
+    $('#publishResolution').text('')
     $('#sendBitrate').text('')
     $('#sendFPS').text('')
     $('#sendPacket').text('')
   }
-  if(flag === 'play' || !flag) {
-    $('#playResolution').text('') 
+  if (flag === 'play' || !flag) {
+    $('#playResolution').text('')
     $('#receiveBitrate').text('')
     $('#receiveFPS').text('')
     $('#receivePacket').text('')
@@ -394,6 +386,7 @@ async function render() {
   $('#RoomID').val(roomID)
   $('#UserName').val(userID)
   $('#UserID').val(userID)
+  $('#Token').val(token)
   $('#PublishID').val(streamID)
   $('#PlayID').val(streamID)
   createZegoExpressEngine()

@@ -9,6 +9,7 @@
 ZegoExpressEngine.use(BackgroundProcess)
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
 let roomID = '0033';
 let streamID = userID;
 let zg = null;
@@ -174,29 +175,30 @@ async function initBackground() {
 		return alert('Not support in Mobile, Please use in Desktop')
 	}
 	try {
-            zg.initBackgroundModule && await zg.initBackgroundModule(0, "./assets");
-    } catch (err) {
-        console.error(err);
-    }
+		zg.initBackgroundModule && await zg.initBackgroundModule(0, "./assets");
+	} catch (err) {
+		console.error(err);
+	}
 }
 
 
 async function preview() {
 	try {
-		localStream = await zg.createStream({
+		localStream = await zg.createZegoStream({
+			videoBitrate: 1000,
 			camera: {
-				videoQuality: 4,
-				width: 480,
-				height: 320,
-				bitrate: 1000,
-        		frameRate: 15
+				video: {
+					quality: 4,
+					width: 480,
+					height: 320,
+					frameRate: 15
+				},
+				audio: true
 			}
 		});
-		const localView = zg.createLocalStreamView(localStream);
-		localView.play("localVideo", {
+		localStream.playVideo($('#localVideo')[0], {
 			mirror: true,
 			objectFit: "cover",
-			enableAutoplayDialog: true,
 		})
 		$('#localVideo').show()
 		return true;
@@ -223,7 +225,7 @@ async function setBlurEffect() {
 
 async function setVirtualEffect() {
 	const img = document.getElementById("backImg");
-	
+
 	zg.setVirtualBackgroundOptions(localStream, {
 		source: img,
 		objectFit: 'cover'
@@ -236,7 +238,7 @@ async function setBackgroundEffect() {
 	const mode = checked.val()
 
 	switch (mode) {
-		case 'none': 
+		case 'none':
 			await setBackgroundProcess(false)
 			break;
 		case 'blur':
@@ -301,17 +303,17 @@ $('[name=bg-mode]').change(function () {
 })
 
 $('[name=blur-degree]').change(function () {
-    const checked = $('[name=bg-mode]:checked')
-    if (checked.val() === 'blur') {
+	const checked = $('[name=bg-mode]:checked')
+	if (checked.val() === 'blur') {
 		setBlurEffect()
 	}
 })
 
-$('#selectImg').click(function() {
+$('#selectImg').click(function () {
 	$('#inputImg').click()
 })
 
-$('#inputImg').change(function() {
+$('#inputImg').change(function () {
 	const img = this.files[0];
 
 	if (!img.type.startsWith('image')) {
@@ -323,7 +325,7 @@ $('#inputImg').change(function() {
 	}
 	const url = URL.createObjectURL(img);
 	backImg.src = url;
-	
+
 })
 // bind event end
 
@@ -361,6 +363,7 @@ function updateButton(button, preText, afterText) {
 async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
+	$('#Token').val(token);
 	$('#UserName').val(userID);
 	$('#UserID').val(userID);
 	createZegoExpressEngine();

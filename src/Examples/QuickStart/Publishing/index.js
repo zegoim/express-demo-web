@@ -8,6 +8,7 @@
 // ==============================================================
 
 let userID = Util.getBrow() + '_' + new Date().getTime();
+let token = ""
 let roomID = '0002';
 let streamID = '0002';
 
@@ -59,7 +60,7 @@ function initEvent() {
 			console.log(111);
 			$('#roomStateSuccessSvg').css('display', 'inline-block');
 			$('#roomStateErrorSvg').css('display', 'none');
-			
+
 		}
 
 		if (state === 'DISCONNECTED') {
@@ -146,23 +147,13 @@ async function loginRoom(roomId, userId, userName, token) {
 //  Start Publishing Stream
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createStream(config);
-		if (zg.getVersion() < "2.17.0") {
-            $('#publishVideo')[0].srcObject = localStream;
-            $('#publishVideo').show()
-            $('#localVideo').hide()
-        } else {
-            const localView = zg.createLocalStreamView(localStream);
-            localView.play("localVideo", {
-                mirror: true,
-                objectFit: "cover",
-                enableAutoplayDialog: true,
-            })
-            $('#publishVideo').hide()
-            $('#localVideo').show()
-        }
+		localStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		$('#publishVideo')[0].srcObject = localStream;
+		localStream.playVideo($('#localVideo')[0], {
+			mirror: true,
+			objectFit: "cover",
+		})
+		$('#localVideo').show()
 		return true;
 	} catch (err) {
 		return false;
@@ -184,7 +175,7 @@ async function stopPublishingStream(streamId) {
 
 function clearStream() {
 	localStream && zg.destroyStream(localStream);
-	$('#publishVideo')[0].srcObject = null;
+
 	localStream = null;
 	published = false
 }
@@ -226,7 +217,7 @@ $('#LoginRoom').on(
 				this.classList.remove('border-primary');
 				this.classList.add('border-error');
 				this.innerText = 'Login Fail Try Again';
-        		throw err;
+				throw err;
 			}
 		} else {
 			if (localStream) {
@@ -297,10 +288,12 @@ $('#MicrophoneDevices').on('change', function ({ target }) {
 function getCreateStreamConfig() {
 	const config = {
 		camera: {
-			audioInput: $('#MicrophoneDevices').val(),
-			videoInput: $('#CameraDevices').val(),
-			video: $('#Camera')[0].checked,
-			audio: $('#Microphone')[0].checked
+			video: $('#Camera')[0].checked ? {
+				input: $('#CameraDevices').val()
+			} : false,
+			audio: $('#Microphone')[0].checked ? {
+				input: $('#MicrophoneDevices').val()
+			} : false
 		}
 	};
 	return config;
@@ -353,12 +346,13 @@ async function render() {
 	$('#roomInfo-id').text(roomID);
 	$('#RoomID').val(roomID);
 	$('#UserID').val(userID);
+	$('#Token').val(token);
 	$('#PublishID').val(streamID);
 	$('#PlayID').val(streamID);
 	$('#Camera')[0].checked = true;
 	$('#Microphone')[0].checked = true;
-    $('#localVideo').hide()
-    $('#publishVideo').hide()
+	$('#localVideo').hide()
+
 	createZegoExpressEngine();
 	await checkSystemRequirements();
 	enumDevices();

@@ -3,7 +3,10 @@ let appID; // 请从官网控制台获取对应的appID Please obtain the corres
 let server; // 请从官网控制台获取对应的server地址，否则可能登录失败 Please obtain the corresponding server address from the console on the official website, otherwise the login may fail
 var baseURL = window.location.href.match(/.*\/Examples/)[0]
 // get local appID and server
-let appInfo = {}
+let appInfo = {
+  appID,
+  server
+}
 if (!appID || !server) {
   try {
     const appInfoStr = localStorage.getItem("app_info")
@@ -22,6 +25,7 @@ if (!appID || !server) {
     server
   }))
 }
+
 appID = appInfo.appID;
 server = appInfo.server;
 

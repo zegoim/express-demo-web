@@ -289,3 +289,91 @@ option {
     margin-top: 0 !important;
   }
 }
+
+
+.zep-player {
+  position: relative;
+  background-color: black;
+  overflow: hidden;
+}
+.zep-player * {
+  margin: 0;
+  padding: 0;
+}
+.zep-player-control {
+  position: absolute;
+  bottom: 0;
+  height: 30px;
+  background-color: rgba(100, 100, 100, 0.5);
+  width: 100%;
+}
+.zep-play-btn:hover {
+  cursor: pointer;
+  background-color: rgba(100, 100, 100);
+}
+.zep-fullscreen-btn {
+  float: right;
+  height: 30px;
+}
+.zep-play-btn {
+  float: left;
+  padding-top: 1px;
+  height: 30px;
+}
+.zep-fullscreen-btn:hover {
+  cursor: pointer;
+  background-color: rgba(100, 100, 100);
+}
+.zep-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.zep-loading {
+width: 30px;
+height: 30px;
+border-radius: 50%;
+display: inline-block;
+border-top: 3px solid #fff;
+border-right: 3px solid transparent;
+animation: zep-loading-rotation 1s linear infinite;
+}
+.zep-mute-btn {
+  float: right;
+  padding-top: 1px;
+  height: 29px;
+}
+.zep-mute-btn:hover {
+  cursor: pointer;
+  background-color: rgba(100, 100, 100);
+}
+.zep-display-none {
+  display: none;
+}
+.zep-express-player{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.zep-express-player:hover {
+  cursor: pointer;
+}
+.zep-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1000;
+}
+@keyframes zep-loading-rotation {
+  0% {
+      transform: rotate(0deg);
+  }
+
+  100% {
+      transform: rotate(360deg);
+  }
+}

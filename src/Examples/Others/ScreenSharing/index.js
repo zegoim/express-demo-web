@@ -203,6 +203,7 @@ async function stopPublishingStream(streamId) {
 	if (remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
 		stopPlayingStream(streamId);
 	}
+	destroyStream();
 }
 
 async function startPlayingStream(streamId, options = {}) {
@@ -338,6 +339,8 @@ $('#startPlaying').on(
 // ==============================================================
 
 function getCreateStreamConfig() {
+	const elemid = $("#screenMode").val();
+	const captureElement = elemid && $("#" + elemid)[0] || undefined
 	const config = {
 		videoBitrate: {
 			bitrate: 3000,
@@ -350,6 +353,7 @@ function getCreateStreamConfig() {
 				width: 1080,
 				height: 720,
 				quality: 4,
+				captureElement
 			}
 		}
 	};

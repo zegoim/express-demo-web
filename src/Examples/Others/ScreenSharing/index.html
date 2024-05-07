@@ -26,7 +26,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-12 login-wrapper">
-            <h6  data-lang="Preconditions">前置条件</h6>
+            <h6 data-lang="Preconditions">前置条件</h6>
             <div class="login-desc" data-lang="PreconditionsDesc">
               体验该功能，需要模拟一个用户（UserID）登陆到对应的房间（RoomID）中，并且有权限（Token）时才可以登陆成功。
             </div>
@@ -58,7 +58,7 @@
                 <input type="text" class="w-70" id="Token" />
               </div>
             </div>
-            <button id="LoginRoom" class="play-pause-button" title="loginRoom()" style="width: 120px;">
+            <button id="LoginRoom" class="play-pause-button row" title="loginRoom()" style="width: 120px;">
               <div class="success-svg m-r-5" id="loginSuccessSvg" style="display: none;">
                 <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="15" width="15" viewBox="0 0 48 48"
                   aria-hidden="true">
@@ -69,6 +69,14 @@
               </div>
               Login Room
             </button>
+            <div class="form-wrap font-14 row select-wrapper">
+              <span data-lang="screenMode">选择共享DOM节点</span>
+              <select class="form-control form-control-sm m-l-5" id="screenMode">
+                <option value="">不选择</option>
+                <option value="customLocalVideo">共享视频播放框</option>
+                <option value="shareText">共享文字展示框</option>
+              </select>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -101,8 +109,7 @@
                     <div class="m-t-10 m-b-5">
                       Publish StreamID <input class="m-l-10" type="text" id="PublishID" />
                     </div>
-                    <button id="startPublishing" class="m-b-5 configBtn play-pause-button"
-                      title="createStream()">Start
+                    <button id="startPublishing" class="m-b-5 configBtn play-pause-button" title="createStream()">Start
                       Screen Capture</button>
                   </div>
                 </div>
@@ -121,6 +128,28 @@
                     <button id="startPlaying" class="m-b-5 configBtn play-pause-button"
                       title="startPlayingStream()">Start Playing</button>
                   </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="preview-pushlishInfo col-lg-6 col-12 m-t-15" id="shareText">
+
+                <div class="preview-content">
+                  <h6>共享DOM节点的文本内容</h6>
+                  <h5>共享DOM节点的文本内容</h5>
+                  <h4>共享DOM节点的文本内容</h4>
+                  <h3>共享DOM节点的文本内容</h3>
+                  <h2>共享DOM节点的文本内容</h2>
+                  <h1>共享DOM节点的文本内容</h1>
+                </div>
+              </div>
+              <div class="preview-pushlishInfo col-lg-6 col-12 m-t-15" id="shareText" style="position:fixed;width: 300px;bottom:80px;right:25px">
+
+                <div class="preview-content">
+                  <div>固定定位的video</div>
+                  <video controls style="width: 100%;" id="customLocalVideo" crossorigin="anonymous" autoplay
+                    playsinline muted controls loop
+                    src="https://zego-public.oss-cn-shanghai.aliyuncs.com/sdk-doc/assets/big_buck_bunny.mp4"></video>
                 </div>
               </div>
             </div>

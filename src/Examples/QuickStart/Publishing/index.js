@@ -149,8 +149,8 @@ async function startPublishingStream(streamId, config) {
 	try {
 		localStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		localStream.playVideo($('#localVideo')[0], {
-			mirror: true,
+		localStream.playVideo($("#localVideo")[0], {
+			mirror: $("#Mirror").val() !== "none" && $("#Mirror").val() !== "onlyPlay",
 			objectFit: "cover",
 		})
 		$('#localVideo').show()

@@ -173,46 +173,47 @@ function setLogConfig() {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createZegoStream(config);
-		zg.startPublishingStream(streamId, localStream, { videoCodec });
-		localStream.playVideo($('#localVideo')[0], {
-      mirror: true,
-      objectFit: "cover"
-    })
-    $('#localVideo').show()
-		return true;
+		localStream = await zg.createZegoStream(config)
+		zg.startPublishingStream(streamId, localStream, { videoCodec })
+		localStream.playVideo($("#localVideo")[0], {
+			mirror: $("#Mirror").val() !== "none" && $("#Mirror").val() !== "onlyPlay",
+			objectFit: "cover",
+		})
+		$("#localVideo").show()
+		return true
 	} catch (err) {
-		return false;
+		return false
 	}
 }
 
 async function stopPublishingStream(streamId) {
-	zg.stopPublishingStream(streamId);
-	if (remoteStream && $('#PublishID').val() === $('#PlayID').val()) {
-		stopPlayingStream(streamId);
+	zg.stopPublishingStream(streamId)
+	if (remoteStream && $("#PublishID").val() === $("#PlayID").val()) {
+		stopPlayingStream(streamId)
 	}
-	destroyStream('publish');
+	destroyStream("publish")
 }
 
 async function startPlayingStream(streamId, options = {}) {
 	try {
-		remoteStream = await zg.startPlayingStream(streamId, options);
-		
+		remoteStream = await zg.startPlayingStream(streamId, options)
+
 		if (zg.getVersion() < "2.17.0") {
-			$('#playVideo').srcObject = remoteStream;
-			$('#playVideo').show()
-			$('#remoteVideo').hide()
+			$("#playVideo").srcObject = remoteStream
+			$("#playVideo").show()
+			$("#remoteVideo").hide()
 		} else {
-			const remoteView = zg.createRemoteStreamView(remoteStream);
+			const remoteView = zg.createRemoteStreamView(remoteStream)
 			remoteView.play("remoteVideo", {
-				objectFit: "cover"
+				mirror: $("#Mirror").val() !== "none" && $("#Mirror").val() !== "onlyPreview",
+				objectFit: "cover",
 			})
-			$('#playVideo').hide()
-			$('#remoteVideo').show()
+			$("#playVideo").hide()
+			$("#remoteVideo").show()
 		}
-		return true;
+		return true
 	} catch (err) {
-		return false;
+		return false
 	}
 }
 

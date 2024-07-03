@@ -252,46 +252,47 @@ function logoutRoom(roomId) {
 
 async function startPublishingStream(streamId, config) {
 	try {
-		localStream = await zg.createZegoStream(config);
-		zg.startPublishingStream(streamId, localStream, { videoCodec });
+		localStream = await zg.createZegoStream(config)
+		zg.startPublishingStream(streamId, localStream, { videoCodec })
 
-		localStream.playVideo($('#localVideo')[0], {
-			mirror: true,
-			objectFit: "cover"
+		localStream.playVideo($("#localVideo")[0], {
+			mirror: $("#Mirror").val() !== "none" && $("#Mirror").val() !== "onlyPlay",
+			objectFit: "cover",
 		})
 
-		$('#localVideo').show()
-		return true;
+		$("#localVideo").show()
+		return true
 	} catch (err) {
-		return false;
+		return false
 	}
 }
 
 async function stopPublishingStream(streamId) {
-	zg.stopPublishingStream(streamId);
-	destroyStream();
+	zg.stopPublishingStream(streamId)
+	destroyStream()
 }
 
 async function startPlayingMultipleStream(streamId, options = {}) {
 	try {
-		const remoteStream = await zg.startPlayingStream(streamId, options);
+		const remoteStream = await zg.startPlayingStream(streamId, options)
 		if (zg.getVersion() < "2.17.0") {
-			$(`[data-id=${streamId}] .playVideo`)[0].srcObject = remoteStream;
+			$(`[data-id=${streamId}] .playVideo`)[0].srcObject = remoteStream
 			$(`[data-id=${streamId}] .playVideo`).show()
 			$(`#v-${streamId}`).hide()
 		} else {
-			const remoteView = zg.createRemoteStreamView(remoteStream);
+			const remoteView = zg.createRemoteStreamView(remoteStream)
 			remoteView.play(`v-${streamId}`, {
-				objectFit: "cover"
+				mirror: $("#Mirror").val() !== "none" && $("#Mirror").val() !== "onlyPreview",
+				objectFit: "cover",
 			})
 			$(`[data-id=${streamId}] .playVideo`).hide()
 			$(`#v-${streamId}`).show()
 		}
 		// $(`[data-id=${streamId}] video`)[0].srcObject = stream;
-		return true;
+		return true
 	} catch (err) {
-		console.error('startPlayingStream', err);
-		return false;
+		console.error("startPlayingStream", err)
+		return false
 	}
 }
 

@@ -125,10 +125,10 @@ $(function () {
                 try {
                     this.localStream = await this.zg.createZegoStream(config);
                     this.zg.startPublishingStream(streamId, this.localStream, { videoCodec: this.videoCodec });
-                    this.localStream.playVideo($('#localVideo')[0], {
-                        mirror: true,
-                        objectFit: "cover"
-                    })
+                    this.localStream.playVideo($("#localVideo")[0], {
+						mirror: $("#Mirror").val() !== "none" && $("#Mirror").val() !== "onlyPlay",
+						objectFit: "cover",
+					})
                     $('#localVideo').show()
                     return true;
                 } catch (err) {
@@ -145,8 +145,9 @@ $(function () {
                     } else {
                         const remoteView = this.zg.createRemoteStreamView(this.remoteStream);
                         remoteView.play("remoteVideo", {
-                            objectFit: "cover"
-                        })
+							mirror: $("#Mirror").val() !== "none" && $("#Mirror").val() !== "onlyPreview",
+							objectFit: "cover",
+						})
                     }
                     return true;
                 } catch (err) {

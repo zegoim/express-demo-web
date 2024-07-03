@@ -136,8 +136,8 @@ async function startPublishingStream(streamId, config) {
 		localStream = await zg.createZegoStream(config);
 		zg.startPublishingStream(streamId, localStream, { videoCodec });
 
-		localStream.playVideo($('#localVideo')[0], {
-			mirror: true,
+		localStream.playVideo($("#localVideo")[0], {
+			mirror: $("#Mirror").val() !== "none" && $("#Mirror").val() !== "onlyPlay",
 			objectFit: "cover",
 		})
 		$('#localVideo').show()
@@ -159,7 +159,8 @@ async function startPlayingStream(streamId, options = {}) {
 		} else {
 			const remoteView = zg.createRemoteStreamView(remoteStream);
 			remoteView.play("remoteVideo", {
-				objectFit: "cover"
+				mirror: $("#Mirror").val() !== "none" && $("#Mirror").val() !== "onlyPreview",
+				objectFit: "cover",
 			})
 			$('#playVideo').hide()
 			$('#remoteVideo').show()

@@ -245,41 +245,40 @@ async function setBeautyEffect(enable) {
 $('#LoginRoom').on(
 	'click',
 	util.throttle(async function () {
-
-		// const userID = $('#UserID').val();
-		// const id = $('#RoomID').val();
-		// const token = $('#Token').val();
-		const userID = '6680'
-		const id = '335'
-		const token = '04AAAAAGUk7xQAEHMwZ2xydGoxaHR5MG5odWgAwGSB7mxkZtyZp0eedqfrHTyutE8bakszFTn77+bvzvUYjUdMeXwdRt/8Q4C03pRe+0ZwvcG9x1vn9H4MXnv7hz43gibSUA82GipheGxI+V35zr3UKIvy+yNJ0QUwO6Oy1i+arKwY3HGooTOm2DM1SFjuKIFZYB3wXH/dLtkmkLjfYjSqWDvm8cZtUY863t6idk4DW6YI2/akDJ5203NeZmX1+ZqAL6dTuJMmo1coOt7jVNcaX2+V86c7QJlhFVqC/w=='
+		const userID = $("#UserID").val()
+		const id = $("#RoomID").val()
+		const token = $("#Token").val()
+		// const userID = '6680'
+		// const id = '335'
+		// const token = '04AAAAAGUk7xQAEHMwZ2xydGoxaHR5MG5odWgAwGSB7mxkZtyZp0eedqfrHTyutE8bakszFTn77+bvzvUYjUdMeXwdRt/8Q4C03pRe+0ZwvcG9x1vn9H4MXnv7hz43gibSUA82GipheGxI+V35zr3UKIvy+yNJ0QUwO6Oy1i+arKwY3HGooTOm2DM1SFjuKIFZYB3wXH/dLtkmkLjfYjSqWDvm8cZtUY863t6idk4DW6YI2/akDJ5203NeZmX1+ZqAL6dTuJMmo1coOt7jVNcaX2+V86c7QJlhFVqC/w=='
 		$("#roomInfo-id").text(id)
 
-		if (!userID) return alert('userID is Empty');
-		if (!id) return alert('RoomID is Empty');
-		this.classList.add('border-primary');
+		if (!userID) return alert("userID is Empty")
+		if (!id) return alert("RoomID is Empty")
+		this.classList.add("border-primary")
 		if (!isLogin) {
 			try {
 				isLogin = true
 				await loginRoom(id, userID, userID, token)
-				updateButton(this, 'Login Room', 'Logout Room');
-				$('#UserID')[0].disabled = true;
-				$('#RoomID')[0].disabled = true;
-				$('#LoginRoom').hide()
+				updateButton(this, "Login Room", "Logout Room")
+				$("#UserID")[0].disabled = true
+				$("#RoomID")[0].disabled = true
+				$("#LoginRoom").hide()
 			} catch (err) {
-				isLogin = false;
-				this.classList.remove('border-primary');
-				this.classList.add('border-error');
-				this.innerText = 'Login Fail Try Again';
+				isLogin = false
+				this.classList.remove("border-primary")
+				this.classList.add("border-error")
+				this.innerText = "Login Fail Try Again"
 			}
 		} else {
 			if (localStream) {
-				updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
+				updateButton($("#startPublishing")[0], "Start Publishing", "Stop Publishing")
 			}
-			isLogin = false;
-			logoutRoom(id);
-			updateButton(this, 'Login Room', 'Logout Room');
-			$('#UserID')[0].disabled = false;
-			$('#RoomID')[0].disabled = false;
+			isLogin = false
+			logoutRoom(id)
+			updateButton(this, "Login Room", "Logout Room")
+			$("#UserID")[0].disabled = false
+			$("#RoomID")[0].disabled = false
 		}
 	}, 500)
 );

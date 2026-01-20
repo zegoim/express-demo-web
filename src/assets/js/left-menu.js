@@ -106,6 +106,12 @@ const menu = `
         <a href="${baseURL}/Others/NetworkDetection/index.html" class="waves-effect" data-lang="NetworkDetection">网络检测</a>
       </li>
       <li>
+        <a href="${baseURL}/Others/WebrtcCheck/index.html" class="waves-effect" data-lang="WebrtcCheck">兼容性检测</a>
+      </li>
+      <li>
+        <a href="${baseURL}/Others/AssistDev/index.html" class="waves-effect" data-lang="AssistDev">视频播放调试示例</a>
+      </li>
+      <li>
         <a href="${baseURL}/Others/StreamMixing/index.html" class="waves-effect" data-lang="StreamMixing">混流</a>
       </li>
       <li>

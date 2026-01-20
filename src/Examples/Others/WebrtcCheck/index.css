@@ -1,0 +1,39 @@
+p {
+  font-size: 14px;
+  margin-bottom: 0;
+}
+.jumbotron-new {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.jumbotron-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-heading {
+  padding: 8px 15px;
+  border-bottom: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-color: #337ab7;
+  background-color: rgb(52, 126, 246);
+}
+.panel-heading > h4 {
+  color: #fff !important;
+  font-size: 14px !important;
+  margin-bottom: 0;
+}
+
+.panel-body {
+  box-sizing: border-box;
+  padding: 15px;
+  overflow: hidden;
+}
+.panel-body .alert {
+  font-size: 14px;
+  margin-bottom: 0;
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang="CommonUsage">WebrtcCheck</title>
+    <link rel="icon" href="../../../../favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../../assets/css/style.css">
+    <link rel="stylesheet" href="./index.css">
+    <script src="../../../assets/js/express_sdk/ZegoExpressWebRTC.js"></script>
+</head>
+
+<body class="fix-sidebar card-no-border">
+    <div class="preloader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+        </svg>
+    </div>
+    <div class="container main-wrapper">
+        <div class="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 col-lg-12 preview-wrapper">
+                        <div class="jumbotron jumbotron-new">
+                            <div class="jumbotron-title">
+                                <h2 style="display:inline-block"><img src="https://www.zego.im/favicon.ico?t=201706023"
+                                        alt="" style="margin-right:10px">webrtc测试</h2>
+                                <button class="btn btn-success" id="startTest" title="startTest()"
+                                    style="background-color:#347ef6">开始测试</button>
+                            </div>
+                            <p class="lead">测试浏览器是否支持webrtc</p>
+                        </div>
+                        <div class="panel panel-primary panel-new">
+                            <div class="panel-heading">
+                                <h4>webRTC <span class="webrtcState"></span></h4>
+                            </div>
+                            <div id="webrtc" class="panel-body"></div>
+                        </div>
+
+                        <div class="panel panel-primary panel-new">
+                            <div class="panel-heading" style="background-color:#347ef6">
+                                <h4>获取设备 <span class="webrtcState"></span></span></h4>
+                            </div>
+                            <div id="capture" class="panel-body"></div>
+                        </div>
+
+                        <div class="panel panel-primary panel-new">
+                            <div class="panel-heading" style="background-color:#347ef6">
+                                <h4>H264编码 <span class="webrtcState"></span></span></h4>
+                            </div>
+                            <div id="H264State" class="panel-body"></div>
+                        </div>
+
+                        <div class="panel panel-primary panel-new">
+                            <div class="panel-heading" style="background-color:#347ef6">
+                                <h4>H265编码 <span class="webrtcState"></span></span></h4>
+                            </div>
+                            <div id="H265State" class="panel-body"></div>
+                        </div>
+
+                        <div class="panel panel-primary panel-new">
+                            <div class="panel-heading" style="background-color:#347ef6">
+                                <h4>VP8编码 <span class="webrtcState"></span></span></h4>
+                            </div>
+                            <div id="VP8State" class="panel-body"></div>
+                        </div>
+
+                        <div class="panel panel-primary panel-new">
+                            <div class="panel-heading" style="background-color:#347ef6">
+                                <h4>音频输入 <span id="audioinputState"></span></h4>
+                            </div>
+                            <div class="panel-body">
+                                <div id="audioinputInfos"></div>
+                                <div class="progress" id="soundProgress" style="display: none;">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                                        aria-valuemax="100" style="width: 0%">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary panel-new">
+                            <div class="panel-heading" style="background-color:#347ef6">
+                                <h4>音频输出 <span id="audiooutputState"></span></h4>
+                            </div>
+                            <div class="panel-body">
+                                <audio controls>
+                                    <source
+                                        src="http://zego-public.oss-cn-shanghai.aliyuncs.com/sdk-doc/assets/bike.mp3">
+                                </audio>
+                                <p id="audiooutputInfos"></p>
+                            </div>
+                        </div>
+                        <div class="panel panel-primary panel-new">
+                            <div class="panel-heading" style="background-color:#347ef6">
+                                <h4>视频输入 <span id="videoinputState"></span></h4>
+                            </div>
+                            <div id="videoinputInfos" class="panel-body"></div>
+                        </div>
+                        <div class="panel panel-primary panel-new">
+                            <div class="panel-heading" style="background-color:#347ef6">
+                                <h4>分辨率检测 <span id="resolutionState"></span></h4>
+                            </div>
+                            <div id="resolutionList" class="panel-body"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../../assets/js/left-menu.js"></script>
+    <script src="../../../assets/js/jquery.min.js"></script>
+    <script src="../../../assets/js/jquery.i18n.properties.min.js"></script>
+    <script src="../../../assets/js/metisMenu.min.js"></script>
+    <script src="../../../assets/js/jquery.slimscroll.min.js"></script>
+    <script src="../../../assets/js/bootstrap.min.js"></script>
+    <script src="../../../assets/js/vconsole.min.js"></script>
+    <script src="../../../assets/js/custom.js"></script>
+    <script src="../../../KeyCenter.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>

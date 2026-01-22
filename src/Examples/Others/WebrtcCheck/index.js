@@ -1,6 +1,7 @@
 // ==============================================================
 // This part of the code defines the default values and global values
 // ==============================================================
+let test_appID = 1739272706; // test appID
 let webRTC = false;
 let capture = false;
 let H264State = false;
@@ -9,7 +10,6 @@ let VP8State = false;
 let localStream = null;
 let isAudioInput = false;
 let isVideoInput = false;
-let isSound = false;
 let audioinputInfos = '';
 let videoinputInfos = '';
 let audiooutputInfos = '';
@@ -29,7 +29,7 @@ const resolutionList=[
 // This part of the code uses the SDK
 // ==============================================================
 function createZegoExpressEngine() {
-    zg = new ZegoExpressEngine(appID, server);
+    zg = new ZegoExpressEngine(test_appID, server);
     window.zg = zg;
 }
 createZegoExpressEngine()
@@ -49,7 +49,7 @@ function setLogConfig() {
 setLogConfig()
 
 function checkDeviceSupport() {
-  zg.enumDevices().then(devices => {
+  return zg.enumDevices().then(devices => {
     if (devices.cameras.length) {
       videoinputInfos = devices.cameras.map(i => i.deviceName).join(' ')
       isVideoInput = true;
@@ -63,7 +63,6 @@ function checkDeviceSupport() {
     if (devices.speakers.length) {
       audiooutputInfos = devices.speakers.map(i => i.deviceName).join(' ')
     }
-    render()
   });
 }
 
@@ -84,7 +83,6 @@ async function resolutionDetection(camera) {
 async function checkResolution() {
   render();
   for (let i = 0; i < resolutionList.length; i++) {
-    localStream && zg.destroyStream(localStream);
     const config = {
       ...resolutionList[i],
       videoQuality: 4,
@@ -92,51 +90,13 @@ async function checkResolution() {
       bitRate: 800
     };
     const supported = await resolutionDetection(config);
+    localStream && zg.destroyStream(localStream);
     resolutionList[i].resolutionState = supported ? '支持' : '不支持';
     render();
   }
 }
-
 // uses SDK end
 
-// Check microphone sound level
-function checkMicrophoneSound() {
-  window.AudioContext =
-    window.AudioContext || window.webkitAudioContext || mozAudioContext;
-  navigator.getUserMedia =
-    navigator.getUserMedia ||
-    navigator.webkitGetUserMedia ||
-    navigator.mozGetUserMedia;
-  if (!window.AudioContext || !navigator.getUserMedia) return;
-  let context = new AudioContext();
-  let script = context.createScriptProcessor(2048, 1, 1);
-
-  navigator.getUserMedia(
-    {
-      audio: true
-    },
-    (stream) => {
-      let audioinput = context.createMediaStreamSource(stream);
-      audioinput.connect(script);
-      script.connect(context.destination);
-      isSound = true;
-      render()
-    }
-  );
-
-  script.onaudioprocess = (event) => {
-    let input = event.inputBuffer.getChannelData(0);
-    let instant = 0.0;
-    let sum = 0.0;
-    for (let i = 0; i < input.length; ++i) {
-      sum += input[i] * input[i];
-    }
-    instant = Math.sqrt(sum / input.length);
-    const sounder = instant * 100;
-    $("#soundProgress .progress-bar").attr('aria-valuenow', sounder).css('width', sounder * 4 + '%');
-  };
-}
-// tool end
 
 // ==============================================================
 // This part of the code renders the WebRTC capability check results
@@ -160,9 +120,6 @@ function render() {
     let audioInputContent = _h(isAudioInput,'检测到音频输入设备！！！','未检测到音频输入设备！！！')
     isAudioInput && (audioInputContent+=audioinputInfos);
     $("#audioinputInfos").html(audioInputContent)
-    if(isSound){
-      $("#soundProgress").show()
-    }
   }
   
   $("#audiooutputInfos").html(audiooutputInfos)
@@ -201,13 +158,12 @@ function startTest() {
       $('.webrtcState').text('检测完成');
       $('#audioinputState').text('正在检测...');
       $('#videoinputState').text('正在检测...');
-      setTimeout(() => {
-        checkDeviceSupport();
-        checkMicrophoneSound();
+      setTimeout(async () => {
+        await checkDeviceSupport();
         $('#audioinputState').text('检测完成');
         $('#videoinputState').text('检测完成');
         $('#resolutionState').text('正在检测...');
-        
+        render()
         setTimeout(() => {
           checkResolution();
           $('#resolutionState').text('检测完成');

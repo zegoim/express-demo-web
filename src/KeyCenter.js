@@ -16,9 +16,11 @@ if (!appID) {
     localStorage.removeItem("app_info")
   }
   if (!appInfo.appID) {
-    localStorage.setItem('lastPage',`${location.pathname}${location.search}`)
-    alert("Need to set appID!")
-    window.location.href = `${baseURL}/DebugAndConfig/InitSettings/index.html${location.search}`
+    if(!location.pathname.includes("WebrtcCheck")){
+      localStorage.setItem('lastPage',`${location.pathname}${location.search}`)
+      alert("Need to set appID!")
+      window.location.href = `${baseURL}/DebugAndConfig/InitSettings/index.html${location.search}`
+    }
   }
 } else {
   localStorage.setItem("app_info", JSON.stringify({

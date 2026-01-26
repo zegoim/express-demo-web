@@ -5,9 +5,9 @@ var baseURL = window.location.href.match(/.*\/Examples/)[0]
 // get local appID and server
 let appInfo = {
   appID,
-  server
+  server: server || ""
 }
-if (!appID || !server) {
+if (!appID) {
   try {
     const appInfoStr = localStorage.getItem("app_info")
     const parseAppInfo = JSON.parse(appInfoStr)
@@ -15,9 +15,12 @@ if (!appID || !server) {
   } catch (error) {
     localStorage.removeItem("app_info")
   }
-  if (!appInfo.appID || !appInfo.server) {
-    alert("Need to set appID and server url!")
-    window.location.href = `${baseURL}/DebugAndConfig/InitSettings/index.html${location.search}`
+  if (!appInfo.appID) {
+    if(!location.pathname.includes("WebrtcCheck")){
+      localStorage.setItem('lastPage',`${location.pathname}${location.search}`)
+      alert("Need to set appID!")
+      window.location.href = `${baseURL}/DebugAndConfig/InitSettings/index.html${location.search}`
+    }
   }
 } else {
   localStorage.setItem("app_info", JSON.stringify({

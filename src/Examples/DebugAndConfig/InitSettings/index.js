@@ -17,7 +17,7 @@ if (!appID || !server) {
   }))
 }
 appID = appInfo.appID;
-server = appInfo.server;
+server = appInfo.server || "";
 
 $("#AppID").val(appID)
 $("#Server").val(server)
@@ -25,9 +25,6 @@ $("#Server").val(server)
 function setAppIDAndServer(newAppID, newServer) {
   if (isNaN(newAppID)) {
     alert("AppID is wrong")
-    return false
-  } else if (!newServer) {
-    alert("Server is wrong")
     return false
   } else {
     appID = newAppID
@@ -48,7 +45,12 @@ $("#submit").click(() => {
     const isLink = confirm("Set successfully! Link to function page.")
     var baseURL = window.location.href.match(/.*\/Examples/)[0]
     if(isLink) {
-      window.location.href = `${baseURL}/QuickStart/VideoTalk/index.html${location.search}`
+      const lastPage  = localStorage.getItem('lastPage')
+      if(lastPage){
+        window.location.href = lastPage
+      }else{
+        window.location.href = `${baseURL}/QuickStart/VideoTalk/index.html${location.search}`
+      }
     }
   }
 })

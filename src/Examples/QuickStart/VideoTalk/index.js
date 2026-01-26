@@ -221,10 +221,8 @@ $('#LoginRoom').on(
 
         userID = $('#UserID').val();
         const id = $('#RoomID').val();
-        const streamID = $('#PublishID').val()
         if (!userID) return alert('userID is Empty');
         if (!id) return alert('RoomID is Empty');
-        if (!streamID) return alert('StreamID is Empty');
 
 
         this.classList.add('border-primary');
@@ -235,9 +233,6 @@ $('#LoginRoom').on(
                 updateButton(this, 'Login Room', 'Logout Room');
                 $('#UserID')[0].disabled = true;
                 $('#RoomID')[0].disabled = true;
-                const flag = await startPublishingStream(streamID, {});
-                published = true;
-                $('#PublishID')[0].disabled = true;
             } catch (err) {
                 isLogin = false;
                 this.classList.remove('border-primary');
@@ -248,6 +243,7 @@ $('#LoginRoom').on(
         } else {
             if (localStream) {
                 $('#PublishID')[0].disabled = false;
+                updateButton($('#startPublishing')[0], 'Start Publishing', 'Stop Publishing');
             }
             isLogin = false;
             logoutRoom(id);
@@ -259,6 +255,34 @@ $('#LoginRoom').on(
             published = false;
         }
     }, 500)
+);
+
+$('#startPublishing').on(
+	'click',
+	util.throttle(async function () {
+		if (!isLogin) return alert('should login room');
+
+		const id = $('#PublishID').val();
+		if (!id) return alert('StreamID is Empty');
+		this.classList.add('border-primary');
+		if (!published) {
+			const flag = await startPublishingStream(streamID,{});
+			if (flag) {
+				updateButton(this, 'Start Publishing', 'Stop Publishing');
+				published = true;
+				$('#PublishID')[0].disabled = true;
+			} else {
+				this.classList.remove('border-primary');
+				this.classList.add('border-error');
+				this.innerText = 'Publishing Fail Try Again';
+			}
+		} else {
+			stopPublishingStream($('#PublishID').val());
+			updateButton(this, 'Start Publishing', 'Stop Publishing');
+			published = false;
+			$('#PublishID')[0].disabled = false;
+		}
+	}, 800)
 );
 
 

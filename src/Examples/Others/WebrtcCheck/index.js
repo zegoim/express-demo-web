@@ -91,7 +91,7 @@ async function checkResolution() {
     };
     const supported = await resolutionDetection(config);
     localStream && zg.destroyStream(localStream);
-    resolutionList[i].resolutionState = supported ? '支持' : '不支持';
+    resolutionList[i].resolutionState = supported ? $.i18n.map['resolution.supported'] : $.i18n.map['resolution.unsupported'];
     render();
   }
 }
@@ -105,32 +105,32 @@ function render() {
   function _h(state,suc,err){
     return state ? `<div class="alert alert-success">${suc}</div>` : `<div class="alert alert-danger">${err}</div>`
   }
-  $("#webrtc").html(_h(webRTC,'当前浏览器支持webrtc！！！','当前浏览器暂不支持webrtc！！！'))
-  $("#capture").html(_h(capture,'当前浏览器支持获取设备！！！','当前浏览器不支持获取设备！！！'))
-  $("#H264State").html(_h(H264State,'当前浏览器支持H264编码！！！','当前浏览器不支持H264编码！！！'))
-  $("#H265State").html(_h(H265State,'当前浏览器支持H265编码！！！','当前浏览器不支持H265编码！！！'))
-  $("#VP8State").html(_h(VP8State,'当前浏览器支持VP8编码！！！','当前浏览器暂不支持VP8编码！！！'))
-  if($('#videoinputState').text() === "检测完成"){
-    let videoInputContent = _h(isVideoInput,'检测到视频输入设备！！！','未检测到视频输入设备！！！')
+  $("#webrtc").html(_h(webRTC,$.i18n.map['webrtc.support.yes'],$.i18n.map['webrtc.support.no']))
+  $("#capture").html(_h(capture,$.i18n.map['device.capture.yes'],$.i18n.map['device.capture.no']))
+  $("#H264State").html(_h(H264State,$.i18n.map['codec.h264.yes'],$.i18n.map['codec.h264.no']))
+  $("#H265State").html(_h(H265State,$.i18n.map['codec.h265.yes'],$.i18n.map['codec.h265.no']))
+  $("#VP8State").html(_h(VP8State,$.i18n.map['codec.vp8.yes'],$.i18n.map['codec.vp8.no']))
+  if($('#videoinputState').text() === $.i18n.map['DetectionComplete']){
+    let videoInputContent = _h(isVideoInput,$.i18n.map['device.video.yes'],$.i18n.map['device.video.no'])
     isVideoInput && (videoInputContent+=videoinputInfos);
     $("#videoinputInfos").html(videoInputContent)
   }
   
-  if($('#audioinputState').text() === "检测完成"){
-    let audioInputContent = _h(isAudioInput,'检测到音频输入设备！！！','未检测到音频输入设备！！！')
+  if($('#audioinputState').text() === $.i18n.map['DetectionComplete']){
+    let audioInputContent = _h(isAudioInput,$.i18n.map['device.audio.yes'],$.i18n.map['device.audio.no'])
     isAudioInput && (audioInputContent+=audioinputInfos);
     $("#audioinputInfos").html(audioInputContent)
   }
   
   $("#audiooutputInfos").html(audiooutputInfos)
 
-  if($('#resolutionState').text() === "检测完成"){
+  if($('#resolutionState').text() === $.i18n.map['DetectionComplete']){
     $('#resolutionList').empty();
     resolutionList.forEach(item => {
       $('#resolutionList').append(
         `<p>
           ${item.width}x${item.height}：
-          <span>${item.resolutionState || '待检测'}</span>
+          <span>${item.resolutionState || $.i18n.map['resolution.pending']}</span>
         </p>`
       );
     });
@@ -142,8 +142,8 @@ function render() {
 // This part of the code binds the button click event
 // ==============================================================
 function startTest() {
-  $('.webrtcState').text('正在检测...');
-
+  $('.webrtcState').text($.i18n.map['Detecting']);
+  
   zg.checkSystemRequirements()
     .then(result => {
       webRTC = result.webRTC;
@@ -155,18 +155,18 @@ function startTest() {
     .catch(console.error);
     setTimeout(() => {
       render()
-      $('.webrtcState').text('检测完成');
-      $('#audioinputState').text('正在检测...');
-      $('#videoinputState').text('正在检测...');
+      $('.webrtcState').text($.i18n.map['DetectionComplete']);
+      $('#audioinputState').text($.i18n.map['Detecting']);
+      $('#videoinputState').text($.i18n.map['Detecting']);
       setTimeout(async () => {
         await checkDeviceSupport();
-        $('#audioinputState').text('检测完成');
-        $('#videoinputState').text('检测完成');
-        $('#resolutionState').text('正在检测...');
+        $('#audioinputState').text($.i18n.map['DetectionComplete']);
+        $('#videoinputState').text($.i18n.map['DetectionComplete']);
+        $('#resolutionState').text($.i18n.map['Detecting']);
         render()
         setTimeout(() => {
           checkResolution();
-          $('#resolutionState').text('检测完成');
+          $('#resolutionState').text($.i18n.map['DetectionComplete']);
         }, 2500);
       }, 2500);
     }, 2500);

@@ -14,14 +14,14 @@ let audioinputInfos = '';
 let videoinputInfos = '';
 let audiooutputInfos = '';
 const resolutionList=[
-  { width: 180, height: 320, resolutionState: '' },
-  { width: 240, height: 320, resolutionState: '' },
-  { width: 264, height: 480, resolutionState: '' },
-  { width: 360, height: 640, resolutionState: '' },
-  { width: 480, height: 640, resolutionState: '' },
-  { width: 540, height: 960, resolutionState: '' },
-  { width: 720, height: 1280, resolutionState: '' },
-  { width: 1080, height: 1920, resolutionState: '' }
+  { height: 180, width: 320, resolutionState: '' },
+  { height: 240, width: 320, resolutionState: '' },
+  { height: 264, width: 480, resolutionState: '' },
+  { height: 360, width: 640, resolutionState: '' },
+  { height: 480, width: 640, resolutionState: '' },
+  { height: 540, width: 960, resolutionState: '' },
+  { height: 720, width: 1280, resolutionState: '' },
+  { height: 1080, width: 1920, resolutionState: '' }
 ]
 // part end
 
